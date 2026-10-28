@@ -1,0 +1,7 @@
+# 行尾统一在仓库里存 LF
+* text=auto eol=lf
+
+# 二进制，别做任何转换（gz 一旦被当文本做行尾转换就会损坏）
+*.gz binary
+*.png binary
+*.ico binary

@@ -1,0 +1,29 @@
+# 构建产物
+target/
+*.class
+
+# 本地工具（体积大，不进仓库）
+tools/apache-maven-*/
+
+# 生成的 SQL（由 tools/export-dict-sql.js 从 dict/ecdict.json.gz 生成）
+sql/dict-data.sql
+
+# 运行时
+*.log
+run.log
+run.err.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# 系统
+Thumbs.db
+.DS_Store
+
+# 本地配置（含数据库密码、OCR AK/SK，绝不入库）
+src/main/resources/application-local.yml

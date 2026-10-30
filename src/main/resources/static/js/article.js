@@ -334,9 +334,9 @@
     if (e.ctrlKey || e.altKey || e.metaKey) return;
 
     if (e.key >= '1' && e.key <= '4') {
-      const qs = body.querySelectorAll('.q');
-      const cur = [...qs].find((q) => !q.dataset.answered);
-      const opt = cur && cur.querySelectorAll('.opt')[Number(e.key) - 1];
+      const qs = [...body.querySelectorAll('.q')];
+      const cur = qs.find((q) => !q.classList.contains('done'));
+      const opt = cur && cur.querySelectorAll('.q-opt')[Number(e.key) - 1];
       if (opt) {
         opt.click();
         e.preventDefault();

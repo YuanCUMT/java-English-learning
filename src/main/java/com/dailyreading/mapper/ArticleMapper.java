@@ -40,6 +40,13 @@ public interface ArticleMapper {
             """)
     List<Article> listByUser(@Param("userId") Long userId);
 
+    @Select("""
+            SELECT id, user_id, article_date, mode, title, subtitle, gist, difficulty, word_count, content, created_at
+              FROM articles
+             WHERE id = #{id} AND user_id = #{userId}
+            """)
+    Article findById(@Param("id") Long id, @Param("userId") Long userId);
+
     @Insert("""
             INSERT INTO articles (user_id, article_date, mode, title, subtitle, gist, difficulty, word_count, content)
             VALUES (#{userId}, #{articleDate}, #{mode}, #{title}, #{subtitle}, #{gist}, #{difficulty}, #{wordCount}, #{content})

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>历史文章 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/workspace.css}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap inner">
+    <div class="brand">
+      <span class="mark">D/R</span>
+      <span>每日阅读</span>
+    </div>
+    <nav>
+      <a th:href="@{/}">今日文章</a>
+      <a class="active" th:href="@{/archive}">历史文章</a>
+      <a th:href="@{/vocab}">单词本</a>
+      <span th:text="${username}">用户</span>
+      <a th:href="@{/logout}">退出</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Archive / 历史</div>
+    <h1>读过的那些篇。</h1>
+    <p>按日期倒序。点开任意一篇都能重新读，查词、收藏照旧。</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div class="panel-code">01 / archive</div>
+      <h2>共 <span th:text="${#lists.size(articles)}">0</span> 篇</h2>
+    </div>
+
+    <p class="empty-hint" th:if="${#lists.isEmpty(articles)}">
+      还没有历史文章。回到「今日文章」生成一篇，这里就会出现。
+    </p>
+
+    <div class="archive-grid" th:unless="${#lists.isEmpty(articles)}">
+      <a class="archive-card" th:each="a : ${articles}"
+         th:href="@{'/article/' + ${a.id}}">
+        <div class="ac-top">
+          <span class="ac-date" th:text="${a.articleDate}">2026-01-01</span>
+          <span class="ac-mode" th:text="${a.mode == 'exam' ? '真题模式' : '复习模式'}">复习模式</span>
+        </div>
+        <h3 class="ac-title" th:text="${a.title}">标题</h3>
+        <p class="ac-sub" th:text="${a.subtitle}">副标题</p>
+        <div class="ac-meta">
+          <span th:text="${a.wordCount} + ' 词'">0 词</span>
+          <span th:text="${a.difficulty}">C1</span>
+          <span class="ac-go">打开 →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

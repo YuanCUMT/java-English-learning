@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>单词本 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/workspace.css}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap inner">
+    <div class="brand">
+      <span class="mark">D/R</span>
+      <span>每日阅读</span>
+    </div>
+    <nav>
+      <a th:href="@{/}">今日文章</a>
+      <a th:href="@{/archive}">历史文章</a>
+      <a class="active" th:href="@{/vocab}">单词本</a>
+      <span th:text="${username}">用户</span>
+      <a th:href="@{/logout}">退出</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Vocabulary / 生词本</div>
+    <h1>攒下来的词，分成两摞。</h1>
+    <p>阅读时点词查释义，点「☆ 收藏」收进这里。背下来的点「已掌握」，随时能退回。</p>
+  </section>
+
+  <section class="stats two">
+    <div class="stat">
+      <div class="num" id="statLearning" th:text="${learning}">0</div>
+      <div class="label">生词 · 学习中</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statMastered" th:text="${mastered}">0</div>
+      <div class="label">生词 · 已掌握</div>
+    </div>
+  </section>
+
+  <section class="panel" id="markPanel">
+    <div class="panel-head">
+      <div class="panel-code">01 / marks</div>
+      <h2>我的生词</h2>
+      <div class="panel-tools">
+        <button class="btn ghost" id="btnClearAll" type="button">清空</button>
+      </div>
+    </div>
+    <div id="markList" class="mark-cards">
+      <p class="empty-hint">还没有生词。读文章时点任意单词，点「☆ 收藏」就会出现在这里。</p>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script th:src="@{/js/vocab.js}"></script>
+</body>
+</html>

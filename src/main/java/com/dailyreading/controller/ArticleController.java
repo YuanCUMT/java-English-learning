@@ -7,6 +7,7 @@ import com.dailyreading.service.PromptBuilder;
 import com.dailyreading.service.WordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,13 @@ public class ArticleController {
     public ApiResponse today(@RequestAttribute("userId") Long userId) {
         var r = articleService.findToday(userId);
         if (r == null) return ApiResponse.ok(null);
+        return ApiResponse.ok(withMeta(r));
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse byId(@RequestAttribute("userId") Long userId, @PathVariable Long id) {
+        var r = articleService.findById(userId, id);
+        if (r == null) return ApiResponse.fail(404, "文章不存在");
         return ApiResponse.ok(withMeta(r));
     }
 

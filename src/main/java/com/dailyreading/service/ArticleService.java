@@ -80,6 +80,17 @@ public class ArticleService {
         return new Result(a, toBody(a.getContent()));
     }
 
+    /** 按 id 取一篇（只能取自己的），用于历史文章阅读。 */
+    public Result findById(Long userId, Long id) {
+        Article a = articleMapper.findById(id, userId);
+        if (a == null) return null;
+        return new Result(a, toBody(a.getContent()));
+    }
+
+    public List<Article> list(Long userId) {
+        return articleMapper.listByUser(userId);
+    }
+
     public Map<String, Object> toBody(String content) {
         try {
             return mapper.readValue(content, new TypeReference<Map<String, Object>>() {});

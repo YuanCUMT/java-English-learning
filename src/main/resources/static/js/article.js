@@ -1,0 +1,289 @@
+/* 文章渲染 + 生成 + 点词查释义。原生 JS，没有构建步骤。 */
+(() => {
+  'use strict';
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const box = $('#articleBox');
+  const body = $('#articleBody');
+  const loading = $('#articleLoading');
+  const btnGen = $('#btnGenerate');
+  const toastEl = $('#toast');
+
+  let state = { article: null, showCn: false };
+  let popover = null;
+  let lastSel = '';
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
+  function toast(msg, isError) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.className = 'toast' + (isError ? ' error' : '');
+    toastEl.hidden = false;
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => { toastEl.hidden = true; }, 2600);
+  }
+
+  async function api(url, opts) {
+    const res = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || data.code !== 0) {
+      throw new Error((data && data.message) || `请求失败（HTTP ${res.status}）`);
+    }
+    return data.data;
+  }
+
+  // ---------- 高亮 ----------
+  function targetPattern(words) {
+    const list = (words || [])
+      .map((w) => String(w || '').trim().toLowerCase())
+      .filter((w) => w && /^[a-z][a-z'\- ]*$/.test(w));
+    if (!list.length) return null;
+    // 长的先匹配（短语优先），再加常见的屈折后缀
+    const alts = [...new Set(list)]
+      .sort((a, b) => b.length - a.length)
+      .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+'));
+    return new RegExp(`\\b(${alts.join('|')})(s|es|ed|d|ing)?\\b`, 'gi');
+  }
+
+  function highlight(text, re) {
+    if (!re) return esc(text);
+    let out = '';
+    let last = 0;
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text))) {
+      out += esc(text.slice(last, m.index));
+      out += `<mark class="w" data-w="${esc(m[1].toLowerCase())}">${esc(m[0])}</mark>`;
+      last = m.index + m[0].length;
+    }
+    out += esc(text.slice(last));
+    return out;
+  }
+
+  // ---------- 渲染 ----------
+  function render(article) {
+    state.article = article;
+    if (!article) {
+      box.hidden = false;
+      body.hidden = true;
+      return;
+    }
+    const b = article.body || {};
+    const paras = b.paragraphs || [];
+    const words = b.words || [];
+    const sents = b.sentences || [];
+    const qs = b.questions || [];
+    const re = targetPattern(words.map((w) => w.word));
+
+    const ymd = article.date || '';
+    const html = [];
+    html.push(`<header class="art-head">
+      <h2>${esc(b.title)}</h2>
+      ${b.subtitle ? `<p class="art-sub">${esc(b.subtitle)}</p>` : ''}
+      <div class="art-meta">
+        <span class="pill">${article.mode === 'exam' ? '真题模式' : '复习模式'}</span>
+        <span class="pill">${esc(ymd)}</span>
+        <span class="pill">${esc(article.difficulty || '')}</span>
+        <span class="pill">${paras.length} 段</span>
+        <span class="pill">约 ${article.wordCount || 0} 词</span>
+        <span class="pill">目标词 ${words.length} 个</span>
+      </div>
+      ${b.gist ? `<p class="art-gist">${esc(b.gist)}</p>` : ''}
+      <div class="art-tools">
+        <button class="btn" id="btnCn" type="button">显示中文</button>
+      </div>
+    </header>`);
+
+    html.push('<div class="paras">');
+    paras.forEach((p, i) => {
+      html.push(`<div class="para">
+        <span class="para-no">${String(i + 1).padStart(2, '0')}</span>
+        <div class="para-main">
+          <p class="en">${highlight(p.en || '', re)}</p>
+          <p class="cn" hidden>${esc(p.cn || '')}</p>
+        </div>
+      </div>`);
+    });
+    html.push('</div>');
+
+    if (words.length) {
+      html.push('<section class="art-sec"><h3>今日词汇</h3><div class="vgrid">');
+      words.forEach((w) => {
+        html.push(`<div class="vcard">
+          <div class="vtop"><b>${esc(w.word)}</b>
+            ${w.phonetic ? `<span class="ph">${esc(w.phonetic)}</span>` : ''}
+            ${w.pos ? `<span class="pos">${esc(w.pos)}</span>` : ''}</div>
+          <div class="vcn">${esc(w.cn || '')}</div>
+          ${w.examSense ? `<div class="vsense"><i>常考</i>${esc(w.examSense)}</div>` : ''}
+          ${w.collocation ? `<div class="vcol"><i>搭配</i>${esc(w.collocation)}</div>` : ''}
+          ${w.example ? `<div class="vex">例：${esc(w.example)}</div>` : ''}
+        </div>`);
+      });
+      html.push('</div></section>');
+    }
+
+    if (sents.length) {
+      html.push('<section class="art-sec"><h3>长难句</h3>');
+      sents.forEach((s, i) => {
+        html.push(`<div class="lsent">
+          <p class="ls-en">${esc(s.sent || '')}</p>
+          <p class="ls-st"><i>结构</i>${esc(s.structure || '')}</p>
+          <p class="ls-cn">${esc(s.meaning || '')}</p>
+        </div>`);
+      });
+      html.push('</section>');
+    }
+
+    if (qs.length) {
+      html.push('<section class="art-sec"><h3>理解题</h3><div class="qs">');
+      qs.forEach((q, qi) => {
+        html.push(`<div class="q" data-q="${qi}" data-answer="${esc(q.answer || '')}">
+          <div class="q-head">${q.type ? `<span class="qtype">${esc(q.type)}</span>` : ''}
+            <span class="qtext">${esc(q.q || '')}</span></div>
+          <div class="q-opts">`);
+        (q.options || []).forEach((o) => {
+          const letter = String(o).trim().charAt(0).toUpperCase();
+          html.push(`<button class="q-opt" type="button" data-k="${esc(letter)}">${esc(o)}</button>`);
+        });
+        html.push(`</div>
+          <div class="q-exp" hidden>
+            ${q.locate ? `<p class="q-locate"><i>原文定位</i>${esc(q.locate)}</p>` : ''}
+            <p>${esc(q.explain || '')}</p>
+          </div>
+        </div>`);
+      });
+      html.push('</div></section>');
+    }
+
+    body.innerHTML = html.join('');
+    box.hidden = true;
+    body.hidden = false;
+    bindArticle();
+  }
+
+  function bindArticle() {
+    const btnCn = $('#btnCn');
+    if (btnCn) {
+      btnCn.onclick = () => {
+        state.showCn = !state.showCn;
+        body.querySelectorAll('.para .cn').forEach((el) => { el.hidden = !state.showCn; });
+        btnCn.textContent = state.showCn ? '隐藏中文' : '显示中文';
+        btnCn.classList.toggle('on', state.showCn);
+      };
+    }
+
+    body.querySelectorAll('.q').forEach((q) => {
+      q.querySelectorAll('.q-opt').forEach((btn) => {
+        btn.onclick = () => {
+          if (q.classList.contains('done')) return;
+          q.classList.add('done');
+          const picked = btn.dataset.k;
+          const right = (q.dataset.answer || '').trim().toUpperCase().charAt(0);
+          q.querySelectorAll('.q-opt').forEach((b) => {
+            if (b.dataset.k === right) b.classList.add('right');
+            else if (b === btn) b.classList.add('wrong');
+          });
+          q.querySelector('.q-exp').hidden = false;
+        };
+      });
+    });
+
+    body.querySelectorAll('mark.w').forEach((m) => {
+      m.onclick = (e) => {
+        e.stopPropagation();
+        openWord(e.clientX, e.clientY, m.dataset.w);
+      };
+    });
+  }
+
+  // ---------- 查词浮层 ----------
+  function closePopover() {
+    if (popover) { popover.remove(); popover = null; }
+  }
+
+  function openWord(x, y, word) {
+    closePopover();
+    const el = document.createElement('div');
+    el.className = 'popover';
+    el.innerHTML = `<div class="pop-head"><b>${esc(word)}</b><span class="pop-text">查词中…</span></div>`;
+    document.body.appendChild(el);
+    popover = el;
+    place(el, x, y);
+
+    api('/api/lookup?word=' + encodeURIComponent(word))
+      .then((d) => {
+        const e = d.entry || {};
+        el.innerHTML = `
+          <div class="pop-head">
+            <b>${esc(e.word || word)}</b>
+            ${e.phonetic ? `<span class="ph">${esc(e.phonetic)}</span>` : ''}
+            ${e.pos ? `<span class="pos">${esc(e.pos)}</span>` : ''}
+            <span class="pop-src">${d.source === 'ecdict' ? '本地词典' : 'AI'}</span>
+          </div>
+          <p class="pop-cn">${esc(e.cn || '没有查到释义')}</p>
+          ${e.collocation ? `<p class="pop-col"><i>搭配</i>${esc(e.collocation)}</p>` : ''}
+          ${e.example ? `<p class="pop-ex">例：${esc(e.example)}</p>` : ''}
+          ${e.tags && e.tags.length ? `<div class="pop-tags">${e.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
+        `;
+      })
+      .catch((err) => {
+        el.innerHTML = `<div class="pop-head"><b>${esc(word)}</b></div><p class="pop-cn">${esc(err.message)}</p>`;
+      });
+  }
+
+  function place(el, x, y) {
+    document.body.appendChild(el);
+    const r = el.getBoundingClientRect();
+    let left = x + 12;
+    let top = y + 14;
+    if (left + r.width > window.innerWidth - 12) left = window.innerWidth - r.width - 12;
+    if (top + r.height > window.innerHeight - 12) top = Math.max(12, y - r.height - 12);
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+  }
+
+  document.addEventListener('click', (e) => {
+    if (popover && !popover.contains(e.target) && !e.target.closest('mark.w')) closePopover();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopover(); });
+
+  // ---------- 生成 ----------
+  async function generate() {
+    if (!btnGen) return;
+    btnGen.disabled = true;
+    box.hidden = true;
+    body.hidden = true;
+    loading.hidden = false;
+    $('#articleLoadingHint').textContent = '正在写文章，大约 20–40 秒……';
+    try {
+      const data = await api('/api/articles/generate', {
+        method: 'POST',
+        body: JSON.stringify({ mode: btnGen.dataset.mode || 'review' }),
+      });
+      render(data);
+      toast('文章生成好了');
+    } catch (err) {
+      toast(err.message, true);
+      box.hidden = !!state.article;
+      if (!state.article) box.hidden = false;
+    } finally {
+      loading.hidden = true;
+      btnGen.disabled = false;
+    }
+  }
+
+  if (btnGen) {
+    btnGen.addEventListener('click', (e) => {
+      e.preventDefault();
+      generate();
+    });
+  }
+
+  // 首次加载：拿今天的文章
+  api('/api/articles/today')
+    .then((d) => render(d || null))
+    .catch(() => render(null));
+})();

@@ -10,6 +10,8 @@ server:
         name: DR_SESSION
 
 spring:
+  config:
+    import: optional:classpath:application-local.yml
   application:
     name: daily-reading
   datasource:
@@ -54,3 +56,9 @@ app:
     api-key: ""
     base-url: https://api.deepseek.com
     model: deepseek-chat
+  article:
+    default-mode: review
+    default-difficulty: C1
+    default-paragraphs: 5
+    default-questions: 5
+    exam-word-limit: 15

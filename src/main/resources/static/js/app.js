@@ -108,9 +108,7 @@
     if (file) importImage(file);
     ev.target.value = '';
   });
-  $('#btnGenerate').addEventListener('click', () => {
-    toast('文章生成是 M3 的内容，下一步就做');
-  });
+
 
   load();
 })();

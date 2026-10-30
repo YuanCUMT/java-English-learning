@@ -27,3 +27,8 @@ Thumbs.db
 
 # 本地配置（含数据库密码、OCR AK/SK，绝不入库）
 src/main/resources/application-local.yml
+
+# maven 输出重定向的临时文件
+build-*.txt
+run.log
+run.err.log

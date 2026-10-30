@@ -19,6 +19,7 @@
 
   <properties>
     <java.version>21</java.version>
+    <lombok.version>1.18.34</lombok.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -66,6 +67,27 @@
 
   <build>
     <plugins>
+      <!-- JDK 23 起 javac 默认不再自动跑类路径上的注解处理器，
+           所以 Lombok 必须显式声明成 annotationProcessorPath，
+           否则换台机器用新 JDK 编译会报「找不到符号 getXxx/setXxx」。 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- 这个 JDK 默认不跑类路径上的注解处理器，必须显式打开 -->
+          <proc>full</proc>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

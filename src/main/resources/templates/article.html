@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>阅读 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/workspace.css}">
+</head>
+<body th:attr="data-article-id=${articleId}">
+
+<header class="topbar">
+  <div class="wrap inner">
+    <div class="brand">
+      <span class="mark">D/R</span>
+      <span>每日阅读</span>
+    </div>
+    <nav>
+      <a th:href="@{/}">今日文章</a>
+      <a class="active" th:href="@{/archive}">历史文章</a>
+      <a th:href="@{/vocab}">单词本</a>
+      <span th:text="${username}">用户</span>
+      <a th:href="@{/logout}">退出</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="panel article-panel">
+    <div class="panel-head">
+      <span class="panel-code">02 / article</span>
+      <span class="panel-title">这一篇</span>
+      <span class="spacer"></span>
+      <a class="btn ghost" th:href="@{/archive}">← 回列表</a>
+    </div>
+
+    <div class="article-placeholder" id="articleBox">
+      <p><b>加载中……</b></p>
+    </div>
+
+    <div class="article-body" id="articleBody" hidden></div>
+
+    <div class="article-loading" id="articleLoading" hidden>
+      <div class="dots"><i></i><i></i><i></i></div>
+      <p class="hint" id="articleLoadingHint">正在加载……</p>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+<script th:src="@{/js/article.js}"></script>
+</body>
+</html>

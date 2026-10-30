@@ -93,7 +93,7 @@
       </div>
       ${b.gist ? `<p class="art-gist">${esc(b.gist)}</p>` : ''}
       <div class="art-tools">
-        <button class="btn" id="btnCn" type="button">显示中文</button>
+        <button class="btn ghost" id="btnCn" type="button">显示中文</button>
       </div>
     </header>`);
 
@@ -227,11 +227,57 @@
           ${e.collocation ? `<p class="pop-col"><i>搭配</i>${esc(e.collocation)}</p>` : ''}
           ${e.example ? `<p class="pop-ex">例：${esc(e.example)}</p>` : ''}
           ${e.tags && e.tags.length ? `<div class="pop-tags">${e.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
+          <div class="pop-acts">
+            <button class="btn ghost sm" type="button" data-say>朗读</button>
+            <button class="btn ghost sm" type="button" data-mark>☆ 收藏</button>
+          </div>
         `;
+        el.querySelector('[data-say]').addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          speak(e.word || word);
+        });
+        el.querySelector('[data-mark]').addEventListener('click', async (ev) => {
+          ev.stopPropagation();
+          const btn = ev.currentTarget;
+          btn.disabled = true;
+          try {
+            await api('/api/marks', {
+              method: 'POST',
+              body: JSON.stringify({
+                word: e.word || word,
+                lemma: e.lemma || e.word || word,
+                phonetic: e.phonetic || '',
+                pos: e.pos || '',
+                cn: e.cn || '',
+                examSense: e.examSense || '',
+                collocation: e.collocation || '',
+                example: e.example || '',
+                note: e.note || '',
+                source: d.source === 'model' ? 'model' : 'ecdict',
+              }),
+            });
+            btn.textContent = '已在生词本';
+            toast('已收进生词本');
+          } catch (err) {
+            btn.disabled = false;
+            toast(err.message, true);
+          }
+        });
       })
       .catch((err) => {
         el.innerHTML = `<div class="pop-head"><b>${esc(word)}</b></div><p class="pop-cn">${esc(err.message)}</p>`;
       });
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window)) {
+      toast('这个浏览器不支持朗读', true);
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
   }
 
   function place(el, x, y) {
@@ -282,8 +328,35 @@
     });
   }
 
-  // 首次加载：拿今天的文章
-  api('/api/articles/today')
+  // 快捷键：1–4 选答案，c 切中文，Esc 关浮层（Esc 在别处已绑）
+  document.addEventListener('keydown', (e) => {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+    if (e.key >= '1' && e.key <= '4') {
+      const qs = body.querySelectorAll('.q');
+      const cur = [...qs].find((q) => !q.dataset.answered);
+      const opt = cur && cur.querySelectorAll('.opt')[Number(e.key) - 1];
+      if (opt) {
+        opt.click();
+        e.preventDefault();
+      }
+      return;
+    }
+
+    if (e.key === 'c' || e.key === 'C') {
+      const btnCn = $('#btnCn');
+      if (btnCn) {
+        btnCn.click();
+        e.preventDefault();
+      }
+    }
+  });
+
+  // 首次加载：历史文章读 ?id，首页读今天
+  const articleId = document.body.getAttribute('data-article-id');
+  const url = articleId ? `/api/articles/${articleId}` : '/api/articles/today';
+  api(url)
     .then((d) => render(d || null))
     .catch(() => render(null));
 })();

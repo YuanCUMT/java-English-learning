@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>今天这一篇 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap inner">
+    <div class="brand">
+      <span class="mark">D/R</span>
+      <span>每日阅读</span>
+    </div>
+    <nav>
+      <a class="active" th:href="@{/}">今日文章</a>
+      <a href="/archive">历史文章</a>
+      <a href="/vocab">单词本</a>
+      <span th:text="${username}">用户</span>
+      <a th:href="@{/logout}">退出</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Today / 今天</div>
+    <h1>今天这一篇</h1>
+    <p>把今天背的词读成一篇真题——截图导入、AI 成文、点词即查。</p>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="num" th:text="${todayWords}">0</div>
+      <div class="label">今日单词</div>
+    </div>
+    <div class="stat">
+      <div class="num" th:text="${totalWords}">0</div>
+      <div class="label">累计单词</div>
+    </div>
+    <div class="stat">
+      <div class="num" th:text="${learningMarks}">0</div>
+      <div class="label">生词·学习中</div>
+    </div>
+    <div class="stat">
+      <div class="num" th:text="${articles}">0</div>
+      <div class="label">历史文章</div>
+    </div>
+  </section>
+
+  <div class="card">
+    <p style="margin:0;color:#6f6a63">
+      M2 进行中：登录 / 注册已经能用了，截图识别和文章生成还没接上。
+      现在去 <a href="/vocab">单词本</a> 会看到空页——那是 M3 的内容。
+    </p>
+  </div>
+</main>
+
+</body>
+</html>

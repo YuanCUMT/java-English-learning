@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>注册 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="auth">
+  <div class="eyebrow">Daily Reading</div>
+  <h1>注册</h1>
+  <p class="sub">用户名 3-20 位字母数字下划线，密码至少 6 位。</p>
+
+  <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+  <form method="post" th:action="@{/register}">
+    <div class="field">
+      <label for="username">用户名</label>
+      <input id="username" name="username" type="text" th:value="${username}"
+             autocomplete="username" autofocus required>
+    </div>
+    <div class="field">
+      <label for="password">密码</label>
+      <input id="password" name="password" type="password" autocomplete="new-password" required>
+    </div>
+    <div class="field">
+      <label for="confirm">再输一次密码</label>
+      <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+    </div>
+    <button class="btn" type="submit">注册并登录</button>
+  </form>
+
+  <p class="foot">已经有账号了？<a th:href="@{/login}">去登录</a></p>
+</div>
+</body>
+</html>

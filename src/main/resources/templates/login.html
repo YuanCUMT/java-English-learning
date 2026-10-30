@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="auth">
+  <div class="eyebrow">Daily Reading</div>
+  <h1>登录</h1>
+  <p class="sub">把今天背的单词，读成一篇真题。</p>
+
+  <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+  <form method="post" th:action="@{/login}">
+    <div class="field">
+      <label for="username">用户名</label>
+      <input id="username" name="username" type="text" th:value="${username}"
+             autocomplete="username" autofocus required>
+    </div>
+    <div class="field">
+      <label for="password">密码</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="btn" type="submit">登录</button>
+  </form>
+
+  <p class="foot">还没有账号？<a th:href="@{/register}">注册一个</a></p>
+</div>
+</body>
+</html>

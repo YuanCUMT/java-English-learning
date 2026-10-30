@@ -1,5 +1,13 @@
 server:
   port: 8080
+  servlet:
+    session:
+      # 只用 Cookie 传会话，别把 jsessionid 拼到 URL 上
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        same-site: lax
+        name: DR_SESSION
 
 spring:
   application:

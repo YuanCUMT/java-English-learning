@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>出错了 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="auth">
+  <div class="eyebrow">Oops</div>
+  <h1>出了点问题</h1>
+  <div class="alert" th:text="${error} ?: '未知错误'">未知错误</div>
+  <a class="btn ghost" th:href="@{/}">回首页</a>
+</div>
+</body>
+</html>

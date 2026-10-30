@@ -40,3 +40,17 @@ mybatis:
 logging:
   level:
     com.dailyreading: debug
+
+# 应用自己的配置。
+# 真实 Key 放在 application-local.yml（已在 .gitignore 里），不提交。
+app:
+  ocr:
+    # mock = 不调用任何外部服务，返回 mock-words 里的词，用来跑通链路
+    # baidu = 调用百度云通用文字识别（需要真实 Key）
+    provider: mock
+    mock-words: abandon,procedure,reluctant,cautious,vivid,witness,harvest,modest
+  deepseek:
+    # 留空则无法生成文章；填了就走真实调用
+    api-key: ""
+    base-url: https://api.deepseek.com
+    model: deepseek-chat

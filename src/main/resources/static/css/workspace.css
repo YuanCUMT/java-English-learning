@@ -1,0 +1,136 @@
+/* 今日单词面板 + 文章区（M2-2） */
+.workspace {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  align-items: start;
+  margin-top: 28px;
+}
+
+.panel {
+  border: 1px solid var(--line, #17161a);
+  background: #fff;
+  padding: 0;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line, #17161a);
+}
+
+.panel-code, .panel-title { white-space: nowrap; }
+.panel-code {
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #d0452c;
+  font-weight: 700;
+}
+
+.panel-title { font-weight: 700; font-size: 14px; }
+.panel-title b { margin-left: 4px; }
+.spacer { flex: 1; }
+
+.mini {
+  margin-left: auto;
+  border: 1px solid transparent;
+  background: none;
+  font-size: 12px;
+  color: #6f6a63;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.mini:hover { border-color: var(--line, #17161a); color: #17161a; }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 14px;
+  min-height: 40px;
+}
+
+.chip {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  border: 1px solid var(--line, #17161a);
+  padding: 3px 9px;
+  cursor: pointer;
+  background: #fff;
+}
+.chip:hover { background: #f3efe6; }
+
+.chip.empty { border: none; color: #9b968e; font-family: inherit; cursor: default; }
+
+.import-box {
+  border-top: 1px solid var(--line, #17161a);
+  padding: 12px 14px 14px;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #6f6a63;
+  margin-bottom: 6px;
+}
+
+.import-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--line, #17161a);
+  padding: 8px;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn-row .btn { flex: 1 1 0; }
+
+.btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 14px;
+  /* app.css 里 .btn 是给登录表单用的 width:100%，这里要还原成「按内容宽」 */
+  width: auto;
+  border: 1px solid var(--line, #17161a);
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn.primary { background: var(--ink, #17161a); color: #fff; }
+.btn.primary:disabled { background: #b9b4ac; border-color: #b9b4ac; cursor: not-allowed; }
+.btn.ghost:hover { background: #f3efe6; }
+.file-btn { display: inline-flex; align-items: center; justify-content: center; }
+
+.hint { font-size: 12px; color: #6f6a63; margin: 8px 0 0; }
+
+.article-panel { min-height: 420px; }
+
+.article-placeholder {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6f6a63;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  background: #17161a;
+  color: #fff;
+  padding: 9px 18px;
+  font-size: 13px;
+  z-index: 90;
+}
+.toast.error { background: #a5321c; }
+
+@media (max-width: 860px) {
+  .workspace { grid-template-columns: 1fr; }
+}

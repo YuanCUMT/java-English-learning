@@ -33,6 +33,9 @@ public class WebConfig implements WebMvcConfigurer {
                 throws Exception {
             HttpSession session = request.getSession(false);
             if (session != null && session.getAttribute(AuthController.SESSION_USER_ID) != null) {
+                // 把当前用户塞进 request，控制器用 @RequestAttribute("userId") 取，省得每处都读 session
+                request.setAttribute("userId", session.getAttribute(AuthController.SESSION_USER_ID));
+                request.setAttribute("username", session.getAttribute(AuthController.SESSION_USERNAME));
                 return true;
             }
             // API 请求返回 401，页面请求跳登录

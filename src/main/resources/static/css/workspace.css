@@ -137,7 +137,7 @@
 
 /* ---------------- 文章渲染 ---------------- */
 .article-body { padding: 20px 22px 32px; }
-.art-head h2 { font-family: var(--serif, Georgia, serif); font-size: 33px; margin: 0 0 6px; line-height: 1.25; }
+.art-head h2 { font-family: var(--serif, Georgia, serif); font-size: 28px; margin: 0 0 6px; line-height: 1.25; }
 .art-sub { margin: 0 0 12px; color: #6b6560; font-size: 15px; }
 .art-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .art-meta .pill { border: 1px solid var(--line, #17161a); padding: 2px 8px; font-size: 11.5px; letter-spacing: .3px; }
@@ -149,7 +149,7 @@
 .para { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid #e2ddd3; }
 .para-no { font-size: 11px; color: #d0372a; letter-spacing: 1px; padding-top: 5px; min-width: 20px; }
 .para-main { flex: 1; min-width: 0; }
-.para .en { margin: 0; font-family: var(--serif, Georgia, serif); font-size: 18.5px; line-height: 1.9; }
+.para .en { margin: 0; font-family: var(--serif, Georgia, serif); font-size: 17px; line-height: 1.85; }
 .para .cn { margin: 9px 0 0; font-size: 14px; line-height: 1.8; color: #6b6560; border-left: 2px solid #e2ddd3; padding-left: 10px; }
 mark.w { background: linear-gradient(transparent 62%, #f6dfa8 62%); cursor: pointer; padding: 0 1px; }
 mark.w:hover { background: #f6dfa8; }
@@ -169,7 +169,7 @@ mark.w:hover { background: #f6dfa8; }
 .vex { margin-top: 5px; font-size: 11.5px; color: #8b8378; line-height: 1.6; }
 
 .lsent { border: 1px solid #e2ddd3; padding: 12px 14px; margin-bottom: 10px; background: #fff; }
-.ls-en { margin: 0 0 8px; font-family: var(--serif, Georgia, serif); font-size: 17px; line-height: 1.8; }
+.ls-en { margin: 0 0 8px; font-family: var(--serif, Georgia, serif); font-size: 16px; line-height: 1.8; }
 .ls-st, .ls-cn { margin: 4px 0 0; font-size: 12.5px; line-height: 1.7; color: #6b6560; }
 .ls-st i { font-style: normal; color: #d0372a; margin-right: 6px; }
 
@@ -268,3 +268,10 @@ mark.w:hover { background: #f6dfa8; }
 /* 拖拽图片进来时的高亮 */
 .panel.dragging { outline: 2px dashed #d0372a; outline-offset: -6px; background: #fffaf6; }
 .panel.dragging .import-box { background: #fff5f0; }
+/* 生成前的模式 / 难度选择 */
+.mini-select {
+  font-family: inherit; font-size: 13px; padding: 5px 8px;
+  border: 1px solid var(--line, #17161a); background: #fff; color: #17161a;
+  border-radius: 0; cursor: pointer;
+}
+.mini-select:focus { outline: 2px solid #d0372a; outline-offset: -2px; }

@@ -305,9 +305,14 @@
     loading.hidden = false;
     $('#articleLoadingHint').textContent = '正在写文章，大约 20–40 秒……';
     try {
+      const modeSel = $('#genMode');
+      const diffSel = $('#genDifficulty');
       const data = await api('/api/articles/generate', {
         method: 'POST',
-        body: JSON.stringify({ mode: btnGen.dataset.mode || 'review' }),
+        body: JSON.stringify({
+          mode: (modeSel && modeSel.value) || 'review',
+          difficulty: (diffSel && diffSel.value) || 'C1',
+        }),
       });
       render(data);
       toast('文章生成好了');

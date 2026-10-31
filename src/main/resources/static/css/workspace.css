@@ -265,3 +265,6 @@ mark.w:hover { background: #f6dfa8; }
 @media (max-height: 820px) {
   .workspace .panel { min-height: 420px; }
 }
+/* 拖拽图片进来时的高亮 */
+.panel.dragging { outline: 2px dashed #d0372a; outline-offset: -6px; background: #fffaf6; }
+.panel.dragging .import-box { background: #fff5f0; }

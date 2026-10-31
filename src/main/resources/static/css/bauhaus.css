@@ -1296,3 +1296,10 @@ body.modal-open { overflow: hidden; }
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "KaiTi", "楷体", "STKaiti", serif;
 }
 body, button, input, select, textarea { font-family: var(--sans); }
+
+/* 中文字体统一成宋体：西文仍走前面的拉丁字体，CJK 落到宋体 */
+:root {
+  --sans: "Avenir Next", "Helvetica Neue", "SimSun", "宋体", "Songti SC", "STSong", serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "SimSun", "宋体", "Songti SC", "STSong", serif;
+}
+body, button, input, select, textarea { font-family: var(--sans); }

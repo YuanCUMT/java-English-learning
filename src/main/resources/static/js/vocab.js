@@ -11,6 +11,9 @@
   const markPanel = $('#markPanel');
   const tabDailyCount = $('#tabDailyCount');
   const tabMineCount = $('#tabMineCount');
+const phrasePanel = $('#phrasePanel');
+const phraseList = $('#phraseList');
+const tabPhraseCount = $('#tabPhraseCount');
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -90,6 +93,21 @@
       html += masteredList.map(card).join('');
     }
     list.innerHTML = html;
+
+    renderPhrases(marks);
+  }
+
+  /** 短语：收藏过的多词表达（词里带空格），单独一栏 */
+  function renderPhrases(marks) {
+    const phrases = marks.filter((m) => /\s/.test(m.word || ''));
+    if (tabPhraseCount) tabPhraseCount.textContent = phrases.length;
+    if (!phrases.length) {
+      phraseList.innerHTML = '<p class="empty-hint">还没有短语。读文章时拖选几个词（比如 in terms of），点「☆ 收藏短语」就会收进来。</p>';
+      return;
+    }
+    phraseList.innerHTML =
+      `<h3 class="mk-sec">短语 <span class="count">${phrases.length}</span></h3>` +
+      phrases.map(card).join('');
   }
 
   /** 每日单词：一天一段，卡片只放词、音标、词性、释义 */
@@ -138,9 +156,9 @@
     document.querySelectorAll('.vtab').forEach((b) => {
       b.classList.toggle('active', b.dataset.tab === name);
     });
-    const daily = name !== 'mine';
-    dailyPanel.hidden = !daily;
-    markPanel.hidden = daily;
+    dailyPanel.hidden = name !== 'daily';
+    markPanel.hidden = name !== 'mine';
+    phrasePanel.hidden = name !== 'phrases';
   }
 
   document.querySelectorAll('.vtab').forEach((b) => {
@@ -156,7 +174,7 @@
     }
   }
 
-  list.addEventListener('click', async (e) => {
+  async function onMarkClick(e) {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const cardEl = e.target.closest('.mark-card');
@@ -191,7 +209,10 @@
     } catch (err) {
       toast(err.message, true);
     }
-  });
+  }
+
+  list.addEventListener('click', onMarkClick);
+  phraseList.addEventListener('click', onMarkClick);
 
   $('#btnClearAll').addEventListener('click', async () => {
     if (!confirm('确定清空全部生词？这会删掉学习和已掌握两摞。')) return;

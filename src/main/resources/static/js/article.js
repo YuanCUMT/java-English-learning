@@ -239,10 +239,24 @@
     popover = el;
     place(el, x, y);
 
-    api('/api/lookup?word=' + encodeURIComponent(word))
+    const load = (askAi) => api('/api/lookup?word=' + encodeURIComponent(word) + (askAi ? '&ai=1' : ''))
       .then((d) => {
+        if (askAi) el.innerHTML = '<div class="pop-head"><b>' + esc(word) + '</b><span class="pop-text">问模型…</span></div>';
         // 后端 /api/lookup 返回的 data 本身就是词条（没有再包一层 entry），这里两种都兼容
         const e = d.entry || d || {};
+        if (!e.cn && d && d.canAskModel) {
+          el.innerHTML = `
+            <div class="pop-head"><b>${esc(word)}</b><span class="pop-src">本地词典没有</span></div>
+            <p class="pop-cn">这个词不在内置词典里。</p>
+            <div class="pop-acts">
+              <button class="btn primary sm" type="button" data-ai>问模型查一下</button>
+            </div>`;
+          el.querySelector('[data-ai]').addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            load(true);
+          });
+          return;
+        }
         el.innerHTML = `
           <div class="pop-head">
             <b>${esc(e.word || word)}</b>
@@ -294,6 +308,8 @@
       .catch((err) => {
         el.innerHTML = `<div class="pop-head"><b>${esc(word)}</b></div><p class="pop-cn">${esc(err.message)}</p>`;
       });
+
+    load(false);
   }
 
   // 只念这一段；再点一次就停

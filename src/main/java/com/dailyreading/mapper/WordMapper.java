@@ -35,6 +35,9 @@ public interface WordMapper {
     @Delete("DELETE FROM words WHERE user_id = #{userId} AND batch_date = #{date}")
     int deleteByDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 
+    @Select("SELECT COUNT(*) FROM words WHERE user_id = #{userId}")
+    int countAll(@Param("userId") Long userId);
+
     @Select("SELECT COUNT(*) FROM words WHERE user_id = #{userId} AND batch_date = #{date}")
     int countByDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 }

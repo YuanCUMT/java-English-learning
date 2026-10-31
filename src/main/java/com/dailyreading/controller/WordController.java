@@ -36,6 +36,12 @@ public class WordController {
         ));
     }
 
+    /** 单词本「每日单词」：按天返回全部词 + 词典释义 */
+    @GetMapping("/history")
+    public ApiResponse history(@RequestAttribute("userId") Long userId) {
+        return ApiResponse.ok(ApiResponse.map("days", wordService.history(userId)));
+    }
+
     /** 粘贴导入：把一段文本里的英文词全抽出来 */
     @PostMapping
     public ApiResponse importByText(@RequestBody Map<String, String> body,

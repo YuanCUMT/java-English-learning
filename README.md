@@ -1,65 +1,69 @@
-# 每日阅读 · 考研英语（Java 结课作业）
+# 每日阅读 · 考研英语
 
-把今天背的单词，写成一篇考研真题风格的阅读文章。
+这是我 Java 课的结课作业。
 
-原版是 Node.js 写的（[bcz-reader](../bcz-reader)），这里是按结课作业要求重做的 **Java + Spring Boot** 版本。
-需求定稿见 [REQUIREMENTS.md](REQUIREMENTS.md)。
+起因很简单：我每天用百词斩背单词，背完就只剩一堆孤零零的词，没有语境。我想要的是——**每天读一篇用我当天背的那些词写成的文章**，顺便当考研阅读练手。
 
-## 当前进度
+先说明：我先用 Node.js 写过一个一模一样的版本，跑起来是能用的；这学期要求用 Java，所以我把整套东西用 **Spring Boot + MyBatis + Thymeleaf + MySQL** 重做了一遍。重做的时候顺手把原来不满意的地方也改了，比如查词从"一律问模型"改成"本地词典优先"。
 
-- [x] **M1** 工程骨架 + 数据库 + 本地词典
-  - Spring Boot 3.3.5 + MyBatis + MySQL 8 + Thymeleaf
-  - 9 张表（用户 / 单词 / 生词本 / 文章 / 用词 / 词典 / 词形 / 查词缓存 / OCR 缓存）
-  - ECDICT 子集导入 MySQL：**21,339 词条 + 27,278 变形**
-  - 词典查询接口跑通（含词形还原：`takes → take`）
-- [x] **M2-1** 用户系统：注册 / 登录 / BCrypt / 拦截器 / 会话固定防护
-- [x] **M2-2** 单词导入：粘贴导入 + 图片上传，OCR 可插拔（`mock` / `baidu` / `tesseract`）
-- [x] **M2-3** 截图识别：两个引擎都实测可用
-  - **百度云高精度版（默认）**：`accurate_basic`，实测一张单词表截图认出 6 个词，干净无杂字
-  - **离线 Tesseract**：不要账号，按字号筛词；单词卡那种「一个大词 + 一堆小字」的图比百度更准
-  - 切换只改 `app.ocr.provider`（`baidu` / `tesseract` / `mock`），代码不用动
-- [x] **M3** 文章生成 + 阅读查词
-  - `POST /api/articles/generate` 调 DeepSeek（`response_format: json_object`），实测一篇 347 词约 16 秒
-  - 两套提示词：复习模式（句子短、少从句）/ 真题模式（社科议论文、带让步—反驳、五类题型）
-  - 阅读页客户端渲染：逐段英文 + 中文对照开关、目标词高亮、今日词汇卡、长难句、理解题（点选项才显示答案与原文定位）
-  - 点任意单词查词（本地词典优先，查不到才问模型），浮层里可「朗读」「☆ 收藏」
-- [x] **M4** 单词本 + 历史文章 + 快捷键 + 文档
-  - `/vocab` 单词本：学习中 / 已掌握两摞，可朗读、标记已掌握、退回学习、删除、一键清空
-  - `/archive` 历史文章：按日期倒序，点开任意一篇可重读（`/article/{id}`）
-  - 阅读页快捷键：`1`–`4` 选答案、`c` 切中文、`Esc` 关浮层
+需求文档在 [REQUIREMENTS.md](REQUIREMENTS.md)，数据库设计在 [docs/er.md](docs/er.md)，接口文档在 [docs/api.md](docs/api.md)。
 
-## 文档
+## 它现在能干什么
 
-| 文档 | 内容 |
-|---|---|
-| [REQUIREMENTS.md](REQUIREMENTS.md) | 需求定稿：功能清单、数据库设计、接口设计、页面设计、里程碑 |
-| [docs/er.md](docs/er.md) | ER 图（Mermaid，9 张表 + 关系 + 设计取舍） |
-| [docs/api.md](docs/api.md) | 接口文档（16 个 API + 9 个页面路由，含真实返回示例） |
+一条完整的链路，从截图到读完做题：
 
-## 怎么跑
+1. **导入单词** —— 百词斩截的图直接传上来，OCR 认字；也可以直接粘贴一段词表
+2. **生成文章** —— 调 DeepSeek 写成考研阅读的风格，两种模式（复习 / 真题）
+3. **读** —— 逐段英文，想看图中文就开；当天背的词在文里高亮
+4. **查词** —— 读到生词点一下，浮层出释义，一键收藏进生词本
+5. **做题** —— 五道理解题，点选项才显示答案和原文定位；键盘 `1`–`4` 就能选
+6. **复习** —— 单词本分"学习中 / 已掌握"两摞，历史文章按天存着，随时能重读
 
-### 1. 准备数据库
+## 做到哪一步了
+
+| 里程碑 | 内容 | 状态 |
+|---|---|---|
+| M1 | 工程骨架 + 9 张表 + ECDICT 本地词典导入 | ✅ |
+| M2-1 | 注册 / 登录 / BCrypt / 拦截器 | ✅ |
+| M2-2 | 单词导入（粘贴 + 图片上传，OCR 可插拔） | ✅ |
+| M2-3 | 截图识别（百度云 / 离线 Tesseract） | ✅ |
+| M3 | 文章生成 + 阅读查词 | ✅ |
+| M4 | 单词本 / 历史文章 / 快捷键 / 文档 | ✅ |
+
+几个具体数字，都是我实际跑出来的：
+
+- 本地词典 **21,339 词条 + 27,278 个变形**，从 ECDICT 里抽的（MIT，见 [dict/README.md](dict/README.md)）
+- 生成一篇 **347 词**的文章，DeepSeek 那边大概 **16 秒**
+- 一张单词表截图，百度 OCR 能干净地认出 **6 个词**，没有杂字
+
+## 怎么跑起来
+
+### 1. 建库建表
 
 ```bash
-# 建库建表（9 张表）
 mysql -uroot -p < sql/init.sql
+```
 
-# 导入本地词典（会生成 2.6 MB 的 sql/dict-data.sql 再执行）
+9 张表，全 utf8mb4。表结构和设计思路在 [docs/er.md](docs/er.md)。
+
+### 2. 导入词典
+
+```bash
+# 把 dict/ecdict.json.gz 导成 SQL（约 2.6 MB）
 node tools/export-dict-sql.js
 mysql -uroot -p --default-character-set=utf8mb4 < sql/dict-data.sql
 ```
 
-> `sql/dict-data.sql` 是生成物，已在 `.gitignore` 里排除。
-> 源数据是 `dict/ecdict.json.gz`（ECDICT 子集，MIT，见 [dict/README.md](dict/README.md)）。
+> `sql/dict-data.sql` 是生成物，没进仓库。源数据是 `dict/ecdict.json.gz`。
 
-### 2. 改配置
+### 3. 填自己的 Key
 
-`src/main/resources/application-local.yml` 放自己真实的 Key（这个文件在 `.gitignore` 里，不进仓库）：
+新建 `src/main/resources/application-local.yml`（这个文件在 `.gitignore` 里，不会进仓库）：
 
 ```yaml
 app:
   deepseek:
-    api-key: "sk-..."        # 文章生成要用
+    api-key: "sk-..."        # 生成文章要用，去 platform.deepseek.com 申请
   ocr:
     provider: baidu          # mock | baidu | tesseract
     baidu:
@@ -68,64 +72,79 @@ app:
       accurate: true
 ```
 
-> `application-local.yml` 会被打进 jar，**改它要重新 `mvn package`** 才生效（不是只重启就行）。
+再改 `application.yml` 里的 `spring.datasource.username / password`。
 
-`application.yml` 里的 `spring.datasource.username / password` 也改成自己的。
+> 注意：`application-local.yml` 会被打进 jar，**改完要重新 `mvn package`**，光重启不生效。我第一次就被这个坑了。
 
-### 2.1 截图识别选哪个引擎
-
-| provider | 要账号吗 | 效果 | 说明 |
-|---|---|---|---|
-| `tesseract` | 不要 | 够用 | 只依赖 `tessdata/eng.traineddata`（3.9 MB，已随仓库提供）；**单词卡截图用它更准** |
-| `baidu` | 要 | 更好 | **默认**。通用文字识别·高精度版，单词表截图很干净；账号必须实名，否则返回 `错误 18`（QPS 配额 0） |
-| `mock` | 不要 | 假数据 | 单测 / 演示用，固定返回 abandon / harvest 之类 |
-
-两个引擎的路子不一样：
-
-- **百度**：整张图逐行识别，抽出所有英文词。适合「一个列表里很多单词」的截图，速度快、字准。
-- **Tesseract**：按字号筛词 —— 单词卡上目标词最大，音标 / 释义 / 例句 / 水印都小一号，
-  只留接近最大字号的那批，杂字自然被滤掉；字都差不多大时退回「按行挑短行」。
-
-一句话：**截图是「单词表」用百度，「单词卡」用 Tesseract**。识别结果都会进候选列表，可以自己勾选和改拼写，不用指望 100% 干净。
-
-### 3. 启动
+### 4. 启动
 
 ```bash
 mvn spring-boot:run
 ```
 
-浏览器打开 <http://127.0.0.1:8080/api/health> 能看到 `{"code":0,...}` 就说明起来了。
+浏览器开 <http://127.0.0.1:8080>，注册个账号就能用了。
+
+## 截图识别用哪个引擎
+
+我做了两个引擎，各有各的用武之地，改一行配置就能换：
+
+| provider | 要账号吗 | 我用它识别什么 |
+|---|---|---|
+| `baidu` | 要 | 默认。**单词表截图**（一屏好几个词）——逐行识别，字准、快 |
+| `tesseract` | 不要 | **单词卡截图**（一个大词 + 例句）——按字号筛词，不会把例句里的 the / this 捞进来 |
+| `mock` | 不要 | 单测和演示用，固定返回几个词 |
+
+为什么不能只留一个？因为我两种截图都会传：
+
+- 百度是**整张图逐行识别、把所有英文词都抽出来**。传单词表很干净；传单词卡就糟了，例句里的 `the`、`this`、`to`、`was` 全被当成生词捞进来。
+- Tesseract 是**按框的高度筛**：单词卡上目标词字号最大，音标、释义、例句都小一号，只留接近最大字号的那批，杂字自然被滤掉。
+
+所以我的用法是：**单词表用百度，单词卡用 Tesseract**。两边识别结果都会进候选列表，可以自己勾选、改拼写，不用指望 100% 干净。
+
+## 踩过的坑
+
+写这份作业踩了不少坑，记下来免得以后忘：
+
+**1. `${DB_USERNAME:root}` 里的中文密码炸了**
+早期用 `characterEncoding=utf8mb4` 连 MySQL，启动直接报 `UnsupportedEncodingException: utf8mb4` —— JDBC 要的是 `utf8`，`utf8mb4` 是 MySQL 的字符集名，不是 Java 的编码名。
+
+**2. Lombok 突然不生效**
+编译报一堆"找不到 getXxx/setXxx"。不是注解没写，是**这台机器的 JDK 21 默认不跑 classpath 上的注解处理器**了。要在 `maven-compiler-plugin` 里显式写 `<proc>full</proc>`，再加上 lombok 的 `annotationProcessorPaths`。
+
+**3. application.yml 重复的顶层键**
+我用脚本往文件末尾追配置，结果 `app:` 出现了两次，SnakeYAML 直接拒绝启动。改完才知道 YAML 不允许重复键，报错信息还很不明显。
+
+**4. 百度 OCR 一直返回错误 18**
+`Open api qps request limit reached`。以为是调用太快，间隔 10 秒重试还是一样。最后才想明白：**账号没实名，配额就是 0**，跟速度无关。实名通过当天就正常了。
+
+**5. 阅读页整页空白**
+`article.html` 里 `#articleBox` 把 `#articleBody` 整个包住了，脚本里 `box.hidden = true` 一执行，标题和正文一起消失。查了半小时才发现是嵌套关系写错。
+
+**6. 快捷键按了没反应**
+`1`–`4` 选答案的代码写的是 `querySelectorAll('.opt')`，而模板里选项的类名是 `.q-opt`。一个类名对不上，功能就整个是死的。
 
 ## 目录结构
 
 ```
 java-reader/
-├─ pom.xml
-├─ sql/
-│  └─ init.sql                 9 张表的建表语句
-├─ dict/
-│  ├─ ecdict.json.gz           词典源数据（21,699 词 + 27,278 变形，0.8 MB）
-│  └─ README.md                来源与抽取规则
-├─ tools/
-│  └─ export-dict-sql.js       把 gz 导成 SQL
-└─ src/main/java/com/dailyreading/
-   ├─ DailyReadingApplication.java
-   ├─ controller/              接口层
-   ├─ service/                 业务层
-   ├─ mapper/                  MyBatis Mapper
-   └─ entity/                  实体
+├─ sql/init.sql                9 张表
+├─ dict/ecdict.json.gz         词典源数据（21,699 词 + 27,278 变形，0.8 MB）
+├─ tessdata/eng.traineddata    离线 OCR 的英文模型（3.9 MB）
+├─ tools/export-dict-sql.js    把 gz 导成 SQL
+└─ src/main/
+   ├─ java/com/dailyreading/
+   │  ├─ controller/           接口层（8 个 Controller）
+   │  ├─ service/              业务层（含 ocr/ 下三个引擎实现）
+   │  ├─ mapper/               MyBatis Mapper
+   │  ├─ entity/               实体
+   │  └─ config/               配置类 + 登录拦截器
+   └─ resources/
+      ├─ templates/            Thymeleaf 页面（首页/登录/注册/单词本/历史/阅读）
+      └─ static/               CSS + JS
 ```
-
-## 已验证的接口
-
-| 接口 | 说明 | 示例 |
-|---|---|---|
-| `GET /api/health` | 健康检查 | `{"code":0,"message":"ok"}` |
-| `GET /api/dict/size` | 词条总数 | `{"data":{"entries":21339}}` |
-| `GET /api/lookup?word=takes` | 查词（含词形还原） | 返回 `word=take, surface=takes, pos=vt., tags=[zk,gk,ielts]` |
 
 ## 环境
 
-- JDK 21（`JAVA_HOME` 指过去；Spring Boot 3.x 对 JDK 25 支持还不完整，别用 PATH 上那个 25）
+- **JDK 21**（`JAVA_HOME` 要指过去。我机器上 PATH 里的 java 是 25，Spring Boot 3.x 对它支持还不完整，踩过）
 - Maven 3.9+
-- MySQL 8.0（本项目在 8.0.29 上验证）
+- MySQL 8.0（我在 8.0.29 上测的）

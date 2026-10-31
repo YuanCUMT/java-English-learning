@@ -12,6 +12,7 @@
   let state = { article: null, showCn: false };
   let popover = null;
   let lastSel = '';
+  let openedAt = 0;
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -93,7 +94,8 @@
       </div>
       ${b.gist ? `<p class="art-gist">${esc(b.gist)}</p>` : ''}
       <div class="art-tools">
-        <button class="btn ghost" id="btnCn" type="button">显示中文</button>
+        <button class="tool-link" id="btnRead" type="button">▶ 朗读全文</button>
+        <button class="tool-link" id="btnCn" type="button">显示中文</button>
       </div>
     </header>`);
 
@@ -173,6 +175,8 @@
         btnCn.textContent = state.showCn ? '隐藏中文' : '显示中文';
         btnCn.classList.toggle('on', state.showCn);
       };
+      const btnRead = document.getElementById('btnRead');
+      if (btnRead) btnRead.onclick = readArticle;
     }
 
     body.querySelectorAll('.q').forEach((q) => {
@@ -215,7 +219,8 @@
 
     api('/api/lookup?word=' + encodeURIComponent(word))
       .then((d) => {
-        const e = d.entry || {};
+        // 后端 /api/lookup 返回的 data 本身就是词条（没有再包一层 entry），这里两种都兼容
+        const e = d.entry || d || {};
         el.innerHTML = `
           <div class="pop-head">
             <b>${esc(e.word || word)}</b>
@@ -292,9 +297,66 @@
   }
 
   document.addEventListener('click', (e) => {
-    if (popover && !popover.contains(e.target) && !e.target.closest('mark.w')) closePopover();
+    // 划词查词是在 mouseup 里开的，紧接着的 click 别把刚开的浮层关掉
+    if (popover && !popover.contains(e.target) && !e.target.closest('mark.w') && Date.now() - openedAt > 250) closePopover();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopover(); });
+
+  // ---------- 划词查词 ----------
+  // 点单词能查，但很多生词不在目标词表里、也不一定是单个词，所以这里支持拖选后再查。
+  body.addEventListener('mouseup', () => {
+    setTimeout(() => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed) return;
+      const raw = sel.toString().replace(/\s+/g, ' ').trim();
+      if (!raw) return;
+      if (!/^[A-Za-z][A-Za-z'\- ]*$/.test(raw)) return; // 含数字/中文的就不当词查
+      if (raw.length > 60 || raw.split(' ').length > 8) {
+        toast('选得太长了，一次最多 8 个词', true);
+        return;
+      }
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      openedAt = Date.now();
+      openWord(rect.left, rect.bottom - 4, raw.toLowerCase());
+    }, 0);
+  });
+
+  // 朗读整篇：一段一段念，念到哪段就高亮哪段
+  let reading = false;
+  function stopReading() {
+    reading = false;
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    body.querySelectorAll('.para.reading').forEach((p) => p.classList.remove('reading'));
+    const b = $('#btnRead');
+    if (b) b.textContent = '▶ 朗读全文';
+  }
+
+  function readArticle() {
+    const btn = $('#btnRead');
+    if (reading) { stopReading(); return; }
+    if (!('speechSynthesis' in window)) { toast('这个浏览器不支持朗读', true); return; }
+    const paras = [...body.querySelectorAll('.para')];
+    if (!paras.length) return;
+    reading = true;
+    if (btn) btn.textContent = '■ 停止朗读';
+    let i = 0;
+    const next = () => {
+      if (!reading) return;
+      if (i >= paras.length) { stopReading(); return; }
+      paras.forEach((p) => p.classList.remove('reading'));
+      const p = paras[i];
+      p.classList.add('reading');
+      p.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const u = new SpeechSynthesisUtterance(p.querySelector('.en').textContent.trim());
+      u.lang = 'en-US';
+      u.rate = 0.95;
+      u.onend = () => { i += 1; next(); };
+      u.onerror = () => { i += 1; next(); };
+      speechSynthesis.speak(u);
+    };
+    next();
+  }
 
   // ---------- 生成 ----------
   async function generate() {

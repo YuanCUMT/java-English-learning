@@ -24,6 +24,12 @@
   </properties>
 
   <dependencies>
+    <!-- 离线 OCR：Tesseract 的 Java 封装，不需要任何账号 -->
+    <dependency>
+      <groupId>net.sourceforge.tess4j</groupId>
+      <artifactId>tess4j</artifactId>
+      <version>5.13.0</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>

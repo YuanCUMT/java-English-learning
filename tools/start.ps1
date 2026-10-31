@@ -60,5 +60,5 @@ if (Test-Port 8080) {
 
 # 3. 浏览器
 Write-Host "  [3/3] http://127.0.0.1:8080" -ForegroundColor Yellow
-Start-Process 'cmd.exe' -ArgumentList '/c','start','','http://127.0.0.1:8080' -WindowStyle Hidden
+Start-Process 'explorer.exe' -ArgumentList 'http://127.0.0.1:8080'
 Start-Sleep -Seconds 2

@@ -290,3 +290,21 @@ mark.w:hover { background: #f6dfa8; }
 .para-tools { display: flex; gap: 14px; margin-top: 6px; }
 .para-tools .tool-link { font-size: 12px; color: #8b8375; }
 .para-tools .tool-link:hover { color: #17161a; }
+/* 左侧「今日单词」钉住不动，只有右边文章随页面滚动；单词栏自己滚、自己搜 */
+.workspace .words-panel {
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+}
+.workspace .words-panel .chips { overflow-y: auto; flex: 1 1 auto; }
+.workspace .words-panel .import-box { flex: none; }
+
+.words-filter { padding: 10px 14px 0; }
+.mini-input {
+  width: 100%; box-sizing: border-box;
+  font: inherit; font-size: 13px;
+  padding: 6px 9px; border: 1px solid var(--line, #17161a); background: #fff; color: #17161a;
+}
+.mini-input:focus { outline: 2px solid #d0372a; outline-offset: -2px; }

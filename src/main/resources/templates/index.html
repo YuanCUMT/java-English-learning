@@ -53,13 +53,16 @@
 
   <div class="workspace">
     <!-- 左：今日单词 -->
-    <aside class="panel">
+    <aside class="panel words-panel">
       <div class="panel-head">
         <span class="panel-code">01 / words</span>
         <span class="panel-title">今日单词 <b id="wordCount" th:text="${todayWords}">0</b></span>
         <button class="mini" id="btnClearWords" type="button">清空</button>
       </div>
 
+      <div class="words-filter">
+        <input class="mini-input" id="wordFilter" type="search" placeholder="搜索今天的单词" autocomplete="off">
+      </div>
       <div class="chips" id="wordList"></div>
 
       <div class="import-box">

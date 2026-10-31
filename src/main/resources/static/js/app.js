@@ -36,10 +36,14 @@
     const stat = $('#statWords');
     if (stat) stat.textContent = words.length;
 
+    const q = (($('#wordFilter') && $('#wordFilter').value) || '').trim().toLowerCase();
+    const shown = q ? words.filter((w) => w.toLowerCase().includes(q)) : words;
     if (!words.length) {
       wordList.innerHTML = '<span class="chip empty">还没有词，先在下面导入</span>';
+    } else if (!shown.length) {
+      wordList.innerHTML = '<span class="chip empty">没有匹配「' + q + '」的词</span>';
     } else {
-      wordList.innerHTML = words
+      wordList.innerHTML = shown
         .map((w) => '<span class="chip" data-word="' + w + '">' + w + '</span>')
         .join('');
     }
@@ -129,6 +133,8 @@
   }
 
   // —— 事件 ——
+  const wordFilter = document.getElementById('wordFilter');
+  if (wordFilter) wordFilter.addEventListener('input', () => load());
   $('#btnPaste').addEventListener('click', importText);
   $('#btnClearWords').addEventListener('click', clearWords);
   $('#fileInput').addEventListener('change', (ev) => {

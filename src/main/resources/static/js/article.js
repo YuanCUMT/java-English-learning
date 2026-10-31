@@ -296,9 +296,16 @@
       });
   }
 
-  // 只念这一段，念完撤掉高亮
+  // 只念这一段；再点一次就停
   function readParagraph(p) {
     if (!('speechSynthesis' in window)) { toast('这个浏览器不支持朗读', true); return; }
+    if (p.classList.contains('reading')) {
+      if (reading) stopReading();
+      speechSynthesis.cancel();
+      p.classList.remove('reading');
+      syncSayLabels();
+      return;
+    }
     if (reading) stopReading();
     speechSynthesis.cancel();
     document.querySelectorAll('.para.reading').forEach((x) => x.classList.remove('reading'));
@@ -306,10 +313,19 @@
     const u = new SpeechSynthesisUtterance(p.querySelector('.en').textContent.trim());
     u.lang = 'en-US';
     u.rate = 0.95;
-    const clear = () => p.classList.remove('reading');
+    const clear = () => { p.classList.remove('reading'); syncSayLabels(); };
     u.onend = clear;
     u.onerror = clear;
     speechSynthesis.speak(u);
+    syncSayLabels();
+  }
+
+  // 段落按钮的文案跟着“正在读哪段”走，读的时候变成「■ 停止」
+  function syncSayLabels() {
+    body.querySelectorAll('.para').forEach((p) => {
+      const btn = p.querySelector('[data-psay]');
+      if (btn) btn.textContent = p.classList.contains('reading') ? '■ 停止' : '▶ 朗读本段';
+    });
   }
 
   function setParaCnLabel(p) {
@@ -390,6 +406,7 @@
     if (!paras.length) return;
     reading = true;
     if (btn) btn.textContent = '■ 停止朗读';
+    syncSayLabels();
     let i = 0;
     const next = () => {
       if (!reading) return;

@@ -23,6 +23,7 @@ public class PageController {
     public String vocab(HttpSession session, Model model) {
         Long userId = userId(session);
         model.addAttribute("username", session.getAttribute(AuthController.SESSION_USERNAME));
+        model.addAttribute("active", "vocab");
         model.addAttribute("total", wordService.totalWords(userId));
         model.addAttribute("learning", markService.count(userId, "learning"));
         model.addAttribute("mastered", markService.count(userId, "mastered"));
@@ -33,6 +34,7 @@ public class PageController {
     public String archive(HttpSession session, Model model) {
         Long userId = userId(session);
         model.addAttribute("username", session.getAttribute(AuthController.SESSION_USERNAME));
+        model.addAttribute("active", "archive");
         model.addAttribute("articles", articleService.list(userId));
         return "archive";
     }

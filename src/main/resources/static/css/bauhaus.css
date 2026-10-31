@@ -1277,3 +1277,15 @@ main.vocab-main, main.archive-main {
   align-self: center; box-sizing: border-box;
 }
 main.vocab-main > section, main.archive-main > section { width: 100%; }
+
+/* 导入弹窗 */
+.modal-card header .x {
+  margin-left: auto; border: none; background: none; cursor: pointer;
+  font-size: 15px; color: var(--muted, #7a766e); padding: 2px 6px;
+}
+.modal-card header .x:hover { color: #b13b25; }
+.modal-card .field + .field { margin-top: 18px; }
+.modal-card .field-actions { margin-top: 10px; }
+.modal-card .import-drop { padding: 26px 16px; }
+
+body.modal-open { overflow: hidden; }

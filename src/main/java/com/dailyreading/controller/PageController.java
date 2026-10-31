@@ -35,6 +35,8 @@ public class PageController {
         Long userId = userId(session);
         model.addAttribute("username", session.getAttribute(AuthController.SESSION_USERNAME));
         model.addAttribute("active", "archive");
+        model.addAttribute("learning", markService.count(userId, "learning"));
+        model.addAttribute("mastered", markService.count(userId, "mastered"));
         model.addAttribute("articles", articleService.list(userId));
         return "archive";
     }

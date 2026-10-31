@@ -1269,3 +1269,11 @@ kbd {
 
 /* bauhaus.css 里 main > section 被固定成 --page 宽，单词本/历史页要占满容器 */
 .vocab-main > section, .archive-main > section { width: auto; max-width: none; }
+
+.vocab-main, .archive-main { width: auto; max-width: 1160px; }
+
+main.vocab-main, main.archive-main {
+  width: 100%; max-width: 1160px; margin: 0 auto; padding: 0 0 80px;
+  align-self: center; box-sizing: border-box;
+}
+main.vocab-main > section, main.archive-main > section { width: 100%; }

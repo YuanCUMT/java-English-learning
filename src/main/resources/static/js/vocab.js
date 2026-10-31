@@ -1,11 +1,16 @@
 'use strict';
-/* 单词本页：拉 /api/marks，分「学习中 / 已掌握」两摞渲染。 */
+/* 单词本页：两个列表——每日单词（按天分组，带词典释义）、我的生词（学习中 / 已掌握）。 */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const list = $('#markList');
   const toastEl = $('#toast');
   const statLearning = $('#statLearning');
   const statMastered = $('#statMastered');
+  const dayList = $('#dayList');
+  const dailyPanel = $('#dailyPanel');
+  const markPanel = $('#markPanel');
+  const tabDailyCount = $('#tabDailyCount');
+  const tabMineCount = $('#tabMineCount');
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -87,6 +92,61 @@
     list.innerHTML = html;
   }
 
+  /** 每日单词：一天一段，卡片只放词、音标、词性、释义 */
+  function renderDays(days) {
+    const total = days.reduce((n, d) => n + d.count, 0);
+    if (tabDailyCount) tabDailyCount.textContent = total;
+    if (!days.length) {
+      dayList.innerHTML = '<p class="empty-hint">还没有导入过单词。回首页用「选图识别」或「粘贴导入」加一批。</p>';
+      return;
+    }
+    dayList.innerHTML = days
+      .map((d) => {
+        const cards = d.words
+          .map(
+            (w) => `<article class="vcard">
+              <header class="v-top">
+                <span class="w">${esc(w.word)}</span>
+                ${w.phonetic ? `<span class="ph">${esc(w.phonetic)}</span>` : ''}
+                ${w.pos ? `<span class="pos">${esc(w.pos)}</span>` : ''}
+              </header>
+              ${w.cn ? `<p class="cn">${esc(w.cn)}</p>` : ''}
+            </article>`
+          )
+          .join('');
+        return `<section class="day">
+          <h3 class="day-head">
+            <span class="d">${esc(d.date)}</span>
+            <span class="n">${d.count} 个</span>
+          </h3>
+          <div class="vcards">${cards}</div>
+        </section>`;
+      })
+      .join('');
+  }
+
+  async function loadDays() {
+    try {
+      const data = await api('/api/words/history');
+      renderDays((data && data.days) || []);
+    } catch (err) {
+      toast(err.message, true);
+    }
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.vtab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.tab === name);
+    });
+    const daily = name !== 'mine';
+    dailyPanel.hidden = !daily;
+    markPanel.hidden = daily;
+  }
+
+  document.querySelectorAll('.vtab').forEach((b) => {
+    b.addEventListener('click', () => switchTab(b.dataset.tab));
+  });
+
   async function load() {
     try {
       const data = await api('/api/marks');
@@ -144,5 +204,6 @@
     }
   });
 
+  loadDays();
   load();
 })();

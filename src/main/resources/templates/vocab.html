@@ -27,12 +27,19 @@
 
 <main class="wrap">
   <section class="hero">
-    <div class="eyebrow">Vocabulary / 生词本</div>
-    <h1>攒下来的词，分成两摞。</h1>
-    <p>阅读时点词查释义，点「☆ 收藏」收进这里。背下来的点「已掌握」，随时能退回。</p>
+    <div class="eyebrow">Vocabulary / 单词本</div>
+    <h1>背过的词，都在这一本。</h1>
+    <p>
+      两个列表：<b>每日单词</b>是你每天导入的全部词（截图识别或粘贴进来的），
+      <b>我的生词</b>是阅读时点「☆ 收藏」攒下来的，背下来的点「已掌握」挪到下面。
+    </p>
   </section>
 
-  <section class="stats two">
+  <section class="stats three">
+    <div class="stat">
+      <div class="num" id="statTotal" th:text="${total}">0</div>
+      <div class="label">累计单词</div>
+    </div>
     <div class="stat">
       <div class="num" id="statLearning" th:text="${learning}">0</div>
       <div class="label">生词 · 学习中</div>
@@ -43,9 +50,29 @@
     </div>
   </section>
 
-  <section class="panel" id="markPanel">
+  <div class="vocab-tabs">
+    <button class="vtab active" type="button" data-tab="daily">
+      每日单词 <span class="count" id="tabDailyCount" th:text="${total}">0</span>
+    </button>
+    <button class="vtab" type="button" data-tab="mine">
+      我的生词 <span class="count" id="tabMineCount"
+                    th:text="${learning + mastered}">0</span>
+    </button>
+  </div>
+
+  <section class="panel" id="dailyPanel">
     <div class="panel-head">
-      <div class="panel-code">01 / marks</div>
+      <div class="panel-code">01 / words</div>
+      <h2>每日单词</h2>
+    </div>
+    <div id="dayList" class="day-list">
+      <p class="empty-hint">还没有导入过单词。回首页用「选图识别」或「粘贴导入」加一批。</p>
+    </div>
+  </section>
+
+  <section class="panel" id="markPanel" hidden>
+    <div class="panel-head">
+      <div class="panel-code">02 / marks</div>
       <h2>我的生词</h2>
       <div class="panel-tools">
         <button class="btn ghost" id="btnClearAll" type="button">清空</button>

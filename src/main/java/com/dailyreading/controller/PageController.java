@@ -2,6 +2,7 @@ package com.dailyreading.controller;
 
 import com.dailyreading.service.ArticleService;
 import com.dailyreading.service.MarkService;
+import com.dailyreading.service.WordService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class PageController {
 
     private final MarkService markService;
+    private final WordService wordService;
     private final ArticleService articleService;
 
     @GetMapping("/vocab")
     public String vocab(HttpSession session, Model model) {
         Long userId = userId(session);
         model.addAttribute("username", session.getAttribute(AuthController.SESSION_USERNAME));
+        model.addAttribute("total", wordService.totalWords(userId));
         model.addAttribute("learning", markService.count(userId, "learning"));
         model.addAttribute("mastered", markService.count(userId, "mastered"));
         return "vocab";

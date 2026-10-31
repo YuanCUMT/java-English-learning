@@ -64,6 +64,9 @@
       我的生词 <span class="count" id="tabMineCount"
                     th:text="${learning + mastered}">0</span>
     </button>
+    <button class="vtab" type="button" data-tab="phrases">
+      短语 <span class="count" id="tabPhraseCount">0</span>
+    </button>
   </div>
 
   <section class="panel" id="dailyPanel">
@@ -86,6 +89,16 @@
     </div>
     <div id="markList" class="mark-cards">
       <p class="empty-hint">还没有生词。读文章时点任意单词，点「☆ 收藏」就会出现在这里。</p>
+    </div>
+  </section>
+
+  <section class="panel" id="phrasePanel" hidden>
+    <div class="panel-head">
+      <div class="panel-code">03 / phrases</div>
+      <h2>收藏的短语</h2>
+    </div>
+    <div id="phraseList" class="mark-cards">
+      <p class="empty-hint">还没有短语。读文章时拖选几个词（比如 in terms of），点「☆ 收藏短语」就会收进来。</p>
     </div>
   </section>
 </main>

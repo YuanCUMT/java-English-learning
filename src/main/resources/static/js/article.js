@@ -106,6 +106,10 @@
         <div class="para-main">
           <p class="en">${highlight(p.en || '', re)}</p>
           <p class="cn" hidden>${esc(p.cn || '')}</p>
+          <div class="para-tools">
+            <button class="tool-link sm" type="button" data-psay>▶ 朗读本段</button>
+            <button class="tool-link sm" type="button" data-pcn>显示本段翻译</button>
+          </div>
         </div>
       </div>`);
     });
@@ -174,10 +178,28 @@
         body.querySelectorAll('.para .cn').forEach((el) => { el.hidden = !state.showCn; });
         btnCn.textContent = state.showCn ? '隐藏中文' : '显示中文';
         btnCn.classList.toggle('on', state.showCn);
+        syncParaTools();
       };
       const btnRead = document.getElementById('btnRead');
       if (btnRead) btnRead.onclick = readArticle;
     }
+
+    // 每一段自己的「朗读本段 / 显示本段翻译」
+    body.querySelectorAll('.para').forEach((p) => {
+      const say = p.querySelector('[data-psay]');
+      if (say) say.onclick = (e) => {
+        e.stopPropagation();
+        readParagraph(p);
+      };
+      const cnBtn = p.querySelector('[data-pcn]');
+      if (cnBtn) cnBtn.onclick = (e) => {
+        e.stopPropagation();
+        const cn = p.querySelector('.cn');
+        cn.hidden = !cn.hidden;
+        setParaCnLabel(p);
+      };
+    });
+    syncParaTools();
 
     body.querySelectorAll('.q').forEach((q) => {
       q.querySelectorAll('.q-opt').forEach((btn) => {
@@ -272,6 +294,34 @@
       .catch((err) => {
         el.innerHTML = `<div class="pop-head"><b>${esc(word)}</b></div><p class="pop-cn">${esc(err.message)}</p>`;
       });
+  }
+
+  // 只念这一段，念完撤掉高亮
+  function readParagraph(p) {
+    if (!('speechSynthesis' in window)) { toast('这个浏览器不支持朗读', true); return; }
+    if (reading) stopReading();
+    speechSynthesis.cancel();
+    document.querySelectorAll('.para.reading').forEach((x) => x.classList.remove('reading'));
+    p.classList.add('reading');
+    const u = new SpeechSynthesisUtterance(p.querySelector('.en').textContent.trim());
+    u.lang = 'en-US';
+    u.rate = 0.95;
+    const clear = () => p.classList.remove('reading');
+    u.onend = clear;
+    u.onerror = clear;
+    speechSynthesis.speak(u);
+  }
+
+  function setParaCnLabel(p) {
+    const btn = p.querySelector('[data-pcn]');
+    if (!btn) return;
+    const hidden = p.querySelector('.cn').hidden;
+    btn.textContent = hidden ? '显示本段翻译' : '隐藏本段翻译';
+    btn.classList.toggle('on', !hidden);
+  }
+
+  function syncParaTools() {
+    body.querySelectorAll('.para').forEach(setParaCnLabel);
   }
 
   function speak(text) {

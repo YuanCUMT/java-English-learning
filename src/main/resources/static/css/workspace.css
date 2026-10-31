@@ -286,3 +286,7 @@ mark.w:hover { background: #f6dfa8; }
 
 /* 朗读到哪一段，哪一段就浅黄底 */
 .para.reading .en { background: #fff6d2; box-shadow: 0 0 0 8px #fff6d2; border-radius: 2px; }
+/* 每段自己的小工具：朗读本段 / 显示本段翻译 */
+.para-tools { display: flex; gap: 14px; margin-top: 6px; }
+.para-tools .tool-link { font-size: 12px; color: #8b8375; }
+.para-tools .tool-link:hover { color: #17161a; }

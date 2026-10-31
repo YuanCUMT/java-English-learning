@@ -48,7 +48,7 @@ public class PromptBuilder {
         StringBuilder sb = new StringBuilder();
         sb.append("今天学生背的单词：").append(w).append("\n\n");
         sb.append("请用这些词写一篇英文文章。\n");
-        sb.append("- 难度：").append(opt.difficulty()).append("（考研英语一阅读的难度）\n");
+        sb.append("- 难度：").append(difficultyHint(opt.difficulty())).append("\n");
         sb.append("- 段落数：").append(opt.paragraphs()).append("\n");
         sb.append("- 题材：").append(opt.topic() == null || opt.topic().isBlank()
                 ? "社科 / 科普类议论文，话题要具体（例如某一项具体的技术、政策、行业变化），不要泛泛谈人生"
@@ -58,12 +58,12 @@ public class PromptBuilder {
             sb.append("""
                     【真题模式】这段是重点，请严格遵守：
                     1. 只从上面的词表里挑 %d 个词用进文章，其余的词不要出现。用上的词原样使用（可以变形）。
-                    2. 正文 400-550 词。每句 20-35 词，允许 2-3 个长难句（带插入语、分词结构、同位语从句）。
+                    2. 正文 400-550 词。%s，允许 2-3 个长难句（带插入语、分词结构、同位语从句）。
                     3. 结构必须有「让步 + 反驳」：先认真陈述一方观点，再用 "Yet" / "That objection has force, but" 转折。
                        不要「现象 → 科学解释 → 历史回顾 → 提出问题 → 文化升华」这种五段模板。
                     4. 结尾不要升华、不要格言、不要提「我们应该」。就以一个具体的、未解决的张力收尾。
                     5. words 数组只放你实际用到的词。
-                    """.formatted(opt.examWordLimit()));
+                    """.formatted(opt.examWordLimit(), sentenceRule(opt.difficulty())));
         } else {
             sb.append("""
                     【复习模式】这段是重点：
@@ -77,5 +77,21 @@ public class PromptBuilder {
         sb.append("\n- sentences 里放 2 个真正的长难句（必须是文章里出现过的原句）。");
         sb.append("\n- 全部用简体中文解释，英文正文用英式拼写也可以，但全文要统一。");
         return sb.toString();
+    }
+    /** 把难度档位翻成具体的句子长度 / 用词要求：光给 B2/C2 这种代号，模型也只能瞎猜 */
+    private String difficultyHint(String difficulty) {
+        return switch (String.valueOf(difficulty).toUpperCase()) {
+            case "B2" -> "B2，句子 12-18 词，少用嵌套从句和超纲词，读起来轻松";
+            case "C2" -> "C2，平均句长 26-38 词，多用抽象名词与多重修饰，可出现少量超纲词";
+            default -> "C1，考研英语一真题难度，平均句长 20-28 词，含 1-2 处嵌套从句";
+        };
+    }
+
+    private String sentenceRule(String difficulty) {
+        return switch (String.valueOf(difficulty).toUpperCase()) {
+            case "B2" -> "每句 15-25 词，尽量少用嵌套";
+            case "C2" -> "每句 26-40 词，句子里套从句";
+            default -> "每句 20-35 词";
+        };
     }
 }

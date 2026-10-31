@@ -275,3 +275,4 @@ mark.w:hover { background: #f6dfa8; }
   border-radius: 0; cursor: pointer;
 }
 .mini-select:focus { outline: 2px solid #d0372a; outline-offset: -2px; }
+.mini-select { max-width: 175px; }

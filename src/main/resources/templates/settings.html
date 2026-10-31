@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>设置 · 每日阅读</title>
+  <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="page">
+<div class="app">
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" th:href="@{/}">
+        <span class="brand-mark" aria-hidden="true">D/R</span>
+        <span class="brand-word">
+          <h1>每日阅读</h1>
+          <p>今天背的词，读成一篇真题</p>
+        </span>
+      </a>
+      <nav class="page-nav" aria-label="主导航">
+        <a th:href="@{/}">今日文章</a>
+        <a th:href="@{/archive}">历史文章</a>
+        <a th:href="@{/vocab}">单词本 <span class="nav-count" th:text="${learningMarks}">0</span></a>
+        <a class="active" th:href="@{/settings}">设置</a>
+        <span class="nav-user" th:text="${username}">用户</span>
+        <a th:href="@{/logout}">退出</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="vocab-main">
+    <section class="page-head">
+      <p class="eyebrow">Settings / 设置</p>
+      <h1>填自己的 Key。</h1>
+      <p class="lede">生成文章和查词都要调 DeepSeek。Key 只存在你这台机器的 MySQL 里，不会发到别处。</p>
+    </section>
+
+    <section class="panel settings-panel">
+      <div class="panel-code">01 / api key</div>
+      <h2>DeepSeek API Key</h2>
+
+      <p class="settings-note">
+        还没用过？去 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">platform.deepseek.com</a>
+        注册后「创建 API Key」，把 <code>sk-</code> 开头那一串复制过来。
+      </p>
+
+      <div class="field-row">
+        <label for="dkInput">Key</label>
+        <input id="dkInput" class="mini-input" type="password" autocomplete="off"
+               placeholder="sk-xxxxxxxxxxxxxxxx">
+      </div>
+      <p class="field-hint" id="dkState">检查中…</p>
+
+      <div class="settings-acts">
+        <button class="btn primary" id="btnSaveKey" type="button">保存</button>
+        <button class="btn ghost" id="btnTestKey" type="button">测试一下</button>
+        <button class="btn ghost" id="btnClearKey" type="button">清除</button>
+      </div>
+    </section>
+
+    <section class="panel settings-panel">
+      <div class="panel-code">02 / 说明</div>
+      <h2>几点说明</h2>
+      <ul class="settings-list">
+        <li>保存后立刻生效，不用重启、不用重新打包。</li>
+        <li>抓图识别用的是百度 OCR 或本地 Tesseract，<b>不吃</b> DeepSeek 的额度。</li>
+        <li>一篇 400 词的文章大约几千 token，几毛钱以内。</li>
+        <li>查词优先用内置词典（2 万多词，免费）；查不到才问你，点了才调模型。</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-mark">每日阅读</span>
+      <span class="footer-note">数据都在本机 MySQL，不上传任何服务器。</span>
+    </div>
+  </footer>
+</div>
+<script th:src="@{/js/settings.js}"></script>
+</body>
+</html>

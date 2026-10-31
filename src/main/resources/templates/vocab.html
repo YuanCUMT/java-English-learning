@@ -25,6 +25,7 @@
         <a href="/">今日文章</a>
         <a th:href="@{/archive}" th:classappend="${active == 'archive'} ? 'active'">历史文章</a>
         <a th:href="@{/vocab}" th:classappend="${active == 'vocab'} ? 'active'">单词本 <span class="nav-count" th:text="${learning + mastered}">0</span></a>
+        <a th:href="@{/settings}">设置</a>
         <span class="nav-user" th:text="${username}">用户</span>
         <a th:href="@{/logout}">退出</a>
       </nav>

@@ -21,6 +21,7 @@ public class PhraseLookupService {
 
     private final DeepSeekClient deepSeek;
     private final LookupCacheMapper cacheMapper;
+    private final SettingService settingService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static String normalize(String raw) {
@@ -46,7 +47,7 @@ public class PhraseLookupService {
                 """;
         String user = "要查的词或短语：" + word;
 
-        JsonNode node = deepSeek.completeJson(system, user, 0.2);
+        JsonNode node = deepSeek.completeJson(system, user, 0.2, settingService.effectiveDeepSeekKey(userId));
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("word", text(node, "word", word));
         data.put("phonetic", text(node, "phonetic", ""));

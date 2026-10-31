@@ -30,8 +30,8 @@ public class ArticleController {
                                   Integer questions, String topic) {}
 
     @GetMapping("/status")
-    public ApiResponse status() {
-        return ApiResponse.ok(Map.of("aiConfigured", articleService.aiConfigured()));
+    public ApiResponse status(@RequestAttribute("userId") Long userId) {
+        return ApiResponse.ok(Map.of("aiConfigured", articleService.aiConfigured(userId)));
     }
 
     @GetMapping("/today")

@@ -27,7 +27,7 @@ public class DeepSeekClient {
     private final DeepSeekProperties props;
     private final ObjectMapper mapper;
 
-    private RestClient client() {
+    private RestClient client(String apiKey) {
         HttpClient http = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(15))
                 .build();
@@ -36,20 +36,30 @@ public class DeepSeekClient {
         return RestClient.builder()
                 .baseUrl(props.getBaseUrl())
                 .requestFactory(factory)
-                .defaultHeader("Authorization", "Bearer " + props.getApiKey())
+                .defaultHeader("Authorization", "Bearer " + apiKey)
                 .build();
     }
 
-    public boolean configured() {
-        return props.configured();
+    /** 不传 key 时用配置文件里的（用户没在设置页填过就走到这里） */
+    public String keyOr(String apiKey) {
+        return apiKey == null || apiKey.isBlank() ? props.getApiKey() : apiKey;
+    }
+
+    public boolean configured(String apiKey) {
+        String k = keyOr(apiKey);
+        return k != null && k.startsWith("sk-") && k.length() > 20;
     }
 
     /**
      * 让模型返回一个 JSON 对象。失败时抛出 IllegalStateException（带人话信息）。
      */
     public JsonNode completeJson(String systemPrompt, String userPrompt, double temperature) {
-        if (!configured()) {
-            throw new IllegalStateException("还没配置 DeepSeek API Key，文章生成需要它。");
+        return completeJson(systemPrompt, userPrompt, temperature, null);
+    }
+
+    public JsonNode completeJson(String systemPrompt, String userPrompt, double temperature, String apiKey) {
+        if (!configured(apiKey)) {
+            throw new IllegalStateException("还没配置 DeepSeek API Key：点右上角「设置」填一个，或写进 application-local.yml。");
         }
         Map<String, Object> payload = Map.of(
                 "model", props.getModel(),
@@ -64,7 +74,7 @@ public class DeepSeekClient {
 
         String raw;
         try {
-            raw = client().post()
+            raw = client(keyOr(apiKey)).post()
                     .uri("/chat/completions")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(payload)

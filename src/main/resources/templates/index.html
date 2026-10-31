@@ -83,6 +83,15 @@
         <span class="panel-code">02 / article</span>
         <span class="panel-title">今天这一篇</span>
         <span class="spacer"></span>
+        <select class="mini-select" id="genMode" title="文章模式">
+          <option value="review">复习模式</option>
+          <option value="exam">真题模式</option>
+        </select>
+        <select class="mini-select" id="genDifficulty" title="难度">
+          <option value="B2">B2 · 偏易</option>
+          <option value="C1" selected>C1 · 考研英语一</option>
+          <option value="C2">C2 · 偏难</option>
+        </select>
         <button class="btn primary" id="btnGenerate" type="button" disabled>生成文章</button>
       </div>
       <div class="article-placeholder" id="articleBox">

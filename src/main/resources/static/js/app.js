@@ -143,8 +143,8 @@
     ev.target.value = '';
   });
 
-  // —— 拖拽图片进左侧面板 ——
-  const dropZone = $('#wordList').closest('.panel');
+  // —— 拖拽图片进导入面板 ——
+  const dropZone = $('#importPanel');
   let dragDepth = 0;
   const hasFiles = (ev) => ev.dataTransfer && Array.from(ev.dataTransfer.types || []).includes('Files');
 

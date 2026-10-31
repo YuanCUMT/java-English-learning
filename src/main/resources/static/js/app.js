@@ -143,8 +143,26 @@
     ev.target.value = '';
   });
 
-  // —— 拖拽图片进导入面板 ——
-  const dropZone = $('#importPanel');
+  // —— 导入弹窗 ——
+  const modalImport = $('#modalImport');
+  const openImport = () => {
+    modalImport.hidden = false;
+    document.body.classList.add('modal-open');
+    setTimeout(() => $('#pasteText').focus(), 30);
+  };
+  const closeImport = () => {
+    modalImport.hidden = true;
+    document.body.classList.remove('modal-open');
+  };
+  $('#btnHeroImport').addEventListener('click', openImport);
+  $('#btnImportClose').addEventListener('click', closeImport);
+  modalImport.addEventListener('click', (ev) => { if (ev.target === modalImport) closeImport(); });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' && !modalImport.hidden) closeImport();
+  });
+
+  // —— 拖拽图片进导入弹窗 ——
+  const dropZone = $('#importDrop');
   let dragDepth = 0;
   const hasFiles = (ev) => ev.dataTransfer && Array.from(ev.dataTransfer.types || []).includes('Files');
 
@@ -184,6 +202,7 @@
     }
     if (!files.length) return;
     ev.preventDefault();
+    openImport();
     importImages(files);
   });
 

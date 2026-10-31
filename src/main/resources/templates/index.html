@@ -40,7 +40,7 @@
           长难句、论证结构、五类理解题。单词表、生词本、文章都存在本机 MySQL 里。
         </p>
         <div class="hero-actions">
-          <a class="btn primary hero-button" href="#import">导入今天的单词 <span aria-hidden="true">↘</span></a>
+          <button class="btn primary hero-button" id="btnHeroImport" type="button">导入今天的单词 <span aria-hidden="true">↘</span></button>
           <a class="btn hero-secondary" href="#today">直接生成文章 <span aria-hidden="true">↗</span></a>
         </div>
         <p class="hero-formats">截图 · 粘贴 — 百度 OCR / Tesseract — 复习 / 真题两种模式</p>
@@ -160,31 +160,7 @@
       </dl>
     </section>
 
-    <!-- 一、导入 -->
-    <section class="panel import-panel" id="importPanel">
-      <div class="panel-bar">
-        <span class="panel-code">01 / import</span>
-        <span class="panel-title">导入今天要背的词</span>
-        <span class="spacer"></span>
-        <span class="hint" id="ocrHint">识别引擎：加载中…</span>
-      </div>
-      <div class="import-body">
-        <div class="import-drop" id="importDrop">
-          <div class="drop-icon" aria-hidden="true">↓</div>
-          <p class="drop-title">把单词截图拖到这里</p>
-          <p class="hint">也可以直接 Ctrl+V 粘贴，或者选一张图</p>
-          <label class="btn ghost file-btn">
-            选图识别
-            <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
-          </label>
-        </div>
-        <div class="import-paste">
-          <label class="field-label" for="pasteText">或者粘贴词表</label>
-          <textarea id="pasteText" rows="4" placeholder="把今天的词表粘进来，英文单词会被自动抽出来"></textarea>
-          <button class="btn primary" id="btnPaste" type="button">导入这些词</button>
-        </div>
-      </div>
-    </section>
+
 
     <!-- 二、今日这一篇 -->
     <section class="today" id="today">
@@ -211,7 +187,7 @@
         <aside class="sidebar">
           <section class="panel words-panel">
             <div class="panel-bar">
-              <span class="panel-code">02 / words</span>
+              <span class="panel-code">01 / words</span>
               <span class="panel-title">今日单词 <b id="wordCount" th:text="${todayWords}">0</b></span>
               <span class="spacer"></span>
               <button class="mini-btn" id="btnClearWords" type="button">清空</button>
@@ -253,7 +229,38 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script th:src="@{/js/app.js}"></script>
-<script th:src="@{/js/article.js}"></script>
+  <!-- 导入弹窗：粘贴词表 + 截图识别 -->
+  <div class="modal" id="modalImport" hidden>
+    <div class="modal-card">
+      <header>
+        <h3>导入今天要背的词</h3>
+        <span class="hint" id="ocrHint">识别引擎：加载中…</span>
+        <button class="x" id="btnImportClose" type="button" aria-label="关闭">✕</button>
+      </header>
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" for="pasteText">粘贴词表</label>
+          <textarea id="pasteText" rows="6" placeholder="把今天的词表粘进来，一行一个或用逗号、空格隔开都行，英文单词会被自动抽出来"></textarea>
+          <div class="field-actions">
+            <button class="btn primary" id="btnPaste" type="button">导入这些词</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">或者用截图</label>
+          <div class="import-drop" id="importDrop">
+            <div class="drop-icon" aria-hidden="true">↓</div>
+            <p class="drop-title">把单词截图拖到这里</p>
+            <p class="hint">也可以直接 Ctrl+V 粘贴，或者选一张图</p>
+            <label class="btn ghost file-btn">
+              选图识别
+              <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script th:src="@{/js/app.js}"></script>
+  <script th:src="@{/js/article.js}"></script>
 </body>
-</html>

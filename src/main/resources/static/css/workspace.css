@@ -48,20 +48,25 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 12px 14px;
+  /* 不加 align-items:stretch，否则只有一个词时它会竖向拉满整个面板 */
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 4px 14px;
+  padding: 14px 16px;
   min-height: 40px;
 }
 
 .chip {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 14px;
-  border: 1px solid var(--line, #17161a);
-  padding: 3px 9px;
+  font-size: 14.5px;
+  border: none;
+  background: none;
+  padding: 2px 0;
   cursor: pointer;
-  background: #fff;
+  line-height: 1.7;
+  border-bottom: 1px solid transparent;
 }
-.chip:hover { background: #f3efe6; }
+.chip:hover { border-bottom-color: var(--ink, #17161a); }
 
 .chip.empty { border: none; color: #9b968e; font-family: inherit; cursor: default; }
 

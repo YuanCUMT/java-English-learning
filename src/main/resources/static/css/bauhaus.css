@@ -1289,3 +1289,10 @@ main.vocab-main > section, main.archive-main > section { width: 100%; }
 .modal-card .import-drop { padding: 26px 16px; }
 
 body.modal-open { overflow: hidden; }
+
+/* 中文字体统一成楷体：西文仍用原来的无衬线/衬线，CJK 落到楷体 */
+:root {
+  --sans: "Avenir Next", "Helvetica Neue", "KaiTi", "楷体", "STKaiti", "Kaiti SC", "Noto Serif SC", serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "KaiTi", "楷体", "STKaiti", serif;
+}
+body, button, input, select, textarea { font-family: var(--sans); }

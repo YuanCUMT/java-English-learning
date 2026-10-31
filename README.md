@@ -59,6 +59,14 @@ mysql -uroot -p --default-character-set=utf8mb4 < sql/dict-data.sql
 
 ### 3. 填自己的 Key
 
+两种方式，任选：
+
+**A. 在网页里填（推荐，不用改文件）**：登录后点右上角「设置」，把 `sk-` 开头的 Key 粘进去，点保存。立刻生效，不用重新打包。Key 存在本机 MySQL 的 `user_settings` 表，按用户隔离，换个人登录就是另一个人的 Key。
+
+![设置页](docs/img/settings.png)
+
+**B. 写进配置文件**（适合只自己用）：
+
 新建 `src/main/resources/application-local.yml`（这个文件在 `.gitignore` 里，不会进仓库）：
 
 ```yaml
@@ -74,6 +82,8 @@ app:
 ```
 
 再改 `application.yml` 里的 `spring.datasource.username / password`。
+
+网页里填的 Key 优先级高于配置文件：填了就用自己的，清掉就退回配置文件那份。
 
 > 注意：`application-local.yml` 会被打进 jar，**改完要重新 `mvn package`**，光重启不生效。我第一次就被这个坑了。
 

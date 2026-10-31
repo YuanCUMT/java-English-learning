@@ -168,3 +168,13 @@ CREATE TABLE ocr_cache
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (image_sha1)
 ) ENGINE = InnoDB COMMENT ='OCR 结果缓存';
+
+DROP TABLE IF EXISTS user_settings;
+CREATE TABLE user_settings
+(
+    user_id    BIGINT      NOT NULL,
+    skey       VARCHAR(40) NOT NULL,
+    svalue     TEXT        NOT NULL,
+    updated_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, skey)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='用户自己的设置（API Key 等）';

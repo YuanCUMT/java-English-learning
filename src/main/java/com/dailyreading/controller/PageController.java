@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 
 /** 页面路由：单词本、历史文章、单篇阅读。 */
 @Controller
@@ -18,6 +19,16 @@ public class PageController {
     private final MarkService markService;
     private final WordService wordService;
     private final ArticleService articleService;
+
+    @GetMapping("/settings")
+    public String settings(@RequestAttribute("userId") Long userId,
+                           @RequestAttribute("username") String username,
+                           Model model) {
+        model.addAttribute("username", username);
+        model.addAttribute("active", "settings");
+        model.addAttribute("learningMarks", markService.count(userId, "learning"));
+        return "settings";
+    }
 
     @GetMapping("/vocab")
     public String vocab(HttpSession session, Model model) {

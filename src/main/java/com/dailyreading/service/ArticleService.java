@@ -25,13 +25,14 @@ public class ArticleService {
 
     private final PromptBuilder promptBuilder;
     private final DeepSeekClient deepSeek;
+    private final SettingService settingService;
     private final ArticleMapper articleMapper;
     private final ObjectMapper mapper;
 
     public record Result(Article article, Map<String, Object> body) {}
 
-    public boolean aiConfigured() {
-        return deepSeek.configured();
+    public boolean aiConfigured(Long userId) {
+        return settingService.deepSeekConfigured(userId);
     }
 
     /** 生成（或重新生成）当天某个模式的文章。 */
@@ -39,7 +40,7 @@ public class ArticleService {
         if (words == null || words.isEmpty()) {
             throw new IllegalArgumentException("今天还没有单词，先导入再生成。");
         }
-        JsonNode json = deepSeek.completeJson(promptBuilder.system(), promptBuilder.user(words, opt), 0.75);
+        JsonNode json = deepSeek.completeJson(promptBuilder.system(), promptBuilder.user(words, opt), 0.75, settingService.effectiveDeepSeekKey(userId));
         validate(json);
 
         int wordCount = countWords(json.path("paragraphs"));

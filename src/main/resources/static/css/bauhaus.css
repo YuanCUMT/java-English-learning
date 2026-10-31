@@ -1303,3 +1303,23 @@ body, button, input, select, textarea { font-family: var(--sans); }
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "SimSun", "宋体", "Songti SC", "STSong", serif;
 }
 body, button, input, select, textarea { font-family: var(--sans); }
+
+/* 设置页 */
+.settings-panel { margin-top: 28px; max-width: 760px; }
+.settings-note { color: #56534d; font-size: 14px; line-height: 1.8; margin: 6px 0 18px; }
+.settings-note a { color: #b13b25; }
+.settings-note code { background: #efeadf; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+.field-row { display: flex; align-items: center; gap: 12px; }
+.field-row label { font-size: 13px; color: #56534d; width: 42px; flex: none; }
+.field-row .mini-input { flex: 1; padding: 10px 12px; font-size: 14px; border: 1px solid #17161a; border-radius: 8px; background: #fff; }
+.field-hint { margin: 8px 0 0; font-size: 13px; color: #8a857c; }
+.field-hint.ok { color: #2f6b45; }
+.field-hint.warn { color: #b13b25; }
+.settings-acts { display: flex; gap: 10px; margin-top: 18px; }
+.settings-list { margin: 4px 0 0; padding-left: 18px; color: #56534d; font-size: 14px; line-height: 1.9; }
+.settings-list b { color: #17161a; }
+.settings-acts .btn { flex: 0 0 auto; padding: 10px 26px; }
+.settings-panel { border-radius: 0; }
+.settings-acts { flex-wrap: wrap; }
+.settings-acts .btn { width: auto; min-width: 96px; flex: 0 0 auto; }
+.settings-panel { overflow: hidden; }

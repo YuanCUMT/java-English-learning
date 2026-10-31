@@ -51,39 +51,50 @@
     </div>
   </section>
 
+  <!-- 一、导入：把截图拖进来，或者粘贴词表 -->
+  <section class="panel import-panel" id="importPanel">
+    <div class="panel-head">
+      <span class="panel-code">01 / import</span>
+      <span class="panel-title">导入今天要背的词</span>
+      <span class="spacer"></span>
+      <span class="hint" id="ocrHint">识别引擎：加载中…</span>
+    </div>
+    <div class="import-body">
+      <div class="import-drop" id="importDrop">
+        <div class="drop-icon" aria-hidden="true">↓</div>
+        <p class="drop-title">把单词截图拖到这里</p>
+        <p class="hint">也可以直接 Ctrl+V 粘贴，或者选一张图</p>
+        <label class="btn ghost file-btn">
+          选图识别
+          <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+        </label>
+      </div>
+      <div class="import-paste">
+        <label class="field-label" for="pasteText">或者粘贴词表</label>
+        <textarea id="pasteText" rows="4" placeholder="把今天的词表粘进来，英文单词会被自动抽出来（一行一个、用逗号或空格隔开都行）"></textarea>
+        <button class="btn primary" id="btnPaste" type="button">导入这些词</button>
+      </div>
+    </div>
+  </section>
+
   <div class="workspace">
-    <!-- 左：今日单词 -->
+    <!-- 二、今日单词 -->
     <aside class="panel words-panel">
       <div class="panel-head">
-        <span class="panel-code">01 / words</span>
+        <span class="panel-code">02 / words</span>
         <span class="panel-title">今日单词 <b id="wordCount" th:text="${todayWords}">0</b></span>
         <button class="mini" id="btnClearWords" type="button">清空</button>
       </div>
-
       <div class="words-filter">
         <input class="mini-input" id="wordFilter" type="search" placeholder="搜索今天的单词" autocomplete="off">
       </div>
       <div class="chips" id="wordList"></div>
-
-      <div class="import-box">
-        <label class="field-label" for="pasteText">粘贴导入</label>
-        <textarea id="pasteText" rows="3" placeholder="把今天的词表粘进来，英文单词会被自动抽出来"></textarea>
-        <div class="btn-row">
-          <button class="btn primary" id="btnPaste" type="button">导入</button>
-          <label class="btn ghost file-btn">
-            选图识别
-            <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
-          </label>
-        </div>
-        <p class="hint" id="ocrHint">识别引擎：加载中…</p>
-        <p class="hint">截图可以直接拖进这块面板，或者 Ctrl+V 粘贴进来</p>
-      </div>
     </aside>
 
-    <!-- 右：文章 -->
+    <!-- 三、文章 -->
     <section class="panel article-panel">
       <div class="panel-head">
-        <span class="panel-code">02 / article</span>
+        <span class="panel-code">03 / article</span>
         <span class="panel-title">今天这一篇</span>
         <span class="spacer"></span>
         <select class="mini-select" id="genMode" title="文章模式">
@@ -99,7 +110,7 @@
       </div>
       <div class="article-placeholder" id="articleBox">
         <p><b>还没有文章。</b></p>
-        <p class="hint">先在左边导入今天的单词，然后点「生成文章」。</p>
+        <p class="hint">先在上面导入今天的单词，再点「生成文章」。</p>
       </div>
       <div class="article-body" id="articleBody" hidden></div>
       <div class="article-loading" id="articleLoading" hidden>

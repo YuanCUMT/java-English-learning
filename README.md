@@ -7,6 +7,7 @@
 先说明：我先用 Node.js 写过一个一模一样的版本，跑起来是能用的；这学期要求用 Java，所以我把整套东西用 **Spring Boot + MyBatis + Thymeleaf + MySQL** 重做了一遍。重做的时候顺手把原来不满意的地方也改了，比如查词从"一律问模型"改成"本地词典优先"。
 
 需求文档在 [REQUIREMENTS.md](REQUIREMENTS.md)，数据库设计在 [docs/er.md](docs/er.md)，接口文档在 [docs/api.md](docs/api.md)。
+**怎么用（带截图、一步一步）写在 [docs/使用说明.md](docs/使用说明.md)。**
 
 ## 它现在能干什么
 

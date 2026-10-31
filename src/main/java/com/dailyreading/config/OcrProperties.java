@@ -12,11 +12,17 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.ocr")
 public class OcrProperties {
 
-    /** mock | baidu */
+    /** mock | baidu | tesseract */
     private String provider = "mock";
 
     /** mock 模式下返回的词 */
     private String mockWords = "abandon,procedure,reluctant,cautious,vivid,witness,harvest,modest";
+
+    /** tesseract 模式下 tessdata 目录（放 eng.traineddata） */
+    private String tessdata = "tessdata";
+
+    /** tesseract 语言包，可写 eng 或 eng+chi_sim */
+    private String lang = "eng";
 
     private Baidu baidu = new Baidu();
 

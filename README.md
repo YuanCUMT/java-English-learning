@@ -13,8 +13,11 @@
   - ECDICT 子集导入 MySQL：**21,339 词条 + 27,278 变形**
   - 词典查询接口跑通（含词形还原：`takes → take`）
 - [x] **M2-1** 用户系统：注册 / 登录 / BCrypt / 拦截器 / 会话固定防护
-- [x] **M2-2** 单词导入：粘贴导入 + 图片上传，OCR 可插拔（mock 可跑通，百度云待接）
-- [x] **M2-3** 截图识别接百度云（通用文字识别·高精度版，已实测认出 8 个单词）
+- [x] **M2-2** 单词导入：粘贴导入 + 图片上传，OCR 可插拔（`mock` / `baidu` / `tesseract`）
+- [x] **M2-3** 截图识别：**离线 Tesseract 已实测可用**（按字号筛词）
+  - 百度云高精度版代码已写好、`access_token` 也能换到，但这个账号**实名认证没通过**，
+    接口一直返回 `错误 18: Open api qps request limit reached`（配额是 0），所以默认走离线引擎。
+  - 实名过了以后把 `app.ocr.provider` 改成 `baidu` 即可，代码不用动。
 - [x] **M3** 文章生成 + 阅读查词
   - `POST /api/articles/generate` 调 DeepSeek（`response_format: json_object`），实测一篇 347 词约 16 秒
   - 两套提示词：复习模式（句子短、少从句）/ 真题模式（社科议论文、带让步—反驳、五类题型）
@@ -43,7 +46,35 @@ mysql -uroot -p --default-character-set=utf8mb4 < sql/dict-data.sql
 
 ### 2. 改配置
 
-`src/main/resources/application.yml` 里的 `spring.datasource.username / password` 改成自己的。
+`src/main/resources/application-local.yml` 放自己真实的 Key（这个文件在 `.gitignore` 里，不进仓库）：
+
+```yaml
+app:
+  deepseek:
+    api-key: "sk-..."        # 文章生成要用
+  ocr:
+    provider: tesseract      # mock | baidu | tesseract
+    baidu:
+      api-key: "..."
+      secret-key: "..."
+      accurate: true
+```
+
+> `application-local.yml` 会被打进 jar，**改它要重新 `mvn package`** 才生效（不是只重启就行）。
+
+`application.yml` 里的 `spring.datasource.username / password` 也改成自己的。
+
+### 2.1 截图识别选哪个引擎
+
+| provider | 要账号吗 | 效果 | 说明 |
+|---|---|---|---|
+| `tesseract` | 不要 | 够用 | 默认。只依赖 `tessdata/eng.traineddata`（3.9 MB，已随仓库提供） |
+| `baidu` | 要 | 更好 | 通用文字识别·高精度版。**账号必须实名**，否则接口返回 `错误 18`（QPS 配额 0） |
+| `mock` | 不要 | 假数据 | 单测 / 演示用，固定返回 abandon / harvest 之类 |
+
+Tesseract 的做法是**按字号筛词**：单词卡上目标词最大，音标 / 释义 / 例句 / 水印都小一号，
+所以按识别出的包围盒高度只留接近最大字号的那批，杂字自然被滤掉；字都差不多大时退回「按行挑短行」。
+识别结果会进候选列表，可以自己勾选和改拼写，不用指望它 100% 干净。
 
 ### 3. 启动
 

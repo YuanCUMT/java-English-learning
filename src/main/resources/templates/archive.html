@@ -5,31 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>历史文章 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
   <link rel="stylesheet" th:href="@{/css/workspace.css}">
 </head>
-<body>
+<body class="page">
 
-<header class="topbar">
-  <div class="wrap inner">
-    <div class="brand">
-      <span class="mark">D/R</span>
-      <span>每日阅读</span>
+<div class="app">
+
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true">D/R</span>
+        <span class="brand-word">
+          <h1>每日阅读</h1>
+          <p>今天背的词，读成一篇真题</p>
+        </span>
+      </a>
+      <nav class="page-nav" aria-label="主导航">
+        <a href="/">今日文章</a>
+        <a th:href="@{/archive}" th:classappend="${active == 'archive'} ? 'active'">历史文章</a>
+        <a th:href="@{/vocab}" th:classappend="${active == 'vocab'} ? 'active'">单词本 <span class="nav-count" th:text="${learning + mastered}">0</span></a>
+        <span class="nav-user" th:text="${username}">用户</span>
+        <a th:href="@{/logout}">退出</a>
+      </nav>
     </div>
-    <nav>
-      <a th:href="@{/}">今日文章</a>
-      <a class="active" th:href="@{/archive}">历史文章</a>
-      <a th:href="@{/vocab}">单词本</a>
-      <span th:text="${username}">用户</span>
-      <a th:href="@{/logout}">退出</a>
-    </nav>
-  </div>
-</header>
+  </header>
 
-<main class="wrap">
-  <section class="hero">
-    <div class="eyebrow">Archive / 历史</div>
+<main class="archive-main">
+  <section class="page-head">
+    <p class="eyebrow">Archive / 历史</p>
     <h1>读过的那些篇。</h1>
-    <p>按日期倒序。点开任意一篇都能重新读，查词、收藏照旧。</p>
+    <p class="lede">按日期倒序。点开任意一篇都能重新读，查词、收藏照旧。</p>
   </section>
 
   <section class="panel">
@@ -60,6 +66,7 @@
     </div>
   </section>
 </main>
+</div>
 
 </body>
 </html>

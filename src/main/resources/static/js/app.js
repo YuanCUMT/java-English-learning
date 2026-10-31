@@ -89,6 +89,34 @@
     }
   }
 
+  // 拖拽 / 粘贴进来的可能是一批图，按顺序一张张识别
+  async function importImages(files) {
+    const list = Array.from(files).filter((f) => f && f.type && f.type.startsWith('image/'));
+    if (!list.length) return false;
+    if (list.length === 1) {
+      await importImage(list[0]);
+      return true;
+    }
+    let total = 0;
+    let added = 0;
+    for (let i = 0; i < list.length; i++) {
+      toast('识别第 ' + (i + 1) + '/' + list.length + ' 张…');
+      try {
+        const form = new FormData();
+        form.append('file', list[i]);
+        const body = await api('/api/words/ocr', { method: 'POST', body: form });
+        total += body.data.total;
+        added += body.data.added;
+      } catch (e) {
+        toast('第 ' + (i + 1) + ' 张失败：' + e.message, true);
+        return true;
+      }
+    }
+    toast('共识别 ' + total + ' 个词，新增 ' + added + ' 个');
+    await load();
+    return true;
+  }
+
   async function clearWords() {
     if (!confirm('清空今天的单词？')) return;
     try {
@@ -104,9 +132,53 @@
   $('#btnPaste').addEventListener('click', importText);
   $('#btnClearWords').addEventListener('click', clearWords);
   $('#fileInput').addEventListener('change', (ev) => {
-    const file = ev.target.files && ev.target.files[0];
-    if (file) importImage(file);
+    const files = ev.target.files;
+    if (files && files.length) importImages(files);
     ev.target.value = '';
+  });
+
+  // —— 拖拽图片进左侧面板 ——
+  const dropZone = $('#wordList').closest('.panel');
+  let dragDepth = 0;
+  const hasFiles = (ev) => ev.dataTransfer && Array.from(ev.dataTransfer.types || []).includes('Files');
+
+  dropZone.addEventListener('dragenter', (ev) => {
+    if (!hasFiles(ev)) return;
+    ev.preventDefault();
+    dragDepth++;
+    dropZone.classList.add('dragging');
+  });
+  dropZone.addEventListener('dragover', (ev) => {
+    if (!hasFiles(ev)) return;
+    ev.preventDefault();
+    ev.dataTransfer.dropEffect = 'copy';
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) dropZone.classList.remove('dragging');
+  });
+  dropZone.addEventListener('drop', (ev) => {
+    if (!hasFiles(ev)) return;
+    ev.preventDefault();
+    dragDepth = 0;
+    dropZone.classList.remove('dragging');
+    importImages(ev.dataTransfer.files);
+  });
+
+  // —— 直接 Ctrl+V 粘贴截图（文本粘贴不拦，照常进输入框）——
+  document.addEventListener('paste', (ev) => {
+    const items = ev.clipboardData && ev.clipboardData.items;
+    if (!items) return;
+    const files = [];
+    for (const it of items) {
+      if (it.kind === 'file' && it.type.startsWith('image/')) {
+        const f = it.getAsFile();
+        if (f) files.push(f);
+      }
+    }
+    if (!files.length) return;
+    ev.preventDefault();
+    importImages(files);
   });
 
 

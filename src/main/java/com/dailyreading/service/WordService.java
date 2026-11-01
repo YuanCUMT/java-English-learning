@@ -68,12 +68,23 @@ public class WordService {
      */
     public List<Map<String, Object>> history(Long userId) {
         List<Map<String, Object>> out = new ArrayList<>();
+        // 先把所有天的词一次性拿到，再整体批量查词典，避免逐词查（N+1）
+        Map<LocalDate, List<Word>> byDate = new LinkedHashMap<>();
+        Set<String> allWords = new LinkedHashSet<>();
         for (LocalDate d : wordMapper.listDates(userId)) {
+            List<Word> ws = wordMapper.listByDate(userId, d);
+            byDate.put(d, ws);
+            for (Word w : ws) allWords.add(w.getWord());
+        }
+        Map<String, Map<String, Object>> dict = dictService.lookupBatch(new ArrayList<>(allWords));
+
+        for (Map.Entry<LocalDate, List<Word>> byDay : byDate.entrySet()) {
+            LocalDate d = byDay.getKey();
             List<Map<String, Object>> items = new ArrayList<>();
-            for (Word w : wordMapper.listByDate(userId, d)) {
+            for (Word w : byDay.getValue()) {
                 Map<String, Object> item = new LinkedHashMap<>();
                 item.put("word", w.getWord());
-                Map<String, Object> e = dictService.lookup(w.getWord());
+                Map<String, Object> e = dict.get(DictService.normalize(w.getWord()));
                 if (e != null) {
                     item.put("phonetic", e.get("phonetic"));
                     item.put("pos", e.get("pos"));

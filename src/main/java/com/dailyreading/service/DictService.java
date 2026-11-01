@@ -5,7 +5,12 @@ import com.dailyreading.mapper.DictMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -64,5 +69,57 @@ public class DictService {
 
     public int size() {
         return dictMapper.countEntries();
+    }    /**
+     * 批量版 lookup：单词本「每日单词」一次拉几百个词时，逐词查是 N+1。
+     * 这里按 500 一批查词形表和词条表，返回 key 是 normalize 之后的原词。
+     */
+    public Map<String, Map<String, Object>> lookupBatch(List<String> raws) {
+        Map<String, Map<String, Object>> out = new LinkedHashMap<>();
+        if (raws == null || raws.isEmpty()) return out;
+
+        List<String> keys = new ArrayList<>(new LinkedHashSet<>(raws.stream()
+                .map(DictService::normalize).filter(s -> !s.isEmpty()).toList()));
+        if (keys.isEmpty()) return out;
+
+        Map<String, String> lemma = new HashMap<>();
+        for (List<String> chunk : chunks(keys)) {
+            for (Map<String, Object> row : dictMapper.findLemmas(chunk)) {
+                Object f = row.get("form");
+                Object l = row.get("lemma");
+                if (f != null && l != null) lemma.put(String.valueOf(f), String.valueOf(l));
+            }
+        }
+
+        Set<String> heads = new LinkedHashSet<>();
+        for (String k : keys) heads.add(lemma.getOrDefault(k, k));
+        heads.addAll(keys);
+
+        Map<String, DictEntry> entries = new HashMap<>();
+        for (List<String> chunk : chunks(new ArrayList<>(heads))) {
+            for (DictEntry e : dictMapper.findByWords(chunk)) entries.put(e.getWord(), e);
+        }
+
+        for (String k : keys) {
+            DictEntry entry = entries.get(lemma.getOrDefault(k, k));
+            if (entry == null) entry = entries.get(k);
+            if (entry == null) continue;
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("word", entry.getWord());
+            item.put("surface", k);
+            item.put("phonetic", entry.getPhonetic() == null || entry.getPhonetic().isEmpty()
+                    ? "" : "/" + entry.getPhonetic() + "/");
+            item.put("pos", entry.getPos());
+            item.put("cn", entry.getTranslation());
+            out.put(k, item);
+        }
+        return out;
+    }
+
+    private static List<List<String>> chunks(List<String> all) {
+        List<List<String>> out = new ArrayList<>();
+        for (int i = 0; i < all.size(); i += 500) {
+            out.add(all.subList(i, Math.min(i + 500, all.size())));
+        }
+        return out;
     }
 }

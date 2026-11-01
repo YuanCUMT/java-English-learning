@@ -1371,3 +1371,11 @@ body, button, input, select, textarea { font-family: var(--sans); }
 }
 .key-notice[hidden] { display: none; }
 
+
+/* 单词本：排序 + 搜索 */
+.vocab-tools { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.vocab-tools select, .vocab-tools input {
+  font-size: 12.5px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface); color: var(--ink); font-family: inherit;
+}
+.vocab-tools input { width: 130px; }

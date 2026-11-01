@@ -14,11 +14,14 @@
 const phrasePanel = $('#phrasePanel');
 const phraseList = $('#phraseList');
 const tabPhraseCount = $('#tabPhraseCount');
+  const sortSel = $('#vocabSort');
+  const searchInput = $('#vocabSearch');
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
+  let allDays = [];
   let toastTimer = null;
   function toast(msg, isError) {
     toastEl.textContent = msg;
@@ -111,7 +114,7 @@ const tabPhraseCount = $('#tabPhraseCount');
   }
 
   /** 每日单词：一天一段，卡片只放词、音标、词性、释义 */
-  function renderDays(days) {
+  function renderDays(days, flatMode) {
     const total = days.reduce((n, d) => n + d.count, 0);
     if (tabDailyCount) tabDailyCount.textContent = total;
     if (!days.length) {
@@ -132,6 +135,15 @@ const tabPhraseCount = $('#tabPhraseCount');
             </article>`
           )
           .join('');
+        if (flatMode) {
+          return `<section class="day">
+          <h3 class="day-head">
+            <span class="d">全部单词</span>
+            <span class="n">${d.count} 个</span>
+          </h3>
+          <div class="vcards">${cards}</div>
+        </section>`;
+        }
         return `<section class="day">
           <h3 class="day-head">
             <span class="d">${esc(d.date)}</span>
@@ -146,10 +158,34 @@ const tabPhraseCount = $('#tabPhraseCount');
   async function loadDays() {
     try {
       const data = await api('/api/words/history');
-      renderDays((data && data.days) || []);
+      allDays = (data && data.days) || [];
+      paintDays();
     } catch (err) {
       toast(err.message, true);
     }
+  }
+
+  /// 排序 + 搜索都在前端做：一个人导入过的词，几千条以内完全够用
+  function paintDays() {
+    const q = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
+    const mode = sortSel ? sortSel.value : 'time-desc';
+
+    let days = allDays.map((d) => ({
+      ...d,
+      words: (d.words || []).filter((w) => !q || String(w.word || '').toLowerCase().includes(q)),
+    }));
+    days = days.filter((d) => d.words.length);
+    days.forEach((d) => { d.count = d.words.length; });
+
+    if (mode === 'time-asc') {
+      days = days.slice().reverse();
+    } else if (mode === 'alpha') {
+      const flat = [];
+      days.forEach((d) => d.words.forEach((w) => flat.push(w)));
+      flat.sort((a, b) => String(a.word).localeCompare(String(b.word), 'en'));
+      days = flat.length ? [{ date: '', count: flat.length, words: flat }] : [];
+    }
+    renderDays(days, mode === 'alpha');
   }
 
   function switchTab(name) {
@@ -164,6 +200,8 @@ const tabPhraseCount = $('#tabPhraseCount');
   document.querySelectorAll('.vtab').forEach((b) => {
     b.addEventListener('click', () => switchTab(b.dataset.tab));
   });
+  if (sortSel) sortSel.addEventListener('change', paintDays);
+  if (searchInput) searchInput.addEventListener('input', paintDays);
 
   async function load() {
     try {

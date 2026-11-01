@@ -36,36 +36,9 @@
       <p class="lede">生成文章和点词查词都要调 DeepSeek。我开发时把 Key 写在 <code>application-local.yml</code> 里（那个文件我没提交），你拿到项目之后，要在这页填一个自己的。</p>
     </section>
 
-    <section class="panel settings-panel">
-      <div class="panel-code">01 / 要不要填</div>
-      <h2>先看你是哪种情况</h2>
-      <table class="key-table">
-        <thead>
-        <tr><th>你的情况</th><th>要不要填</th><th>为什么</th></tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>只在自己电脑上用</td>
-          <td><b>不用</b></td>
-          <td>程序会先读 <code>application-local.yml</code> 里那份（我留的那份不提交，跟着仓库走的只有空模板）</td>
-        </tr>
-        <tr>
-          <td>把项目发给别人 / 交作业</td>
-          <td><b>对方要自己填</b></td>
-          <td>我的 Key 只在这台机器上，不会跟着仓库走</td>
-        </tr>
-        <tr>
-          <td>老师在自己电脑上检查</td>
-          <td><b>老师要自己填</b>，或者用我的电脑演示</td>
-          <td>同上；我不建议把 Key 一起交上去</td>
-        </tr>
-        </tbody>
-      </table>
-      <p class="key-advice" id="dkAdvice">检查中…</p>
-    </section>
 
     <section class="panel settings-panel">
-      <div class="panel-code">02 / api key</div>
+      <div class="panel-code">01 / api key</div>
       <h2>DeepSeek API Key</h2>
 
       <p class="settings-note">
@@ -88,7 +61,7 @@
     </section>
 
     <section class="panel settings-panel">
-      <div class="panel-code">03 / 说明</div>
+      <div class="panel-code">02 / 说明</div>
       <h2>几点说明</h2>
       <ul class="settings-list">
         <li>保存后立刻生效，不用重启、也不用重新打包 —— Key 存在 <code>user_settings</code> 表里，按账号隔离。</li>

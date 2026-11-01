@@ -1462,3 +1462,7 @@ body, button, input, select, textarea { font-family: var(--sans); }
 }
 .nav-logout button:hover { color: var(--ink, #17161a); }
 @media (max-width: 720px) { .nav-logout button { font-size: 12.5px; } }
+
+/* 设置页面板内边距（原来正文贴着边框） */
+.settings-panel { padding: 14px 18px 18px; }
+.settings-panel .panel-code { margin-bottom: 8px; }

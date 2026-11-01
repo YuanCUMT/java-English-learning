@@ -73,7 +73,8 @@ public class WordController {
         byte[] bytes = file.getBytes();
         // 同一张图（内容 sha1 相同）只识别一次；命中缓存就不碰外部服务
         String sha1 = OcrCacheService.sha1(bytes);
-        OcrCacheService.Cached hit = ocrCacheService.get(sha1);
+        // 显式配成 mock 时不读缓存：缓存里可能是以前真引擎认出来的词，读出来就分不清真假了
+        OcrCacheService.Cached hit = ocrResolver.explicitlyMock() ? null : ocrCacheService.get(sha1);
         boolean fromCache = hit != null;
         OcrResolver.Result result;
         if (hit != null) {

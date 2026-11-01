@@ -99,4 +99,12 @@ class OcrResolverTest {
             assertTrue(chain.get(0).engine().toLowerCase().contains("mock"));
         });
     }
+
+    @Test
+    void 只有显式配置成mock才算explicitlyMock() {
+        runner.withPropertyValues("app.ocr.provider=mock").run(ctx ->
+                assertTrue(ctx.getBean(OcrResolver.class).explicitlyMock(), "显式 mock 要能被识别，否则还会去读缓存"));
+        runner.withPropertyValues("app.ocr.provider=auto").run(ctx ->
+                assertFalse(ctx.getBean(OcrResolver.class).explicitlyMock(), "auto 不算显式 mock"));
+    }
 }

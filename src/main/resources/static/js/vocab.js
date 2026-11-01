@@ -74,8 +74,10 @@ const tabPhraseCount = $('#tabPhraseCount');
   }
 
   function render(marks, noMatch) {
-    const learning = marks.filter((m) => m.status !== 'mastered').length;
-    const mastered = marks.length - learning;
+    // 顶部统计永远是「全部生词」的口径，搜索只筛下面的列表，不改总数
+    const total = allMarks.filter((m) => !/\s/.test(m.word || ''));
+    const learning = total.filter((m) => m.status !== 'mastered').length;
+    const mastered = total.length - learning;
     statLearning.textContent = learning;
     statMastered.textContent = mastered;
 
@@ -177,7 +179,9 @@ const tabPhraseCount = $('#tabPhraseCount');
 
     let days = allDays.map((d) => ({
       ...d,
-      words: (d.words || []).filter((w) => !q || String(w.word || '').toLowerCase().includes(q)),
+      words: (d.words || []).filter((w) => !q
+        || String(w.word || '').toLowerCase().includes(q)
+        || String(w.cn || '').toLowerCase().includes(q)),
     }));
     days = days.filter((d) => d.words.length);
     days.forEach((d) => { d.count = d.words.length; });
@@ -210,10 +214,20 @@ const tabPhraseCount = $('#tabPhraseCount');
     b.addEventListener('click', () => switchTab(b.dataset.tab));
   });
 
+  function timeOf(x) {
+    return String(x.addedAt || x.updatedAt || x.createdAt || '');
+  }
+
   function sortList(items, key) {
     const mode = sortSel ? sortSel.value : 'time-desc';
     const arr = items.slice();
-    if (mode === 'alpha') arr.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en'));
+    if (mode === 'alpha') {
+      arr.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en'));
+    } else if (mode === 'time-asc') {
+      arr.sort((a, b) => timeOf(a).localeCompare(timeOf(b)));
+    } else {
+      arr.sort((a, b) => timeOf(b).localeCompare(timeOf(a)));
+    }
     return arr;
   }
 

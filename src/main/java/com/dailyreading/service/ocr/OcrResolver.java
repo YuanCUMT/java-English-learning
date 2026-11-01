@@ -39,6 +39,11 @@ public class OcrResolver {
     }
 
     /** 页面显示用：真正会先用到的那个引擎（跳过不可用的） */
+    /** 配置里显式写死 mock 时，缓存也要跳过：否则切到 mock 还能拿到当年真引擎认出来的词。 */
+    public boolean explicitlyMock() {
+        return "mock".equals(preferred);
+    }
+
     public String engine() {
         return firstAvailable(chain()).engine();
     }

@@ -3,6 +3,7 @@ package com.dailyreading.service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,14 @@ public final class ArticleValidator {
                 if (!opts.isArray() || opts.size() != 4) {
                     problems.add("第 " + (i + 1) + " 题选项不是 4 个");
                 }
+                if (opts.isArray()) {
+                    for (int j = 0; j < opts.size(); j++) {
+                        String text = opts.get(j).asText("").trim();
+                        if (!text.toUpperCase().startsWith(String.valueOf((char) ('A' + j)))) {
+                            problems.add("第 " + (i + 1) + " 题第 " + (j + 1) + " 个选项没有 A./B./C./D. 前缀：" + text);
+                        }
+                    }
+                }
                 String answer = q.path("answer").asText("").trim().toUpperCase();
                 if (!OPTION_KEYS.contains(answer)) {
                     problems.add("第 " + (i + 1) + " 题答案不是 A/B/C/D：" + answer);
@@ -58,5 +67,40 @@ public final class ArticleValidator {
             }
         }
         return problems;
+    }
+
+    /**
+     * 从正文里实际找目标词，而不是信模型自己在 words 数组里报的那份。
+     * 单词按词形前缀匹配（take / takes / taking 都算），短语按整串匹配。
+     * 这样 article_words 记的就是"正文里真出现了什么"，老师问起来才有得答。
+     */
+    public static List<String> matchWords(JsonNode json, List<String> targets) {
+        StringBuilder sb = new StringBuilder();
+        for (JsonNode p : json.path("paragraphs")) {
+            sb.append(' ').append(p.path("en").asText(""));
+        }
+        String raw = (" " + sb + " ").toLowerCase();
+        String flat = raw.replaceAll("[^a-z0-9'\\-]+", " ");
+        String[] tokens = flat.trim().split("\\s+");
+        Set<String> out = new LinkedHashSet<>();
+        if (targets == null) return new ArrayList<>(out);
+        for (String t : targets) {
+            String key = t == null ? "" : t.trim().toLowerCase();
+            if (key.isEmpty()) continue;
+            boolean hit;
+            if (key.contains(" ")) {
+                hit = flat.contains(" " + key + " ");
+            } else {
+                hit = false;
+                for (String tok : tokens) {
+                    if (tok.equals(key) || (tok.startsWith(key) && tok.length() <= key.length() + 3)) {
+                        hit = true;
+                        break;
+                    }
+                }
+            }
+            if (hit) out.add(key);
+        }
+        return new ArrayList<>(out);
     }
 }

@@ -45,7 +45,7 @@
 mvn -B test
 ```
 
-13 个单测：`ArticleValidatorTest`（标题/段数/题数/选项数/答案范围）、`DictServiceTest`（原形命中、变形还原、查不到、normalize）、`OcrResolverTest`（三个 OCR 引擎的 Bean 装配、链路顺序、mock 兜底）。全部跑在内存里，不碰 MySQL、不调外部服务。
+29 个单测：`ArticleValidatorTest`（标题/段数/题数/选项数/选项序号前缀/答案范围/目标词是否真写进正文）、`DictServiceTest`（原形命中、变形还原、查不到、normalize）、`OcrResolverTest`（三个 OCR 引擎的 Bean 装配、链路顺序、mock 兜底）、`OcrCacheServiceTest`（缓存命中/坏数据/空输入）、`WordServiceHistoryTest`（历史一次取全量、不再按天 N+1）。全部跑在内存里，不碰 MySQL、不调外部服务。
 
 ## 怎么跑起来
 

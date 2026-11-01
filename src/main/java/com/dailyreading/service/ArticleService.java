@@ -66,7 +66,12 @@ public class ArticleService {
         a.setContent(content);
 
         // 先删同一天的旧文再插入 + 写 article_words，整段在一个事务里
-        articleStore.replace(a, usedWords(json));
+        List<String> actualUsed = ArticleValidator.matchWords(json, words);
+        if (actualUsed.isEmpty()) {
+            throw new IllegalStateException("生成的文章里一个目标词都没用上，再生成一次试试。");
+        }
+        // article_words 记「正文里真的出现了哪些目标词」，不是模型自己声明的清单
+        articleStore.replace(a, actualUsed);
         return new Result(a, toBody(content));
     }
 

@@ -23,6 +23,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ArticleController {
 
+    @org.springframework.beans.factory.annotation.Value("${app.article.default-mode:review}")
+    private String defaultMode;
+    @org.springframework.beans.factory.annotation.Value("${app.article.default-difficulty:C1}")
+    private String defaultDifficulty;
+    @org.springframework.beans.factory.annotation.Value("${app.article.default-paragraphs:5}")
+    private int defaultParagraphs;
+    @org.springframework.beans.factory.annotation.Value("${app.article.default-questions:5}")
+    private int defaultQuestions;
+    @org.springframework.beans.factory.annotation.Value("${app.article.exam-word-limit:15}")
+    private int examWordLimit;
+
     private final ArticleService articleService;
     private final WordService wordService;
 
@@ -63,10 +74,10 @@ public class ArticleController {
 
         PromptBuilder.Options opt = new PromptBuilder.Options(
                 mode,
-                blankTo(r.difficulty(), "C1"),
-                clamp(r.paragraphs(), 3, 8, 5),
-                clamp(r.questions(), 3, 8, 5),
-                15,
+                blankTo(r.difficulty(), defaultDifficulty),
+                clamp(r.paragraphs(), 3, 8, defaultParagraphs),
+                clamp(r.questions(), 3, 8, defaultQuestions),
+                examWordLimit,
                 r.topic());
 
         try {

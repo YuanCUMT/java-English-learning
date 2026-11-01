@@ -130,7 +130,14 @@
         }
       }
       renderPending();
-      toast('识别到 ' + d.total + ' 个词，确认后点「保存这些词」');
+      const engine = String(d.engine || '');
+      if (d.degraded) {
+        toast('识别到 ' + d.total + ' 个词，但真实 OCR 这次失败了，用的是备用引擎（' + engine + '），结果可能不准', true);
+      } else if (engine.toLowerCase().startsWith('mock')) {
+        toast('识别到 ' + d.total + ' 个词，但当前是 mock 模拟数据，不是从图片里认出来的，请手动核对', true);
+      } else {
+        toast('识别到 ' + d.total + ' 个词，确认后点「保存这些词」');
+      }
     } catch (e) {
       toast(e.message, true);
     }

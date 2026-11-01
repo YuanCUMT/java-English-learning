@@ -59,4 +59,47 @@ class ArticleValidatorTest {
     void 空对象要报错() throws Exception {
         assertFalse(ArticleValidator.check(json("{}"), 1, 1).isEmpty());
     }
+
+    @Test
+    void 选项缺少ABCD前缀要报错() throws Exception {
+        String noPrefix = """
+                {"title":"t","paragraphs":[{"en":"This paragraph is long enough to pass the length check."}],
+                 "questions":[{"q":"q1","options":["first option","second option","third option","fourth option"],"answer":"A"}]}
+                """;
+        assertFalse(ArticleValidator.check(json(noPrefix), 1, 1).isEmpty(), "没有 A./B./C./D. 前缀应该被拦下来");
+    }
+
+    @Test
+    void 带前缀的选项不报错() throws Exception {
+        String ok = """
+                {"title":"t","paragraphs":[{"en":"This paragraph is long enough to pass the length check."}],
+                 "questions":[{"q":"q1","options":["A. one","B. two","C. three","D. four"],"answer":"B"}]}
+                """;
+        assertTrue(ArticleValidator.check(json(ok), 1, 1).isEmpty());
+    }
+
+    @Test
+    void 目标词按词形前缀匹配() throws Exception {
+        String body = """
+                {"paragraphs":[{"en":"She takes notes and taking breaks; the result was taken badly."}]}
+                """;
+        assertEquals(List.of("take"), ArticleValidator.matchWords(json(body), List.of("take")));
+    }
+
+    @Test
+    void 没出现在正文里的词不算用过() throws Exception {
+        String body = """
+                {"paragraphs":[{"en":"Tool libraries are popular this year."}]}
+                """;
+        assertTrue(ArticleValidator.matchWords(json(body), List.of("abandon")).isEmpty());
+    }
+
+    @Test
+    void 短语按整串匹配() throws Exception {
+        String body = """
+                {"paragraphs":[{"en":"In terms of cost, it is cheaper."}]}
+                """;
+        assertEquals(List.of("in terms of"), ArticleValidator.matchWords(json(body), List.of("in terms of")));
+        assertTrue(ArticleValidator.matchWords(json(body), List.of("in term of")).isEmpty());
+    }
 }

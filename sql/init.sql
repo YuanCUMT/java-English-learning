@@ -164,7 +164,7 @@ DROP TABLE IF EXISTS ocr_cache;
 CREATE TABLE ocr_cache
 (
     image_sha1 CHAR(40) NOT NULL COMMENT '图片内容 sha1',
-    payload    LONGTEXT NOT NULL COMMENT 'JSON：识别到的词 + 坐标',
+    payload    LONGTEXT NOT NULL COMMENT 'JSON：识别到的词 + 产生它的引擎',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (image_sha1)
 ) ENGINE = InnoDB COMMENT ='OCR 结果缓存';
@@ -176,5 +176,6 @@ CREATE TABLE user_settings
     skey       VARCHAR(40) NOT NULL,
     svalue     TEXT        NOT NULL,
     updated_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, skey)
+    PRIMARY KEY (user_id, skey),
+    CONSTRAINT fk_setting_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='用户自己的设置（API Key 等）';

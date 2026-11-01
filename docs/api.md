@@ -129,10 +129,7 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
   "data": {
     "date": "2026-10-31",
     "count": 0,
-    "words": [],
-    "engine": "baidu 高精度版",
-    "degraded": false,
-    "cached": false
+    "words": []
   }
 }
 ```
@@ -158,7 +155,7 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 `multipart/form-data`，字段名 `file`。可选 `date`，可选 `save`（默认 `true`）。
 
 - `save=true`：识别完直接入库，返回 `added / skipped / total / words / engine`
-- `save=false`：**只识别不入库**，返回 `{words, total, engine, degraded}` 给前端做候选词确认
+- `save=false`：**只识别不入库**，返回 `{words, total, engine, degraded, cached}` 给前端做候选词确认
 
 ```bash
 # 直接入库

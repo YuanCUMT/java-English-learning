@@ -97,7 +97,7 @@ erDiagram
 
     ocr_cache {
         char    image_sha1 PK "图片内容的 sha1"
-        longtext payload      "JSON：识别到的词 + 坐标"
+        longtext payload      "JSON：识别到的词 + 产生它的引擎"
         datetime created_at
     }
   user_settings {

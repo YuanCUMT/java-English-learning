@@ -130,7 +130,8 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
     "date": "2026-10-31",
     "count": 0,
     "words": [],
-    "engine": "tesseract（离线，不用账号）"
+    "engine": "baidu 高精度版",
+    "degraded": false
   }
 }
 ```
@@ -153,10 +154,17 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 
 ### POST /api/words/ocr
 
-`multipart/form-data`，字段名 `file`。可选 `date`。
+`multipart/form-data`，字段名 `file`。可选 `date`，可选 `save`（默认 `true`）。
+
+- `save=true`：识别完直接入库，返回 `added / skipped / total / words / engine`
+- `save=false`：**只识别不入库**，返回 `{words, total, engine, degraded}` 给前端做候选词确认
 
 ```bash
+# 直接入库
 curl -b jar.txt -F "file=@word-card.png" http://127.0.0.1:8080/api/words/ocr
+
+# 只拿候选词，确认后用户自己点保存
+curl -b jar.txt -F "file=@word-card.png" "http://127.0.0.1:8080/api/words/ocr?save=false"
 ```
 
 ```json
@@ -168,7 +176,8 @@ curl -b jar.txt -F "file=@word-card.png" http://127.0.0.1:8080/api/words/ocr
     "skipped": 0,
     "total": 7,
     "words": ["abandon", "harvest", "modest", "procedure", "reluctant", "vivid"],
-    "engine": "tesseract（离线，不用账号）"
+    "engine": "baidu 高精度版",
+    "degraded": false
   }
 }
 ```
@@ -318,3 +327,43 @@ curl -b jar.txt -F "file=@word-card.png" http://127.0.0.1:8080/api/words/ocr
 | `questions` | `[{ "type", "q", "options", "answer", "locate", "explain" }]` 理解题，`type` 是五类题型之一 |
 
 今天的作业词为空 → `400`「今天还没有单词」；模型返回的 JSON 缺字段或不是合法 JSON → `500`。
+
+## 设置（每个用户自己的 Key）
+
+### GET /api/settings
+
+返回当前用户实际生效的 Key 状态，**只回显掩码**，不返回明文。
+
+```bash
+curl -b jar.txt http://127.0.0.1:8080/api/settings
+```
+
+```json
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "deepseekKeyMasked": "sk-4d53****1fe4",
+    "deepseekConfigured": true,
+    "usingOwnKey": false
+  }
+}
+```
+
+`usingOwnKey=false` 表示现在用的是 `application-local.yml` 里那份。
+
+### POST /api/settings
+
+```json
+{ "deepseekKey": "sk-..." }
+```
+
+非 `sk-` 开头 → `400`。保存到这个用户的 `user_settings`，立刻生效，不用重启。
+
+### POST /api/settings/test
+
+真发一次最小请求试 Key，返回 `{ "ok": true, "ms": 812 }`。Key 不可用时返回 `500`，`message` 带 DeepSeek 的原始报错。
+
+### DELETE /api/settings
+
+清掉用户自己填的 Key，退回配置文件那份。

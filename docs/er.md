@@ -1,6 +1,6 @@
 # 数据库设计（ER 图）
 
-9 张表，全部 `utf8mb4` / InnoDB。建表语句见 [`../sql/init.sql`](../sql/init.sql)。
+10 张表，全部 `utf8mb4` / InnoDB。建表语句见 [`../sql/init.sql`](../sql/init.sql)。
 
 ## 关系图
 
@@ -113,7 +113,8 @@ erDiagram
 | 6 | `dict_entries` | 本地词典词条（21,339 条） | 主键就是 `word`；`translation` 建了全文索引 |
 | 7 | `dict_forms` | 词形 → 原形（27,278 条） | 主键 `form`，查 `takes` 时先查这张表 |
 | 8 | `lookup_cache` | 模型查过的词 | `uk_lookup_user_word`，避免同一个词重复花钱 |
-| 9 | `ocr_cache` | 同一张图不重复识别 | 主键是图片内容的 sha1 |
+| 9 | `ocr_cache` | 同一张图不重复识别 | 主键是图片内容的 sha1；**目前还没接代码，预留着** |
+| 10 | `user_settings` | 用户自己填的 Key 等设置 | `uk_setting_user_key (user_id, skey)`，一个用户一个键一行 |
 
 ## 几个设计取舍
 

@@ -3,7 +3,6 @@ package com.dailyreading.service.ocr;
 import com.dailyreading.config.OcrProperties;
 import com.dailyreading.service.WordService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

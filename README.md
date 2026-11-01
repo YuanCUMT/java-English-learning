@@ -39,10 +39,11 @@
 
 ## 测试
 
-`ash
+```bash
 mvn -B test
-`\n
-9 个单测：ArticleValidatorTest（标题/段数/题数/选项数/答案范围）、DictServiceTest（原形命中、变形还原、查不到、normalize）。都跑内存里，不碰 MySQL、不调外部服务。
+```
+
+13 个单测：`ArticleValidatorTest`（标题/段数/题数/选项数/答案范围）、`DictServiceTest`（原形命中、变形还原、查不到、normalize）、`OcrResolverTest`（三个 OCR 引擎的 Bean 装配、链路顺序、mock 兜底）。全部跑在内存里，不碰 MySQL、不调外部服务。
 
 ## 怎么跑起来
 
@@ -118,8 +119,8 @@ mvn spring-boot:run
 
 | provider | 要账号吗 | 我用它识别什么 |
 |---|---|---|
-| `baidu` | 要 | 默认。**单词表截图**（一屏好几个词）——逐行识别，字准、快 |
-| `tesseract` | 不要 | **单词卡截图**（一个大词 + 例句）——按字号筛词，不会把例句里的 the / this 捞进来 |
+| `baidu` | 要 | **单词表截图**（一屏好几个词）——逐行识别，字准、快。配了 Key 时自动优先用它 |
+| `tesseract` | 不要 | **单词卡截图**（一个大词 + 例句）——按字号筛词，不会把例句里的 the / this 捞进来。没配百度 Key 时它顶上 |
 | `mock` | 不要 | 一个 Key 都没配时的兜底，固定返回几个词，保证链路能跑通 |
 
 为什么不能只留一个？因为我两种截图都会传：

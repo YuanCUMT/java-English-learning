@@ -182,31 +182,15 @@
     });
   }
 
-  // 拖拽 / 粘贴进来的可能是一批图，按顺序一张张识别
+  // 拖拽 / 粘贴进来的可能是一批图：逐张走同一套「先候选、再确认」流程，不绕过确认直接入库
   async function importImages(files) {
     const list = Array.from(files).filter((f) => f && f.type && f.type.startsWith('image/'));
     if (!list.length) return false;
-    if (list.length === 1) {
-      await importImage(list[0]);
-      return true;
-    }
-    let total = 0;
-    let added = 0;
     for (let i = 0; i < list.length; i++) {
-      toast('识别第 ' + (i + 1) + '/' + list.length + ' 张…');
-      try {
-        const form = new FormData();
-        form.append('file', list[i]);
-        const body = await api('/api/words/ocr', { method: 'POST', body: form });
-        total += body.data.total;
-        added += body.data.added;
-      } catch (e) {
-        toast('第 ' + (i + 1) + ' 张失败：' + e.message, true);
-        return true;
-      }
+      if (list.length > 1) toast('识别第 ' + (i + 1) + '/' + list.length + ' 张…');
+      await importImage(list[i]);
     }
-    toast('共识别 ' + total + ' 个词，新增 ' + added + ' 个');
-    await load();
+    if (list.length > 1) toast('共 ' + list.length + ' 张图，结果都进候选区了，确认后点「保存这些词」');
     return true;
   }
 
@@ -295,6 +279,6 @@
     importImages(files);
   });
 
-
+  bindPending();
   load();
 })();

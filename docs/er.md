@@ -13,6 +13,7 @@ erDiagram
     users ||--o{ articles       : "生成的文章"
     users ||--o{ lookup_cache   : "查词缓存"
     articles ||--o{ article_words : "本篇用了哪些词"
+  users ||--o{ user_settings  : "用户自己的设置（Key）"
     dict_forms }o--|| dict_entries : "form → lemma"
 
     users {
@@ -99,6 +100,12 @@ erDiagram
         longtext payload      "JSON：识别到的词 + 坐标"
         datetime created_at
     }
+  user_settings {
+    BIGINT user_id PK
+    VARCHAR skey PK
+    TEXT svalue
+    DATETIME updated_at
+  }
 ```
 
 ## 表清单
@@ -113,7 +120,7 @@ erDiagram
 | 6 | `dict_entries` | 本地词典词条（21,339 条） | 主键就是 `word`；`translation` 建了全文索引 |
 | 7 | `dict_forms` | 词形 → 原形（27,278 条） | 主键 `form`，查 `takes` 时先查这张表 |
 | 8 | `lookup_cache` | 模型查过的词 | `uk_lookup_user_word`，避免同一个词重复花钱 |
-| 9 | `ocr_cache` | 同一张图不重复识别 | 主键是图片内容的 sha1；**目前还没接代码，预留着** |
+| 9 | `ocr_cache` | 同一张图不重复识别 | 主键是图片内容的 sha1；**mock 的结果不写入**，避免以后配了真引擎还拿到假词 |
 | 10 | `user_settings` | 用户自己填的 Key 等设置 | `uk_setting_user_key (user_id, skey)`，一个用户一个键一行 |
 
 ## 几个设计取舍

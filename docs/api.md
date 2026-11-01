@@ -131,7 +131,8 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
     "count": 0,
     "words": [],
     "engine": "baidu 高精度版",
-    "degraded": false
+    "degraded": false,
+    "cached": false
   }
 }
 ```
@@ -177,7 +178,8 @@ curl -b jar.txt -F "file=@word-card.png" "http://127.0.0.1:8080/api/words/ocr?sa
     "total": 7,
     "words": ["abandon", "harvest", "modest", "procedure", "reluctant", "vivid"],
     "engine": "baidu 高精度版",
-    "degraded": false
+    "degraded": false,
+    "cached": false
   }
 }
 ```

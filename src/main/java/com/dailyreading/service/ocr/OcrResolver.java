@@ -58,6 +58,11 @@ public class OcrResolver {
     /** 按当前配置的偏好排出来的完整链路（包含不可用的，用于展示） */
     public List<OcrService> chain() {
         List<OcrService> list = new ArrayList<>();
+        if ("mock".equals(preferred)) {
+            // 显式配成 mock 就只跑 mock：演示/没网时用它，不要去碰百度或 tesseract
+            list.add(mock);
+            return list;
+        }
         if ("tesseract".equals(preferred)) {
             list.add(tesseract);
             list.add(baidu);

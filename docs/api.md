@@ -63,6 +63,7 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 | 单词 | GET | `/api/words?date=` | 某天的作业词（默认今天） |
 | 单词 | POST | `/api/words` | 粘贴文本导入 |
 | 单词 | POST | `/api/words/ocr` | 上传图片识别导入（multipart） |
+| 单词 | POST | `/api/words/fill-meanings` | 给内置词典查不到的词补释义（一次最多 40 个） |
 | 单词 | DELETE | `/api/words?date=` | 清空某天（默认今天） |
 | 生词本 | GET | `/api/marks` | 全部生词 + 两摞计数 |
 | 生词本 | POST | `/api/marks` | 收藏（已存在则更新） |
@@ -369,3 +370,20 @@ curl -b jar.txt http://127.0.0.1:8080/api/settings
 ### DELETE /api/settings
 
 清掉用户自己填的 Key，退回配置文件那份。
+
+### POST /api/words/fill-meanings
+
+内置词典（21,339 条）查不到的词——OCR 认出来的生僻词、拼错的词、专有名词——单独调一次模型补释义，
+结果写进 `lookup_cache`，同一个词以后不再花钱。
+
+```json
+{ "words": ["au", "hardline", "kil"] }
+```
+
+```json
+{ "code": 0, "message": "ok", "data": { "filled": 3, "requested": 3, "words": ["au", "hardline", "kil"] } }
+```
+
+- 一次最多处理 40 个（前端按钮会把整本缺释义的词分批送上）
+- 词典里已经有的词会被跳过，不产生调用
+- 需要用户自己配好 DeepSeek Key；没配会返回 `code: 500` 并带提示

@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,23 @@ public class WordController {
     @GetMapping("/history")
     public ApiResponse history(@RequestAttribute("userId") Long userId) {
         return ApiResponse.ok(ApiResponse.map("days", wordService.history(userId)));
+    }
+
+    /** 给内置词典查不到的词补释义（一次最多 40 个，结果写进 lookup_cache） */
+    @PostMapping("/fill-meanings")
+    public ApiResponse fillMeanings(@RequestBody(required = false) Map<String, Object> body,
+                                    @RequestAttribute("userId") Long userId) {
+        List<String> words = new ArrayList<>();
+        if (body != null && body.get("words") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o != null) words.add(String.valueOf(o));
+            }
+        }
+        try {
+            return ApiResponse.ok(wordService.fillMeanings(userId, words));
+        } catch (Exception e) {
+            return ApiResponse.fail(500, "补释义失败：" + e.getMessage());
+        }
     }
 
     /** 粘贴导入：把一段文本里的英文词全抽出来 */

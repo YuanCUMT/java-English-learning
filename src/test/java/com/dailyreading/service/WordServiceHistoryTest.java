@@ -1,6 +1,7 @@
 package com.dailyreading.service;
 
 import com.dailyreading.entity.Word;
+import com.dailyreading.mapper.LookupCacheMapper;
 import com.dailyreading.mapper.WordMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +23,15 @@ class WordServiceHistoryTest {
 
     private WordMapper wordMapper;
     private DictService dictService;
+    private LookupCacheMapper lookupCacheMapper;
     private WordService service;
 
     @BeforeEach
     void setUp() {
         wordMapper = mock(WordMapper.class);
         dictService = mock(DictService.class);
-        service = new WordService(wordMapper, dictService);
+        lookupCacheMapper = mock(LookupCacheMapper.class);
+        service = new WordService(wordMapper, dictService, null, null, lookupCacheMapper);
     }
 
     private static Word word(String w, LocalDate d) {

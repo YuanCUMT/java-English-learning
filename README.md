@@ -9,6 +9,8 @@
 需求文档在 [REQUIREMENTS.md](REQUIREMENTS.md)，数据库设计在 [docs/er.md](docs/er.md)，接口文档在 [docs/api.md](docs/api.md)。
 **怎么用（带截图、一步一步）写在 [docs/使用说明.md](docs/使用说明.md)。**
 
+界面在 ≤720px 会切窄屏版式，手机截图见 [使用说明 · 7. 手机上能不能用](docs/使用说明.md#7-手机上能不能用)。
+
 ## 它现在能干什么
 
 一条完整的链路，从截图到读完做题：

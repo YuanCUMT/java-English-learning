@@ -306,4 +306,10 @@ const tabPhraseCount = $('#tabPhraseCount');
 
   loadDays();
   load();
+
+  // 支持 /vocab?tab=phrases 直达某个标签（文档和 README 里会用到）
+  const wanted = new URLSearchParams(location.search).get('tab');
+  if (wanted && ['daily', 'mine', 'phrases'].includes(wanted) && wanted !== 'daily') {
+    switchTab(wanted);
+  }
 })();

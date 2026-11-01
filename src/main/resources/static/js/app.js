@@ -18,7 +18,13 @@
   }
 
   async function api(url, options) {
-    const res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options));
+    const opts = Object.assign({ credentials: 'same-origin' }, options);
+    // 有 body 但没写 Content-Type 时默认按 JSON 发，否则浏览器会用 text/plain，
+    // 后端 @RequestBody 收不了（HttpMediaTypeNotSupportedException / 415）。
+    if (opts.body && typeof opts.body === 'string' && !opts.headers) {
+      opts.headers = { 'Content-Type': 'application/json' };
+    }
+    const res = await fetch(url, opts);
     if (res.status === 401) {
       window.location.href = '/login';
       throw new Error('未登录');

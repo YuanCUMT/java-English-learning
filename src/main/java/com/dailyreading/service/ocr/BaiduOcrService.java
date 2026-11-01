@@ -5,7 +5,6 @@ import com.dailyreading.service.WordService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,7 +21,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.ocr.provider", havingValue = "baidu")
 public class BaiduOcrService implements OcrService {
 
     private static final String TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";

@@ -68,25 +68,29 @@ public class WordController {
             return ApiResponse.fail(400, "没有收到图片");
         }
         LocalDate d = date == null || date.isBlank() ? LocalDate.now() : LocalDate.parse(date);
-        List<String> words;
+        OcrResolver.Result result;
         try {
-            words = ocrResolver.recognize(file.getBytes());
+            result = ocrResolver.recognize(file.getBytes());
         } catch (Exception e) {
             return ApiResponse.fail(500, "识别失败：" + e.getMessage());
         }
-        if (words.isEmpty()) {
+        List<String> words = result.words();
+        if (words == null || words.isEmpty()) {
             return ApiResponse.fail(400, "没从图片里识别出英文单词");
         }
+        // engine 用「这一次实际干活的引擎」，不是链首那个，降级时页面才不会骗人
         // save=false：只把识别结果当「候选词」返回，由前端确认/改错/删掉后再入库
         if (!save) {
             Map<String, Object> preview = new LinkedHashMap<>();
             preview.put("words", words);
             preview.put("total", words.size());
-            preview.put("engine", ocrResolver.engine());
+            preview.put("engine", result.engine());
+            preview.put("degraded", result.degraded());
             return ApiResponse.ok(preview);
         }
         Map<String, Object> data = wordService.importWords(userId, d, words);
-        data.put("engine", ocrResolver.engine());
+        data.put("engine", result.engine());
+        data.put("degraded", result.degraded());
         return ApiResponse.ok(data);
     }
 

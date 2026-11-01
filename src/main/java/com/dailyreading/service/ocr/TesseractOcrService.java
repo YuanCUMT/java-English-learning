@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.Word;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.ocr.provider", havingValue = "tesseract")
 public class TesseractOcrService implements OcrService {
 
     /** 只认纯英文词，中文和标点会被 eng 模型认成乱码，直接丢掉 */

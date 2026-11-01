@@ -4,6 +4,7 @@ import com.dailyreading.entity.Word;
 import com.dailyreading.mapper.WordMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class WordService {
      *
      * @return {added, skipped, total, words}
      */
+    @Transactional
     public Map<String, Object> importWords(Long userId, LocalDate date, List<String> words) {
         int added = 0;
         int skipped = 0;

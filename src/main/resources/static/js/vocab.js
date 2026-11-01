@@ -160,6 +160,46 @@ const tabPhraseCount = $('#tabPhraseCount');
         </section>`;
       })
       .join('');
+    paintFillButton(days);
+  }
+
+  // 内置词典查不到的词：给一个「补全释义」按钮，一次最多补 40 个（走模型，会花钱，所以要点一下才动）
+  let fillBtn = null;
+  function paintFillButton(days) {
+    const missing = [];
+    days.forEach((d) => d.words.forEach((w) => { if (!w.cn) missing.push(w.word); }));
+    if (!missing.length) {
+      if (fillBtn) { fillBtn.remove(); fillBtn = null; }
+      return;
+    }
+    if (!fillBtn) {
+      fillBtn = document.createElement('button');
+      fillBtn.className = 'btn ghost';
+      fillBtn.type = 'button';
+      fillBtn.id = 'btnFillMeaning';
+      const tools = document.querySelector('.vocab-tools');
+      if (tools) tools.appendChild(fillBtn); else return;
+      fillBtn.onclick = () => fillMeanings(fillBtn.dataset.words.split(','));
+    }
+    fillBtn.dataset.words = missing.slice(0, 40).join(',');
+    fillBtn.textContent = '补全释义（' + missing.length + ' 个）';
+  }
+
+  async function fillMeanings(words) {
+    if (!words.length) return;
+    fillBtn.disabled = true;
+    const old = fillBtn.textContent;
+    fillBtn.textContent = '正在补 ' + words.length + ' 个…';
+    try {
+      const body = await api('/api/words/fill-meanings', { method: 'POST', body: JSON.stringify({ words }) });
+      const n = body.data.filled || 0;
+      toast(n ? '补好了 ' + n + ' 个词的释义' : '模型没返回新的释义，稍后再试');
+      await loadDays();
+    } catch (e) {
+      toast(e.message, true);
+    } finally {
+      if (fillBtn) { fillBtn.disabled = false; fillBtn.textContent = old; }
+    }
   }
 
   async function loadDays() {

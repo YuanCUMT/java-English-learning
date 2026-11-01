@@ -196,7 +196,17 @@
             <div class="words-filter">
               <input class="mini-input" id="wordFilter" type="search" placeholder="搜索今天的单词" autocomplete="off">
             </div>
-            <div class="chips" id="wordList"></div>
+            <div class="word-rows" id="wordList"></div>
+          </section>
+
+          <section class="panel marks-panel">
+            <div class="panel-bar">
+              <span class="panel-code">02 / marks</span>
+              <span class="panel-title">我的生词 <b id="markCount">0</b></span>
+              <span class="spacer"></span>
+              <a class="mini-btn" th:href="@{/vocab}">全部</a>
+            </div>
+            <div class="mark-rows" id="markList"></div>
           </section>
         </aside>
 

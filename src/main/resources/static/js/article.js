@@ -1,5 +1,8 @@
 /* 文章渲染 + 生成 + 点词查释义。原生 JS，没有构建步骤。 */
 (() => {
+  // 侧栏的词条也要能点开浮层：在 IIFE 顶部就挂好，否则文章为空时这段不会执行到
+  window.__drOpenWord = (x, y, word) => openWord(x, y, word);
+
   'use strict';
 
   const $ = (s, r = document) => r.querySelector(s);

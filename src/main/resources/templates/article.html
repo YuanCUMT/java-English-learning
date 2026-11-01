@@ -20,7 +20,7 @@
       <a class="active" th:href="@{/archive}">历史文章</a>
       <a th:href="@{/vocab}">单词本</a>
       <span th:text="${username}">用户</span>
-      <a th:href="@{/logout}">退出</a>
+      <form class="nav-logout" th:action="@{/logout}" method="post"><button type="submit">退出</button></form>
     </nav>
   </div>
 </header>

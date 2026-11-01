@@ -1522,3 +1522,41 @@ body, button, input, select, textarea { font-family: var(--sans); }
 /* 面板被 flex 拉伸成了 520px 的空框，锁死成内容高度 */
 .workspace .sidebar > .panel { flex: 0 0 auto; height: auto; min-height: 0; align-self: stretch; }
 .workspace .sidebar { height: auto; }
+
+/* ---------- 覆盖：去掉 all:unset（字体/盒模型被重置会导致渲染异常），并让侧栏整体粘住 ---------- */
+.workspace .sidebar {
+  position: sticky;
+  top: calc(var(--header-h, 84px) + 16px);
+  max-height: calc(100vh - var(--header-h, 84px) - 34px);
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column; gap: 12px;
+  align-self: start;
+}
+.workspace .sidebar > .panel { flex: 0 0 auto; height: auto; }
+
+.word-rows {
+  display: flex; flex-direction: column;
+  max-height: calc(10 * 30px);
+  overflow-y: auto; overflow-x: hidden;
+}
+.word-row {
+  display: block; width: 100%; text-align: left;
+  margin: 0; border: 0; background: none; padding: 5px 8px; border-radius: 6px;
+  font-family: var(--sans); font-size: 15px; line-height: 1.4;
+  color: var(--ink); cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.word-row:hover { color: var(--red, #d0372a); background: var(--tint, #efeade); }
+
+.mark-rows {
+  display: flex; flex-direction: column;
+  max-height: min(46vh, calc(100vh - var(--header-h, 84px) - 250px));
+  overflow-y: auto; overflow-x: hidden;
+}
+.mark-row {
+  display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
+  margin: 0; border: 0; background: none; padding: 6px 8px; border-radius: 6px;
+  cursor: pointer;
+}
+.mark-row .w { font-family: var(--serif); font-size: 14.5px; color: var(--ink); }
+.mark-row .m { font-size: 12px; color: var(--muted, #6f6a63); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

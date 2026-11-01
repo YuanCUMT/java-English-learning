@@ -1446,3 +1446,19 @@ body, button, input, select, textarea { font-family: var(--sans); }
   .page-head h1, .hero h1 { font-size: 28px; }
   .page-head .lede, .hero-lede { font-size: 13.5px; }
 }
+
+
+/* 「退出」现在是 POST 表单里的按钮，外观保持和导航链接一致 */
+.nav-logout { display: inline; margin: 0; }
+.nav-logout button {
+  all: unset;
+  cursor: pointer;
+  font: inherit;
+  color: var(--muted, #6f6a63);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -.1px;
+  padding: 4px 0;
+}
+.nav-logout button:hover { color: var(--ink, #17161a); }
+@media (max-width: 720px) { .nav-logout button { font-size: 12.5px; } }

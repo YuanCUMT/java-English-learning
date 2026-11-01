@@ -26,7 +26,7 @@
         <a th:href="@{/vocab}">单词本 <span class="nav-count" id="navMarkCount" th:text="${learningMarks}">0</span></a>
         <a th:href="@{/settings}">设置</a>
         <span class="nav-user" th:text="${username}">用户</span>
-        <a th:href="@{/logout}">退出</a>
+        <form class="nav-logout" th:action="@{/logout}" method="post"><button type="submit">退出</button></form>
       </nav>
     </div>
   </header>

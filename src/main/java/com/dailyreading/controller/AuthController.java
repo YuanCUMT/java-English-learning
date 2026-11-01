@@ -1,6 +1,7 @@
 package com.dailyreading.controller;
 
 import com.dailyreading.entity.User;
+import com.dailyreading.service.LoginAttemptService;
 import com.dailyreading.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,7 @@ public class AuthController {
     public static final String SESSION_USERNAME = "username";
 
     private final UserService userService;
+    private final LoginAttemptService attempts;
 
     @GetMapping("/login")
     public String loginPage(HttpSession session) {
@@ -31,8 +33,16 @@ public class AuthController {
                           @RequestParam String password,
                           HttpServletRequest request,
                           Model model) {
+        String attemptKey = LoginAttemptService.key(username, request.getRemoteAddr());
+        long wait = attempts.remainingBlockSeconds(attemptKey);
+        if (wait > 0) {
+            model.addAttribute("error", "失败次数太多，请 " + Math.max(1, wait / 60) + " 分钟后再试");
+            model.addAttribute("username", username);
+            return "login";
+        }
         try {
             User user = userService.login(username, password);
+            attempts.onSuccess(attemptKey);
             HttpSession old = request.getSession(false);
             if (old != null) old.invalidate();          // 防会话固定
             HttpSession session = request.getSession(true);
@@ -40,6 +50,7 @@ public class AuthController {
             session.setAttribute(SESSION_USERNAME, user.getUsername());
             return "redirect:/";
         } catch (UserService.BizException e) {
+            attempts.onFailure(attemptKey);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("username", username);
             return "login";
@@ -71,9 +82,15 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/logout")
+    /** 退出只接受 POST：GET 退出会被 IM 预览、浏览器预取之类的东西触发，属于「被登出」漏洞。 */
+    @PostMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    @GetMapping("/logout")
+    public String logoutByGet() {
+        return "redirect:/";
     }
 }

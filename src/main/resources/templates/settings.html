@@ -32,16 +32,44 @@
   <main class="vocab-main">
     <section class="page-head">
       <p class="eyebrow">Settings / 设置</p>
-      <h1>填自己的 Key。</h1>
-      <p class="lede">生成文章和查词都要调 DeepSeek。Key 只存在你这台机器的 MySQL 里，不会发到别处。</p>
+      <h1>要不要填自己的 Key？</h1>
+      <p class="lede">生成文章和点词查词都要调 DeepSeek，这一步决定谁来出这个 Key、扣谁的钱。Key 只存在你这台机器的 MySQL 里，不会发到别处。</p>
     </section>
 
     <section class="panel settings-panel">
-      <div class="panel-code">01 / api key</div>
+      <div class="panel-code">01 / 要不要填</div>
+      <h2>先对号入座</h2>
+      <table class="key-table">
+        <thead>
+        <tr><th>你的情况</th><th>要不要填</th><th>原因</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>自己一个人用，就跑在你自己电脑上</td>
+          <td><b>不用</b></td>
+          <td>程序会先用 <code>application-local.yml</code> 里那份 Key</td>
+        </tr>
+        <tr>
+          <td>把项目发给别人用 / 交作业</td>
+          <td><b>对方要自己填</b></td>
+          <td>你的 Key 只在你机器上，不会跟着仓库走</td>
+        </tr>
+        <tr>
+          <td>老师在自己的电脑上检查</td>
+          <td><b>老师要自己填</b>，或者用你的电脑演示</td>
+          <td>同上；不建议把 Key 一起交上去</td>
+        </tr>
+        </tbody>
+      </table>
+      <p class="key-advice" id="dkAdvice">检查中…</p>
+    </section>
+
+    <section class="panel settings-panel">
+      <div class="panel-code">02 / api key</div>
       <h2>DeepSeek API Key</h2>
 
       <p class="settings-note">
-        还没用过？去 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">platform.deepseek.com</a>
+        还没有 Key？去 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">platform.deepseek.com</a>
         注册后「创建 API Key」，把 <code>sk-</code> 开头那一串复制过来。
       </p>
 
@@ -60,7 +88,7 @@
     </section>
 
     <section class="panel settings-panel">
-      <div class="panel-code">02 / 说明</div>
+      <div class="panel-code">03 / 说明</div>
       <h2>几点说明</h2>
       <ul class="settings-list">
         <li>保存后立刻生效，不用重启、不用重新打包。</li>

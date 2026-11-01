@@ -63,6 +63,13 @@
     } catch (e) {
       toast(e.message, true);
     }
+    // 没有可用 Key 时提前提示，别等点了「生成文章」才报错
+    try {
+      const s = await api('/api/settings');
+      const notice = $('#keyNotice');
+      // api() 返回的是整包 {code,message,data}
+      if (notice) notice.hidden = !!(s && s.data && s.data.deepseekConfigured);
+    } catch {}
   }
 
   async function importText() {

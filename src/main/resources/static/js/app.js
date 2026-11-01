@@ -49,16 +49,56 @@
     const q = (($('#wordFilter') && $('#wordFilter').value) || '').trim().toLowerCase();
     const shown = q ? words.filter((w) => w.toLowerCase().includes(q)) : words;
     if (!words.length) {
-      wordList.innerHTML = '<span class="chip empty">还没有词，先在下面导入</span>';
+      wordList.innerHTML = '<p class="row-empty">还没有词，先在下面导入</p>';
     } else if (!shown.length) {
-      wordList.innerHTML = '<span class="chip empty">没有匹配「' + q + '」的词</span>';
+      wordList.innerHTML = '<p class="row-empty">没有匹配「' + q + '」的词</p>';
     } else {
       wordList.innerHTML = shown
-        .map((w) => '<span class="chip" data-word="' + w + '">' + w + '</span>')
+        .map((w) => '<button type="button" class="word-row" data-word="' + w + '">' + w + '</button>')
         .join('');
+      wordList.querySelectorAll('.word-row').forEach((el) => {
+        el.onclick = (ev) => {
+          // 别让同一个 click 冒泡到 article.js 的「点别处关浮层」逻辑，否则刚开的浮层立刻被关掉
+          ev.stopPropagation();
+          if (window.__drOpenWord) window.__drOpenWord(ev.clientX, ev.clientY, el.dataset.word);
+        };
+      });
     }
     const btn = $('#btnGenerate');
     if (btn) btn.disabled = words.length === 0;
+  }
+
+  const markList = $('#markList');
+
+  function renderMarks(marks) {
+    const n = marks.length;
+    const badge = $('#markCount');
+    if (badge) badge.textContent = n;
+    if (!markList) return;
+    if (!n) {
+      markList.innerHTML = '<p class="row-empty">阅读时点词，点「☆ 收藏」就收进来</p>';
+      return;
+    }
+    markList.innerHTML = marks
+      .map((m) => '<button type="button" class="mark-row" data-mark-word="' + m.word + '">' +
+        '<span class="w">' + m.word + '</span>' +
+        '<span class="m">' + (m.cn || m.note || '') + '</span>' +
+        '</button>')
+      .join('');
+    markList.querySelectorAll('.mark-row').forEach((el) => {
+      el.onclick = (ev) => {
+        ev.stopPropagation();
+        if (window.__drOpenWord) window.__drOpenWord(ev.clientX, ev.clientY, el.dataset.markWord);
+      };
+    });
+  }
+
+  async function loadMarks() {
+    if (!markList) return;
+    try {
+      const body = await api('/api/marks');
+      renderMarks(body.data.marks || []);
+    } catch (e) { /* 生词面板挂了不影响记单词 */ }
   }
 
   async function load() {
@@ -66,6 +106,7 @@
       const body = await api('/api/words');
       renderWords(body.data.words || []);
       ocrHint.textContent = '识别引擎：' + body.data.engine;
+      loadMarks();
     } catch (e) {
       toast(e.message, true);
     }
@@ -188,7 +229,8 @@
         savePending();
       }
     });
-    $('#btnSavePending').addEventListener('click', savePending);
+
+  $('#btnSavePending').addEventListener('click', savePending);
     $('#btnPendingClear').addEventListener('click', () => {
       pending = [];
       renderPending();
@@ -290,6 +332,14 @@
     ev.preventDefault();
     openImport();
     importImages(files);
+  });
+
+  // 侧栏的词条 / 生词：点一下就查词（用 document 代理，免得被模块内的 if 块挡住）
+  document.addEventListener('click', (e) => {
+    const row = e.target.closest('.word-row, .mark-row');
+    if (!row || !window.__drOpenWord) return;
+    const word = row.dataset.word || row.dataset.markWord;
+    if (word) window.__drOpenWord(e.clientX, e.clientY, word);
   });
 
   bindPending();

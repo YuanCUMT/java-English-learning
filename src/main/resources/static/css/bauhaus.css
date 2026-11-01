@@ -1466,3 +1466,59 @@ body, button, input, select, textarea { font-family: var(--sans); }
 /* 设置页面板内边距（原来正文贴着边框） */
 .settings-panel { padding: 14px 18px 18px; }
 .settings-panel .panel-code { margin-bottom: 8px; }
+
+/* ---------- 侧栏：今日单词一列 10 行、我的生词 3 行，各自滚动且随文章固定 ---------- */
+.word-rows {
+  display: flex; flex-direction: column;
+  max-height: calc(10 * 32px); overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin;
+}
+.word-row {
+  all: unset; display: block; padding: 6px 8px; border-radius: 6px; cursor: pointer;
+  font-family: var(--serif); font-size: 15.5px; line-height: 1.3; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.word-row:hover { background: var(--tint, #efeade); color: var(--red, #d0372a); }
+.word-row[hidden] { display: none; }
+
+.mark-rows {
+  display: flex; flex-direction: column;
+  max-height: calc(3 * 34px); overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin;
+}
+.mark-row {
+  all: unset; display: flex; align-items: baseline; gap: 8px; padding: 6px 8px;
+  border-radius: 6px; cursor: pointer; min-height: 22px;
+}
+.mark-row:hover { background: var(--tint, #efeade); }
+.mark-row .w { font-family: var(--serif); font-size: 14.5px; color: var(--ink); flex: none; }
+.mark-row .m {
+  font-size: 12px; color: var(--muted, #6f6a63); min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.words-panel, .marks-panel { position: sticky; top: 16px; }
+.marks-panel { margin-top: 12px; top: 16px; }
+.sidebar { display: flex; flex-direction: column; }
+
+.row-empty { margin: 4px 2px 2px; font-size: 12.5px; color: var(--muted, #6f6a63); line-height: 1.7; }
+.word-rows::-webkit-scrollbar, .mark-rows::-webkit-scrollbar { width: 6px; }
+.word-rows::-webkit-scrollbar-thumb, .mark-rows::-webkit-scrollbar-thumb {
+  background: #d7cfc0; border-radius: 99px;
+}
+
+/* 段落序号：DOM 里已有 .para-no，撤掉 counter 伪元素，否则两个 01 叠在一起像重影 */
+.para { padding-left: 0; }
+.para::before { content: none; }
+.para-no {
+  font-size: 11px; font-weight: 750; letter-spacing: .8px; color: var(--red, #d0372a);
+  font-variant-numeric: tabular-nums; padding-top: 7px; min-width: 24px;
+}
+
+/* 两个面板各自 sticky 会打架：改成整个侧栏粘住，面板内部只负责滚动 */
+.workspace .sidebar { position: sticky; top: 16px; align-self: start; display: flex; flex-direction: column; gap: 12px; }
+.workspace .words-panel, .workspace .marks-panel { position: static; margin-top: 0; }
+
+/* 面板被 flex 拉伸成了 520px 的空框，锁死成内容高度 */
+.workspace .sidebar > .panel { flex: 0 0 auto; height: auto; min-height: 0; align-self: stretch; }
+.workspace .sidebar { height: auto; }

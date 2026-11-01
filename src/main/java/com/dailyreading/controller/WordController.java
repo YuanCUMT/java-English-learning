@@ -3,7 +3,7 @@ package com.dailyreading.controller;
 import com.dailyreading.common.ApiResponse;
 import com.dailyreading.entity.Word;
 import com.dailyreading.service.WordService;
-import com.dailyreading.service.ocr.OcrService;
+import com.dailyreading.service.ocr.OcrResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 public class WordController {
 
     private final WordService wordService;
-    private final OcrService ocrService;
+    private final OcrResolver ocrResolver;
 
     @GetMapping
     public ApiResponse list(@RequestParam(required = false)
@@ -32,7 +33,7 @@ public class WordController {
                 "date", d.toString(),
                 "count", words.size(),
                 "words", words.stream().map(Word::getWord).toList(),
-                "engine", ocrService.engine()
+                "engine", ocrResolver.engine()
         ));
     }
 
@@ -61,6 +62,7 @@ public class WordController {
     @PostMapping("/ocr")
     public ApiResponse importByImage(@RequestParam("file") MultipartFile file,
                                      @RequestParam(required = false) String date,
+                                     @RequestParam(required = false, defaultValue = "true") boolean save,
                                      @RequestAttribute("userId") Long userId) throws IOException {
         if (file == null || file.isEmpty()) {
             return ApiResponse.fail(400, "没有收到图片");
@@ -68,15 +70,23 @@ public class WordController {
         LocalDate d = date == null || date.isBlank() ? LocalDate.now() : LocalDate.parse(date);
         List<String> words;
         try {
-            words = ocrService.recognize(file.getBytes());
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            return ApiResponse.fail(500, e.getMessage());
+            words = ocrResolver.recognize(file.getBytes());
+        } catch (Exception e) {
+            return ApiResponse.fail(500, "识别失败：" + e.getMessage());
         }
         if (words.isEmpty()) {
             return ApiResponse.fail(400, "没从图片里识别出英文单词");
         }
+        // save=false：只把识别结果当「候选词」返回，由前端确认/改错/删掉后再入库
+        if (!save) {
+            Map<String, Object> preview = new LinkedHashMap<>();
+            preview.put("words", words);
+            preview.put("total", words.size());
+            preview.put("engine", ocrResolver.engine());
+            return ApiResponse.ok(preview);
+        }
         Map<String, Object> data = wordService.importWords(userId, d, words);
-        data.put("engine", ocrService.engine());
+        data.put("engine", ocrResolver.engine());
         return ApiResponse.ok(data);
     }
 

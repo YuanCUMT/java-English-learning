@@ -30,8 +30,14 @@
   async function api(url, opts) {
     const res = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
     const data = await res.json().catch(() => null);
-    if (!res.ok || !data || data.code !== 0) {
+    if (!res.ok || !data) {
       throw new Error((data && data.message) || `请求失败（HTTP ${res.status}）`);
+    }
+    // 本地词典没命中时后端返回 code=404 + canAskModel，这不是错误，
+    // 要把整个包体交给上层，好让浮层渲染「问模型查一下」按钮。
+    if (data.code !== 0) {
+      if (data.code === 404 && data.canAskModel) return data;
+      throw new Error(data.message || `请求失败（业务码 ${data.code}）`);
     }
     return data.data;
   }

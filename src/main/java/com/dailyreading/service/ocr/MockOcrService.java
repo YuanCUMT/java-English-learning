@@ -14,7 +14,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.ocr.provider", havingValue = "mock", matchIfMissing = true)
 public class MockOcrService implements OcrService {
 
     private final OcrProperties props;

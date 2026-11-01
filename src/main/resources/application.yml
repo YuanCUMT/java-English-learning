@@ -49,7 +49,7 @@ app:
   ocr:
     # mock = 不调用任何外部服务，返回 mock-words 里的词，用来跑通链路
     # baidu = 调用百度云通用文字识别（需要真实 Key）
-    provider: mock
+    provider: auto          # auto = 百度（有 Key 时）> tesseract（本地有 tessdata 时）> mock
     mock-words: abandon,procedure,reluctant,cautious,vivid,witness,harvest,modest
   deepseek:
     # 留空则无法生成文章；填了就走真实调用

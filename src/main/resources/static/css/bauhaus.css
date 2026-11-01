@@ -1323,3 +1323,19 @@ body, button, input, select, textarea { font-family: var(--sans); }
 .settings-acts { flex-wrap: wrap; }
 .settings-acts .btn { width: auto; min-width: 96px; flex: 0 0 auto; }
 .settings-panel { overflow: hidden; }
+
+/* 识别候选词：可改、可删，确认后入库 */
+.pending { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e6e1d7; }
+.pending-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.pending-head b { color: #c8342a; }
+.pending-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.pending-chip { display: inline-flex; align-items: center; gap: 2px; border: 1px solid #dcd6ca; background: #fff; padding: 3px 4px 3px 8px; }
+.pending-word {
+  border: none; outline: none; background: transparent; font-family: inherit;
+  font-size: 14px; color: #17161a; width: 7.5em; min-width: 4em;
+}
+.pending-del {
+  border: none; background: transparent; cursor: pointer; color: #9a948a;
+  font-size: 12px; line-height: 1; padding: 4px 5px;
+}
+.pending-del:hover { color: #c8342a; }

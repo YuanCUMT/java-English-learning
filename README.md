@@ -24,7 +24,7 @@
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
-| M1 | 工程骨架 + 9 张表 + ECDICT 本地词典导入 | ✅ |
+| M1 | 工程骨架 + 10 张表 + ECDICT 本地词典导入 | ✅ |
 | M2-1 | 注册 / 登录 / BCrypt / 拦截器 | ✅ |
 | M2-2 | 单词导入（粘贴 + 图片上传，OCR 可插拔） | ✅ |
 | M2-3 | 截图识别（百度云 / 离线 Tesseract） | ✅ |
@@ -33,9 +33,16 @@
 
 几个具体数字，都是我实际跑出来的：
 
-- 本地词典 **21,339 词条 + 27,278 个变形**，从 ECDICT 里抽的（MIT，见 [dict/README.md](dict/README.md)）
+- 本地词典 **21,339 词条 + 27,278 个变形**，从 ECDICT 里抽的（MIT，见 [dict/README.md](dict/README.md)）。源 JSON 里 21,699 条，入库时同原形的重复行被主键去重，所以表里是 21,339
 - 生成一篇 **347 词**的文章，DeepSeek 那边大概 **16 秒**
 - 一张单词表截图，百度 OCR 能干净地认出 **6 个词**，没有杂字
+
+## 测试
+
+`ash
+mvn -B test
+`\n
+9 个单测：ArticleValidatorTest（标题/段数/题数/选项数/答案范围）、DictServiceTest（原形命中、变形还原、查不到、normalize）。都跑内存里，不碰 MySQL、不调外部服务。
 
 ## 怎么跑起来
 
@@ -45,7 +52,7 @@
 mysql -uroot -p < sql/init.sql
 ```
 
-9 张表，全 utf8mb4。表结构和设计思路在 [docs/er.md](docs/er.md)。
+10 张表，全 utf8mb4。表结构和设计思路在 [docs/er.md](docs/er.md)。
 
 ### 2. 导入词典
 
@@ -74,7 +81,7 @@ app:
   deepseek:
     api-key: "sk-..."        # 生成文章要用，去 platform.deepseek.com 申请
   ocr:
-    provider: baidu          # mock | baidu | tesseract
+    provider: auto           # auto | baidu | tesseract | mock
     baidu:
       api-key: "..."
       secret-key: "..."
@@ -103,7 +110,7 @@ mvn spring-boot:run
 |---|---|---|
 | `baidu` | 要 | 默认。**单词表截图**（一屏好几个词）——逐行识别，字准、快 |
 | `tesseract` | 不要 | **单词卡截图**（一个大词 + 例句）——按字号筛词，不会把例句里的 the / this 捞进来 |
-| `mock` | 不要 | 单测和演示用，固定返回几个词 |
+| `mock` | 不要 | 一个 Key 都没配时的兜底，固定返回几个词，保证链路能跑通 |
 
 为什么不能只留一个？因为我两种截图都会传：
 
@@ -138,8 +145,8 @@ mvn spring-boot:run
 
 ```
 java-reader/
-├─ sql/init.sql                9 张表
-├─ dict/ecdict.json.gz         词典源数据（21,699 词 + 27,278 变形，0.8 MB）
+├─ sql/init.sql                10 张表
+├─ dict/ecdict.json.gz         词典源数据（21,699 词 + 27,278 变形，0.8 MB；入库去重后 21,339 条）
 ├─ tessdata/eng.traineddata    离线 OCR 的英文模型（3.9 MB）
 ├─ tools/export-dict-sql.js    把 gz 导成 SQL
 └─ src/main/

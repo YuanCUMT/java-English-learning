@@ -15,4 +15,9 @@ public interface OcrService {
 
     /** 给前端显示当前用的是哪个引擎 */
     String engine();
+
+    /** 这个引擎当前能不能用（Key 填了没、依赖装了没） */
+    default boolean available() {
+        return true;
+    }
 }

@@ -148,6 +148,11 @@ public class TesseractOcrService implements OcrService {
     }
 
     @Override
+    public boolean available() {
+        return new java.io.File(props.getTessdata(), props.getLang() + ".traineddata").isFile();
+    }
+
+    @Override
     public String engine() {
         return "tesseract（离线，不用账号）";
     }

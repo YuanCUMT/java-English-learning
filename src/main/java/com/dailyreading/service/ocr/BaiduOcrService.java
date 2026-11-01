@@ -108,6 +108,11 @@ public class BaiduOcrService implements OcrService {
     }
 
     @Override
+    public boolean available() {
+        return props.configured();
+    }
+
+    @Override
     public String engine() {
         return "baidu " + (props.getBaidu().isAccurate() ? "高精度版" : "标准版");
     }

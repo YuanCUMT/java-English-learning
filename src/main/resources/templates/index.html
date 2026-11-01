@@ -258,6 +258,15 @@
             </label>
           </div>
         </div>
+        <!-- 识别出来的候选词：可改拼写、可删掉，确认后再入库 -->
+        <div class="pending" id="pendingBox" hidden>
+          <div class="pending-head">
+            <span class="field-label">识别结果 <b id="pendingCount">0</b> 个 —— 改掉认错的，删掉不要的，再保存</span>
+            <button class="mini-btn" id="btnPendingClear" type="button">全部清掉</button>
+          </div>
+          <div class="pending-list" id="pendingList"></div>
+          <button class="btn primary" id="btnSavePending" type="button">保存这些词</button>
+        </div>
       </div>
     </div>
   </div>

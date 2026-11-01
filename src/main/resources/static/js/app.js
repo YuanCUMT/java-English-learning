@@ -28,6 +28,10 @@
     if (!res.ok) {
       throw new Error((body && body.message) || ('请求失败 ' + res.status));
     }
+    // 业务码统一在 data.code 里，0 才是成功
+    if (body && typeof body.code === 'number' && body.code !== 0) {
+      throw new Error(body.message || ('请求失败（业务码 ' + body.code + '）'));
+    }
     return body;
   }
 
@@ -79,18 +83,96 @@
     }
   }
 
+  // 识别出来的词先进「候选」区：可以改拼写、删掉认错的，点保存才入库
+  let pending = [];
+
+  function renderPending() {
+    const box = $('#pendingBox');
+    const list = $('#pendingList');
+    box.hidden = pending.length === 0;
+    $('#pendingCount').textContent = pending.length;
+    list.innerHTML = pending
+      .map(
+        (w, i) => `<span class="pending-chip">
+          <input class="pending-word" data-i="${i}" value="${w}" spellcheck="false" autocomplete="off" />
+          <button class="pending-del" type="button" data-del="${i}" title="删掉这个">✕</button>
+        </span>`
+      )
+      .join('');
+  }
+
   async function importImage(file) {
     const form = new FormData();
     form.append('file', file);
     try {
       toast('识别中…');
-      const body = await api('/api/words/ocr', { method: 'POST', body: form });
+      const body = await api('/api/words/ocr?save=false', { method: 'POST', body: form });
       const d = body.data;
-      toast('识别到 ' + d.total + ' 个词，新增 ' + d.added + ' 个');
+      const words = (d.words || []).filter(Boolean);
+      if (!words.length) {
+        toast('没识别出单词，换张清楚的图试试', true);
+        return;
+      }
+      // 同一张图重复识别时不要重复堆，按顺序去重
+      const seen = new Set(pending.map((w) => w.toLowerCase()));
+      for (const w of words) {
+        const k = String(w).toLowerCase();
+        if (!seen.has(k)) {
+          seen.add(k);
+          pending.push(w);
+        }
+      }
+      renderPending();
+      toast('识别到 ' + d.total + ' 个词，确认后点「保存这些词」');
+    } catch (e) {
+      toast(e.message, true);
+    }
+  }
+
+  async function savePending() {
+    const words = pending.map((w) => w.trim()).filter(Boolean);
+    if (!words.length) {
+      toast('还没有可保存的词', true);
+      return;
+    }
+    try {
+      const body = await api('/api/words', { method: 'POST', body: JSON.stringify({ text: words.join(',') }) });
+      const d = body.data;
+      toast('新增 ' + d.added + ' 个，跳过重复 ' + d.skipped + ' 个');
+      pending = [];
+      renderPending();
       await load();
     } catch (e) {
       toast(e.message, true);
     }
+  }
+
+  function bindPending() {
+    const list = $('#pendingList');
+    if (!list) return;
+    list.addEventListener('input', (e) => {
+      const input = e.target.closest('.pending-word');
+      if (!input) return;
+      const i = Number(input.dataset.i);
+      if (pending[i] !== undefined) pending[i] = input.value;
+    });
+    list.addEventListener('click', (e) => {
+      const del = e.target.closest('[data-del]');
+      if (!del) return;
+      pending.splice(Number(del.dataset.del), 1);
+      renderPending();
+    });
+    list.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.closest('.pending-word')) {
+        e.preventDefault();
+        savePending();
+      }
+    });
+    $('#btnSavePending').addEventListener('click', savePending);
+    $('#btnPendingClear').addEventListener('click', () => {
+      pending = [];
+      renderPending();
+    });
   }
 
   // 拖拽 / 粘贴进来的可能是一批图，按顺序一张张识别

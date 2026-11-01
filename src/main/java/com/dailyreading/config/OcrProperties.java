@@ -5,15 +5,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * OCR 配置。provider=mock 时用内置假数据，方便没 Key 时跑通整条链路。
+ * OCR 配置。provider 只决定「优先试哪个」，失败会自动降级到下一个能用的引擎。
  */
 @Data
 @Component
 @ConfigurationProperties(prefix = "app.ocr")
 public class OcrProperties {
 
-    /** mock | baidu | tesseract */
-    private String provider = "mock";
+    /** auto | mock | baidu | tesseract（auto = 百度 > tesseract > mock 自动降级） */
+    private String provider = "auto";
 
     /** mock 模式下返回的词 */
     private String mockWords = "abandon,procedure,reluctant,cautious,vivid,witness,harvest,modest";
@@ -25,6 +25,13 @@ public class OcrProperties {
     private String lang = "eng";
 
     private Baidu baidu = new Baidu();
+
+    /** 百度这对 Key 有没有填 */
+    public boolean configured() {
+        return baidu != null
+                && baidu.getApiKey() != null && !baidu.getApiKey().isBlank()
+                && baidu.getSecretKey() != null && !baidu.getSecretKey().isBlank();
+    }
 
     @Data
     public static class Baidu {

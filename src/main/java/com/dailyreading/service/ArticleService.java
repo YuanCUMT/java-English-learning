@@ -26,6 +26,7 @@ public class ArticleService {
     private final PromptBuilder promptBuilder;
     private final DeepSeekClient deepSeek;
     private final SettingService settingService;
+    private final ArticleStore articleStore;
     private final ArticleMapper articleMapper;
     private final ObjectMapper mapper;
 
@@ -41,7 +42,7 @@ public class ArticleService {
             throw new IllegalArgumentException("今天还没有单词，先导入再生成。");
         }
         JsonNode json = deepSeek.completeJson(promptBuilder.system(), promptBuilder.user(words, opt), 0.75, settingService.effectiveDeepSeekKey(userId));
-        validate(json);
+        validate(json, opt);
 
         int wordCount = countWords(json.path("paragraphs"));
         String content;
@@ -52,8 +53,6 @@ public class ArticleService {
         }
 
         LocalDate today = LocalDate.now();
-        // 同一用户同一天同一模式只能有一条：先删后插，避免撞唯一键
-        articleMapper.deleteByUserDateMode(userId, today, opt.mode());
 
         Article a = new Article();
         a.setUserId(userId);
@@ -65,12 +64,9 @@ public class ArticleService {
         a.setDifficulty(opt.difficulty());
         a.setWordCount(wordCount);
         a.setContent(content);
-        articleMapper.insert(a);
 
-        // 记下文章实际用到的词，后面「本篇用到 X/Y」靠它
-        for (String w : usedWords(json)) {
-            articleMapper.insertArticleWord(a.getId(), w, 1);
-        }
+        // 先删同一天的旧文再插入 + 写 article_words，整段在一个事务里
+        articleStore.replace(a, usedWords(json));
         return new Result(a, toBody(content));
     }
 
@@ -102,29 +98,12 @@ public class ArticleService {
 
     // ---------------- 内部 ----------------
 
-    private void validate(JsonNode json) {
-        if (json == null || !json.isObject()) {
-            throw new IllegalStateException("模型返回的不是一个 JSON 对象");
-        }
-        JsonNode ps = json.path("paragraphs");
-        if (!ps.isArray() || ps.isEmpty()) {
-            throw new IllegalStateException("模型没有给出正文段落，再试一次");
-        }
-        for (JsonNode p : ps) {
-            if (p.path("en").asText("").isBlank()) {
-                throw new IllegalStateException("模型返回的段落是空的，再试一次");
-            }
-        }
-        JsonNode qs = json.path("questions");
-        if (qs.isArray()) {
-            for (JsonNode q : qs) {
-                if (q.path("options").size() != 4) {
-                    throw new IllegalStateException("有一道题的选项不是 4 个，再试一次");
-                }
-            }
+    private void validate(JsonNode json, PromptBuilder.Options opt) {
+        List<String> problems = ArticleValidator.check(json, opt.paragraphs(), opt.questions());
+        if (!problems.isEmpty()) {
+            throw new IllegalStateException("模型返回的内容不合规（" + String.join("；", problems) + "），再试一次");
         }
     }
-
     private int countWords(JsonNode paragraphs) {
         int n = 0;
         for (JsonNode p : paragraphs) {

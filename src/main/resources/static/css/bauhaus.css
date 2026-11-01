@@ -1339,3 +1339,35 @@ body, button, input, select, textarea { font-family: var(--sans); }
   font-size: 12px; line-height: 1; padding: 4px 5px;
 }
 .pending-del:hover { color: #c8342a; }
+
+/* 设置页：要不要填 Key 的对照表 */
+.key-table { width: 100%; border-collapse: collapse; margin: 4px 0 14px; font-size: 14px; }
+.key-table th, .key-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #e6e1d7; vertical-align: top; }
+.key-table th { font-size: 12px; letter-spacing: .06em; color: #7a746a; text-transform: uppercase; font-weight: 600; }
+.key-table td:first-child { width: 38%; }
+.key-table td:nth-child(2) { width: 22%; white-space: nowrap; }
+.key-table b { color: #17161a; }
+.key-table code, .key-advice code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px; background: #f2efe8; padding: 1px 5px; border-radius: 3px;
+}
+.key-advice {
+  margin: 0; padding: 12px 14px; border-left: 3px solid #c8342a;
+  background: #faf7f2; font-size: 14px; line-height: 1.75; color: #3a3733;
+}
+.key-advice.ok { border-left-color: #2f7a52; background: #f4f8f4; }
+.key-advice.warn { border-left-color: #c8342a; background: #fdf3f1; }
+
+/* 首页：没配 Key 时的提示条 */
+.key-notice {
+  display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline;
+  margin: 0 0 14px; padding: 10px 14px; border-left: 3px solid #c8342a;
+  background: #fdf3f1; font-size: 13.5px; line-height: 1.7; color: #3a3733;
+}
+.key-notice b { color: #c8342a; }
+.key-notice code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px; background: #f2efe8; padding: 1px 5px; border-radius: 3px;
+}
+.key-notice[hidden] { display: none; }
+

@@ -22,6 +22,7 @@ const tabPhraseCount = $('#tabPhraseCount');
   ));
 
   let allDays = [];
+  let allMarks = [];
   let toastTimer = null;
   function toast(msg, isError) {
     toastEl.textContent = msg;
@@ -72,14 +73,16 @@ const tabPhraseCount = $('#tabPhraseCount');
     </article>`;
   }
 
-  function render(marks) {
+  function render(marks, noMatch) {
     const learning = marks.filter((m) => m.status !== 'mastered').length;
     const mastered = marks.length - learning;
     statLearning.textContent = learning;
     statMastered.textContent = mastered;
 
     if (!marks.length) {
-      list.innerHTML = '<p class="empty-hint">还没有生词。读文章时点任意单词，点「☆ 收藏」就会出现在这里。</p>';
+      list.innerHTML = noMatch
+        ? '<p class="empty-hint">没有匹配的生词。</p>'
+        : '<p class="empty-hint">还没有生词。读文章时点任意单词，点「☆ 收藏」就会出现在这里。</p>';
       return;
     }
     const pick = (st) => marks.filter((m) => (m.status === 'mastered') === st);
@@ -101,11 +104,13 @@ const tabPhraseCount = $('#tabPhraseCount');
   }
 
   /** 短语：收藏过的多词表达（词里带空格），单独一栏 */
-  function renderPhrases(marks) {
+  function renderPhrases(marks, noMatch) {
     const phrases = marks.filter((m) => /\s/.test(m.word || ''));
     if (tabPhraseCount) tabPhraseCount.textContent = phrases.length;
     if (!phrases.length) {
-      phraseList.innerHTML = '<p class="empty-hint">还没有短语。读文章时拖选几个词（比如 in terms of），点「☆ 收藏短语」就会收进来。</p>';
+      phraseList.innerHTML = noMatch
+        ? '<p class="empty-hint">没有匹配的短语。</p>'
+        : '<p class="empty-hint">还没有短语。读文章时拖选几个词（比如 in terms of），点「☆ 收藏短语」就会收进来。</p>';
       return;
     }
     phraseList.innerHTML =
@@ -185,6 +190,10 @@ const tabPhraseCount = $('#tabPhraseCount');
       flat.sort((a, b) => String(a.word).localeCompare(String(b.word), 'en'));
       days = flat.length ? [{ date: '', count: flat.length, words: flat }] : [];
     }
+    if (!days.length && q) {
+      dayList.innerHTML = '<p class="empty-hint">没有匹配的词。</p>';
+      return;
+    }
     renderDays(days, mode === 'alpha');
   }
 
@@ -200,13 +209,45 @@ const tabPhraseCount = $('#tabPhraseCount');
   document.querySelectorAll('.vtab').forEach((b) => {
     b.addEventListener('click', () => switchTab(b.dataset.tab));
   });
-  if (sortSel) sortSel.addEventListener('change', paintDays);
-  if (searchInput) searchInput.addEventListener('input', paintDays);
+
+  function sortList(items, key) {
+    const mode = sortSel ? sortSel.value : 'time-desc';
+    const arr = items.slice();
+    if (mode === 'alpha') arr.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en'));
+    return arr;
+  }
+
+  function paintMarks() {
+    const q = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
+    const hit = allMarks.filter((m) => !q
+      || String(m.word || '').toLowerCase().includes(q)
+      || String(m.cn || '').toLowerCase().includes(q));
+    render(sortList(hit, 'word'), Boolean(q) && !hit.length);
+  }
+
+  function paintPhrases() {
+    const q = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
+    const all = allMarks.filter((m) => /\s/.test(m.word || ''));
+    const hit = all.filter((m) => !q
+      || String(m.word || '').toLowerCase().includes(q)
+      || String(m.cn || '').toLowerCase().includes(q));
+    renderPhrases(sortList(hit, 'word'), Boolean(q) && !hit.length);
+  }
+  function paintAll() {
+    paintDays();
+    paintMarks();
+    paintPhrases();
+  }
+
+  if (sortSel) sortSel.addEventListener('change', paintAll);
+  if (searchInput) searchInput.addEventListener('input', paintAll);
 
   async function load() {
     try {
       const data = await api('/api/marks');
-      render((data && data.marks) || []);
+      allMarks = (data && data.marks) || [];
+      paintMarks();
+      paintPhrases();
     } catch (err) {
       toast(err.message, true);
     }

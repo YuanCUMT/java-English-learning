@@ -40,4 +40,8 @@ public interface WordMapper {
 
     @Select("SELECT COUNT(*) FROM words WHERE user_id = #{userId} AND batch_date = #{date}")
     int countByDate(@Param("userId") Long userId, @Param("date") LocalDate date);
+    /** 一次取回该用户的全部词，按日期倒序 + 词排序；单词本用它避免「按天 N+1」 */
+    @Select("SELECT id, user_id, word, surface, batch_date, created_at FROM words "
+            + "WHERE user_id = #{userId} ORDER BY batch_date DESC, word ASC")
+    List<Word> listAllByUser(@Param("userId") Long userId);
 }

@@ -84,7 +84,10 @@ public class WordController {
             } catch (Exception e) {
                 return ApiResponse.fail(500, "识别失败：" + e.getMessage());
             }
-            ocrCacheService.put(sha1, result.words(), result.engine());
+            // mock 是假数据，缓存下来会害人：以后配了真引擎，同一张图还会拿到假词
+            if (!result.engine().toLowerCase().startsWith("mock")) {
+                ocrCacheService.put(sha1, result.words(), result.engine());
+            }
         }
         List<String> words = result.words();
         if (words == null || words.isEmpty()) {

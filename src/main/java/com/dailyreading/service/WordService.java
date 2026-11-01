@@ -69,13 +69,14 @@ public class WordService {
     public List<Map<String, Object>> history(Long userId) {
         List<Map<String, Object>> out = new ArrayList<>();
         // 先把所有天的词一次性拿到，再整体批量查词典，避免逐词查（N+1）
+        // 一次取回全部词（1 条 SQL），再在内存里按天分组——避免「1 + 天数」次查询
         Map<LocalDate, List<Word>> byDate = new LinkedHashMap<>();
         Set<String> allWords = new LinkedHashSet<>();
-        for (LocalDate d : wordMapper.listDates(userId)) {
-            List<Word> ws = wordMapper.listByDate(userId, d);
-            byDate.put(d, ws);
-            for (Word w : ws) allWords.add(w.getWord());
+        for (Word w : wordMapper.listAllByUser(userId)) {
+            byDate.computeIfAbsent(w.getBatchDate(), (k) -> new ArrayList<>()).add(w);
+            allWords.add(w.getWord());
         }
+        if (byDate.isEmpty()) return out;
         Map<String, Map<String, Object>> dict = dictService.lookupBatch(new ArrayList<>(allWords));
 
         for (Map.Entry<LocalDate, List<Word>> byDay : byDate.entrySet()) {

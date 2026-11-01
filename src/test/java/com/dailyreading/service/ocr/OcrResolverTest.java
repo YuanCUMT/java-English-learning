@@ -88,4 +88,15 @@ class OcrResolverTest {
             assertTrue(last.available(), "mock 必须永远可用");
         });
     }
+
+    @Test
+    void provider为mock时链路只有mock() {
+        runner.withPropertyValues("app.ocr.provider=mock").run(ctx -> {
+            OcrResolver resolver = ctx.getBean(OcrResolver.class);
+            List<OcrService> chain = resolver.chain();
+            assertEquals(1, chain.size(), "显式配成 mock 就该只跑 mock，不能先去试百度");
+            assertEquals(resolver.engine(), chain.get(0).engine());
+            assertTrue(chain.get(0).engine().toLowerCase().contains("mock"));
+        });
+    }
 }

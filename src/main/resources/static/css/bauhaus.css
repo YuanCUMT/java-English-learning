@@ -1560,3 +1560,20 @@ body, button, input, select, textarea { font-family: var(--sans); }
 }
 .mark-row .w { font-family: var(--serif); font-size: 14.5px; color: var(--ink); }
 .mark-row .m { font-size: 12px; color: var(--muted, #6f6a63); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 今日单词的字体改成跟「我的生词」一致（--sans 在某些机器上会落到奇怪的字形），并允许长词折行 */
+.word-row {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-variant: normal;
+  letter-spacing: 0;
+  word-spacing: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+/* 关键：列表是 flex 列，行默认会被压缩到几像素高，文字就只剩一条条碎片。
+   固定每行不缩放，超出交给容器滚动。 */
+.word-rows > .word-row,
+.mark-rows > .mark-row { flex: 0 0 auto; }

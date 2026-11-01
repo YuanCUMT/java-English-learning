@@ -388,3 +388,16 @@ mark.w:hover { background: #f6dfa8; }
   .import-body { grid-template-columns: 1fr; }
   .import-drop { border-right: none; border-bottom: 1px solid var(--grid, #d8d3c9); }
 }
+
+/* 窄屏（手机）—— 阅读页沿用 workspace 版式，这里单独适配 */
+@media (max-width: 720px) {
+  .topbar .inner { flex-wrap: wrap; gap: 6px 12px; padding: 8px 14px; }
+  .topbar nav { gap: 10px; font-size: 12.5px; flex-wrap: wrap; }
+  .topbar nav a, .topbar nav span { white-space: nowrap; }
+  .wrap { padding: 0 14px; }
+  .article-panel { border-left: 0; border-right: 0; }
+  .art-head h2, .article-head h2 { font-size: 24px; line-height: 1.25; }
+  .para .en, .lsent { font-size: 16px; }
+  .para-tools, .art-tools { flex-wrap: wrap; }
+  .q-opt { font-size: 14px; }
+}

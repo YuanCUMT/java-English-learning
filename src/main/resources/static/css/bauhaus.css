@@ -1389,3 +1389,60 @@ body, button, input, select, textarea { font-family: var(--sans); }
   background: var(--surface); color: var(--ink); font-family: inherit;
 }
 .vocab-tools input { width: 160px; }
+
+/* ---------------- 窄屏（手机） ---------------- */
+.page-nav a, .nav-user, .nav-count { white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .nav-shell { flex-wrap: wrap; gap: 6px 10px; padding: 10px 16px; }
+  .brand-word { font-size: 17px; }
+  .brand-word small { display: none; }
+  .page-nav { gap: 12px; font-size: 13.5px; flex-wrap: wrap; }
+  .nav-user { font-size: 13px; }
+
+  .hero { padding: 28px 0 8px; }
+  .hero h1, .page-head h1 { font-size: 30px; line-height: 1.2; letter-spacing: -.6px; }
+  .hero-lede, .page-head .lede { font-size: 14px; line-height: 1.75; }
+  .hero-art { margin-top: 20px; }
+
+  .vocab-main, .archive-main { padding: 0 16px 60px; }
+  .page-head { padding-top: 28px; }
+  .stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .stats > .stat { border-right: none; }
+
+  .vocab-bar { flex-wrap: wrap; gap: 8px; }
+  .vocab-tabs { width: 100%; }
+  .vocab-tools { width: 100%; }
+  .vocab-tools select, .vocab-tools input { flex: 1 1 120px; min-width: 0; }
+  .vcards { grid-template-columns: 1fr; }
+
+  .today-tools { flex-wrap: wrap; }
+  .workspace { display: block; }
+  .workspace .words-panel { position: static; max-height: none; margin-bottom: 16px; }
+  .ledger dl, .ledger .ledger-grid { grid-template-columns: repeat(2, 1fr); }
+  .article-body, .art-body { padding: 0 2px; }
+  .art-head h2 { font-size: 22px; }
+  .para .en { font-size: 16px; }
+}
+
+@media (max-width: 720px) {
+  .page-nav { font-size: 12.5px; gap: 9px; width: 100%; }
+  .nav-user { margin-left: 0; font-size: 12.5px; }
+  .nav-shell { padding: 8px 14px 10px; }
+  .nav-count { font-size: 11px; padding: 0 5px; }
+}
+
+@media (max-width: 720px) {
+  .site-header .page-nav, .page-nav { margin-left: 0; justify-content: flex-start; gap: 8px; }
+  .site-header .page-nav a, .page-nav a { font-size: 12.5px; }
+}
+
+@media (max-width: 720px) {
+  main.vocab-main, main.archive-main { width: auto; max-width: 100%; padding: 0 16px 60px; box-sizing: border-box; }
+  .marks-stats, .vocab-main .stats { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 14px 0; }
+  .vocab-page .marks-stats > div, .marks-stats > div { padding-left: 0 !important; border-left: 0 !important; }
+  .marks-stats dd { font-size: 30px; }
+  .marks-stats dt { font-size: 12px; }
+  .page-head h1, .hero h1 { font-size: 28px; }
+  .page-head .lede, .hero-lede { font-size: 13.5px; }
+}

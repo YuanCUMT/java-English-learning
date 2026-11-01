@@ -74,6 +74,14 @@
     <div class="panel-head">
       <div class="panel-code">01 / words</div>
       <h2>每日单词</h2>
+      <div class="vocab-tools">
+        <select id="vocabSort" aria-label="排序">
+          <option value="time-desc">时间：新 → 旧</option>
+          <option value="time-asc">时间：旧 → 新</option>
+          <option value="alpha">字母：A → Z</option>
+        </select>
+        <input id="vocabSearch" class="mini-input" type="search" placeholder="搜单词">
+      </div>
     </div>
     <div id="dayList" class="day-list">
       <p class="empty-hint">还没有导入过单词。回首页用「选图识别」或「粘贴导入」加一批。</p>

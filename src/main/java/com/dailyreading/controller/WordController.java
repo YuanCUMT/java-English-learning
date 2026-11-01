@@ -2,6 +2,7 @@ package com.dailyreading.controller;
 
 import com.dailyreading.common.ApiResponse;
 import com.dailyreading.entity.Word;
+import com.dailyreading.service.OcrCacheService;
 import com.dailyreading.service.WordService;
 import com.dailyreading.service.ocr.OcrResolver;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class WordController {
 
     private final WordService wordService;
     private final OcrResolver ocrResolver;
+    private final OcrCacheService ocrCacheService;
 
     @GetMapping
     public ApiResponse list(@RequestParam(required = false)
@@ -68,11 +70,21 @@ public class WordController {
             return ApiResponse.fail(400, "没有收到图片");
         }
         LocalDate d = date == null || date.isBlank() ? LocalDate.now() : LocalDate.parse(date);
+        byte[] bytes = file.getBytes();
+        // 同一张图（内容 sha1 相同）只识别一次；命中缓存就不碰外部服务
+        String sha1 = OcrCacheService.sha1(bytes);
+        OcrCacheService.Cached hit = ocrCacheService.get(sha1);
+        boolean fromCache = hit != null;
         OcrResolver.Result result;
-        try {
-            result = ocrResolver.recognize(file.getBytes());
-        } catch (Exception e) {
-            return ApiResponse.fail(500, "识别失败：" + e.getMessage());
+        if (hit != null) {
+            result = new OcrResolver.Result(hit.words(), hit.engine(), false);
+        } else {
+            try {
+                result = ocrResolver.recognize(bytes);
+            } catch (Exception e) {
+                return ApiResponse.fail(500, "识别失败：" + e.getMessage());
+            }
+            ocrCacheService.put(sha1, result.words(), result.engine());
         }
         List<String> words = result.words();
         if (words == null || words.isEmpty()) {
@@ -86,11 +98,13 @@ public class WordController {
             preview.put("total", words.size());
             preview.put("engine", result.engine());
             preview.put("degraded", result.degraded());
+            preview.put("cached", fromCache);
             return ApiResponse.ok(preview);
         }
         Map<String, Object> data = wordService.importWords(userId, d, words);
         data.put("engine", result.engine());
         data.put("degraded", result.degraded());
+        data.put("cached", fromCache);
         return ApiResponse.ok(data);
     }
 

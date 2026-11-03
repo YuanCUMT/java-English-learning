@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# 本地私有配置模板
+#
+# 用法：复制一份改名为 application-local.yml，填上你自己的 Key。
+# 这个文件已被 .gitignore 排除，不会被提交；但填了真实 Key 之后
+# 不要把改名后的文件发给别人 / 传网盘。
+#
+# 一项都不填也能跑：文章生成和「问模型查词」会提示去网页「设置」里填。
+# ---------------------------------------------------------------------------
+app:
+  deepseek:
+    # 去 https://platform.deepseek.com 注册 → 创建 API Key → 复制 sk- 开头那一串
+    # 也可以留空，改在网页右上角「设置」里填（网页填的优先级更高）
+    api-key: ""
+
+  ocr:
+    # auto | baidu | tesseract | mock
+    #   auto      百度有 Key 就用百度，否则用本地 tesseract，都没有就用 mock
+    #   baidu     百度通用文字识别（高精度版），需要账号已实名
+    #   tesseract 离线识别，不需要账号，单词卡截图更准（需 tessdata/eng.traineddata）
+    #   mock      假数据，只用来演示界面
+    provider: auto
+
+    baidu:
+      # 百度智能云 → 文字识别 → 应用管理 → 创建应用（勾选「通用文字识别（高精度版）」）
+      app-id: ""
+      api-key: ""
+      secret-key: ""
+      # true = 用高精度版（推荐），false = 标准版
+      accurate: true
+
+    # tesseract 的语言数据目录，相对项目根目录；文件是 tessdata/eng.traineddata
+    tessdata: tessdata
+    lang: eng
+
+  article:
+    # 生成文章的默认参数（页面上还能临时改）
+    default-mode: review        # review | exam
+    default-difficulty: C1      # B2 | C1 | C2
+    default-paragraphs: 5
+    default-questions: 5
+    exam-word-limit: 15         # 真题模式最多用多少个目标词
+
+# 如果你本机的 MySQL 不是默认口令，可以在这里覆盖（application.yml 里用的是环境变量）
+# spring:
+#   datasource:
+#     username: root
+#     password: "123456"

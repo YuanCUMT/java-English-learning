@@ -333,6 +333,22 @@ curl -b jar.txt -F "file=@word-card.png" "http://127.0.0.1:8080/api/words/ocr?sa
 
 ## 设置（每个用户自己的 Key）
 
+### POST /api/settings/theme
+
+改外观（浅色 / 深色 / 跟随系统）。只动外观，不影响 Key。
+
+```bash
+curl -b jar.txt -H 'Content-Type: application/json' \
+  -d '{"theme":"dark"}' http://127.0.0.1:8080/api/settings/theme
+```
+
+```json
+{ "code": 0, "message": "ok", "data": { "theme": "dark" } }
+```
+
+`theme` 只接受 `light` / `dark` / `auto`，其它值返回 `code=400`。
+`GET /api/settings` 的返回里也多了 `theme` 字段。
+
 ### GET /api/settings
 
 返回当前用户实际生效的 Key 状态，**只回显掩码**，不返回明文。

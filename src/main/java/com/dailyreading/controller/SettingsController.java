@@ -29,13 +29,23 @@ public class SettingsController {
 
     public record SaveRequest(String deepseekKey) {}
 
+    public record ThemeRequest(String theme) {}
+
     @GetMapping
     public ApiResponse get(@RequestAttribute("userId") Long userId) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("deepseekKeyMasked", settingService.maskedDeepSeekKey(userId));
         data.put("deepseekConfigured", settingService.deepSeekConfigured(userId));
         data.put("usingOwnKey", settingService.userDeepSeekKey(userId) != null);
+        data.put("theme", settingService.theme(userId));
         return ApiResponse.ok(data);
+    }
+
+    /** 只改外观，不动 Key；单独一个接口是为了设置页切换时不必提交整张表单 */
+    @PostMapping("/theme")
+    public ApiResponse saveTheme(@RequestAttribute("userId") Long userId, @RequestBody ThemeRequest req) {
+        settingService.saveTheme(userId, req.theme());
+        return ApiResponse.ok(Map.of("theme", settingService.theme(userId)));
     }
 
     @PostMapping

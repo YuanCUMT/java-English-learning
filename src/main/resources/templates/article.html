@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>阅读 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
   <link rel="stylesheet" th:href="@{/css/workspace.css}">
+  <script th:src="@{/js/theme.js}"></script>
 </head>
 <body th:attr="data-article-id=${articleId}">
 

@@ -3,6 +3,34 @@
   const $ = (s) => document.querySelector(s);
   const keyInput = $('#dkInput');
   const stateEl = $('#dkState');
+  const themeState = $('#themeState');
+  const themeOpts = Array.from(document.querySelectorAll('[data-theme-opt]'));
+
+  const THEME_LABEL = { light: '浅色', dark: '深色', auto: '跟随系统' };
+
+  function paintTheme(mode) {
+    const m = THEME_LABEL[mode] ? mode : 'auto';
+    themeOpts.forEach((btn) => {
+      const on = btn.dataset.themeOpt === m;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    if (themeState) themeState.textContent = `当前：${THEME_LABEL[m]}`;
+  }
+
+  async function pickTheme(mode) {
+    // 先在本地生效（不闪），再落库；落库失败就把提示写出来
+    if (window.__drTheme) window.__drTheme.set(mode);
+    paintTheme(mode);
+    try {
+      const d = await api('/api/settings/theme', { method: 'POST', body: JSON.stringify({ theme: mode }) });
+      paintTheme(d.theme || mode);
+    } catch (e) {
+      if (themeState) themeState.textContent = `没存上：${e.message}`;
+    }
+  }
+
+  themeOpts.forEach((btn) => btn.addEventListener('click', () => pickTheme(btn.dataset.themeOpt)));
 
   const api = async (url, opts = {}) => {
     const res = await fetch(url, {
@@ -32,7 +60,9 @@
 
   async function load() {
     try {
-      paint(await api('/api/settings'));
+      const d = await api('/api/settings');
+      paint(d);
+      paintTheme((window.__drTheme && window.__drTheme.get()) || d.theme || 'auto');
     } catch (e) {
       stateEl.textContent = e.message;
       stateEl.className = 'field-hint warn';

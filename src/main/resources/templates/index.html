@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,6 +7,7 @@
   <link rel="stylesheet" th:href="@{/css/app.css}">
   <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
   <link rel="stylesheet" th:href="@{/css/workspace.css}">
+  <script th:src="@{/js/theme.js}"></script>
 </head>
 <body class="page">
 <div class="app">
@@ -136,29 +137,28 @@
       </figure>
     </section>
 
-    <section class="ledger" aria-labelledby="ledger-title">
-      <div class="ledger-heading">
-        <h2 id="ledger-title">把今天的进度，<br>摆在明面上。</h2>
+    <section class="ledger bento" aria-labelledby="ledger-title">
+      <div class="bento-cell bento-hero">
+        <p class="bento-eyebrow">Today / 今日单词</p>
+        <p class="bento-num" th:text="${todayWords}">0</p>
+        <p class="bento-foot">今天要背的这些词，<br>就是下面这一篇的取材范围。</p>
+      </div>
+      <div class="bento-cell bento-a">
+        <p class="bento-label">累计单词</p>
+        <p class="bento-num sm" th:text="${totalWords}">0</p>
+      </div>
+      <div class="bento-cell bento-b">
+        <p class="bento-label">生词 · 学习中</p>
+        <p class="bento-num sm" th:text="${learningMarks}">0</p>
+      </div>
+      <div class="bento-cell bento-c">
+        <p class="bento-label">历史文章</p>
+        <p class="bento-num sm" th:text="${articles}">0</p>
+      </div>
+      <div class="bento-cell bento-wide">
+        <h2 id="ledger-title">把今天的进度，摆在明面上。</h2>
         <span>数字随读写实时变</span>
       </div>
-      <dl>
-        <div>
-          <dd th:text="${todayWords}">0</dd>
-          <dt>今日单词</dt>
-        </div>
-        <div>
-          <dd th:text="${totalWords}">0</dd>
-          <dt>累计单词</dt>
-        </div>
-        <div>
-          <dd th:text="${learningMarks}">0</dd>
-          <dt>生词本</dt>
-        </div>
-        <div>
-          <dd th:text="${articles}">0</dd>
-          <dt>历史文章</dt>
-        </div>
-      </dl>
     </section>
 
 

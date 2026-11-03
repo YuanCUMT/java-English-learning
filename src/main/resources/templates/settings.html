@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>设置 · 每日阅读</title>
-  <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
   <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
+  <link rel="stylesheet" th:href="@{/css/workspace.css}">
+  <script th:src="@{/js/theme.js}"></script>
 </head>
 <body class="page">
 <div class="app">
@@ -38,7 +40,31 @@
 
 
     <section class="panel settings-panel">
-      <div class="panel-code">01 / api key</div>
+      <div class="panel-code">01 / 外观</div>
+      <h2>外观</h2>
+      <p class="settings-note">晚上读得多的话，深色更省眼。这个选择存在你的账号里，换台电脑打开还是它。</p>
+      <div class="theme-picker" role="radiogroup" aria-label="外观">
+        <button type="button" class="theme-opt" data-theme-opt="light" role="radio" aria-checked="false">
+          <span class="theme-swatch sw-light" aria-hidden="true"></span>
+          <b>浅色</b>
+          <small>米白纸底</small>
+        </button>
+        <button type="button" class="theme-opt" data-theme-opt="dark" role="radio" aria-checked="false">
+          <span class="theme-swatch sw-dark" aria-hidden="true"></span>
+          <b>深色</b>
+          <small>夜里不刺眼</small>
+        </button>
+        <button type="button" class="theme-opt" data-theme-opt="auto" role="radio" aria-checked="false">
+          <span class="theme-swatch sw-auto" aria-hidden="true"></span>
+          <b>跟随系统</b>
+          <small>系统切了它跟着切</small>
+        </button>
+      </div>
+      <p class="field-hint" id="themeState">当前：跟随系统</p>
+    </section>
+
+    <section class="panel settings-panel">
+      <div class="panel-code">02 / api key</div>
       <h2>DeepSeek API Key</h2>
 
       <p class="settings-note">
@@ -61,7 +87,7 @@
     </section>
 
     <section class="panel settings-panel">
-      <div class="panel-code">02 / 说明</div>
+      <div class="panel-code">03 / 说明</div>
       <h2>几点说明</h2>
       <ul class="settings-list">
         <li>保存后立刻生效，不用重启、也不用重新打包 —— Key 存在 <code>user_settings</code> 表里，按账号隔离。</li>

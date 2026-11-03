@@ -83,4 +83,26 @@ class SettingServiceTest {
         assertTrue(masked.endsWith("wxyz"), masked);
         assertFalse(masked.contains("efghij"), masked);
     }
+
+    @Test
+    void 外观默认跟随系统() {
+        when(mapper.get(UID, SettingService.KEY_THEME)).thenReturn(null);
+        assertEquals("auto", svc.theme(UID));
+        assertEquals("auto", svc.theme(null), "没登录也要给个默认值，不能抛");
+    }
+
+    @Test
+    void 外观存了能读回来() {
+        svc.saveTheme(UID, "dark");
+        verify(mapper).put(UID, SettingService.KEY_THEME, "dark");
+        when(mapper.get(UID, SettingService.KEY_THEME)).thenReturn("dark");
+        assertEquals("dark", svc.theme(UID));
+    }
+
+    @Test
+    void 外观存了乱七八糟的值当没存() {
+        when(mapper.get(UID, SettingService.KEY_THEME)).thenReturn("  DARK  ");
+        assertEquals("auto", svc.theme(UID), "大小写不对就回落到 auto，别让页面拿到非法值");
+        assertThrows(IllegalArgumentException.class, () -> svc.saveTheme(UID, "neon"));
+    }
 }

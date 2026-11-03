@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
   <meta charset="UTF-8">
   <title>出错了 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
+  <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 <div class="auth">

@@ -82,7 +82,7 @@ a:hover { text-decoration: underline; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 11px 22px; border: 1px solid var(--ink); border-radius: 2px;
-  background: var(--ink); color: #fff; font-size: 14.5px; font-family: var(--sans);
+  background: var(--solid); color: var(--solid-fg); font-size: 14.5px; font-family: var(--sans);
   cursor: pointer; width: 100%;
 }
 .btn:hover { background: #000; }

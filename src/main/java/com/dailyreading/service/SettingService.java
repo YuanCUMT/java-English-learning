@@ -14,6 +14,28 @@ import org.springframework.stereotype.Service;
 public class SettingService {
 
     public static final String KEY_DEEPSEEK = "deepseek.apiKey";
+    public static final String KEY_THEME = "ui.theme";
+
+    /** 外观：light / dark / auto（跟随系统），默认 auto */
+    public String theme(Long userId) {
+        if (userId == null) return "auto";
+        String v = settingMapper.get(userId, KEY_THEME);
+        if (v == null) return "auto";
+        return switch (v.trim()) {
+            case "light" -> "light";
+            case "dark" -> "dark";
+            default -> "auto";
+        };
+    }
+
+    public void saveTheme(Long userId, String theme) {
+        if (userId == null) return;
+        String v = theme == null ? "auto" : theme.trim();
+        if (!"light".equals(v) && !"dark".equals(v) && !"auto".equals(v)) {
+            throw new IllegalArgumentException("外观只能是 light / dark / auto");
+        }
+        settingMapper.put(userId, KEY_THEME, v);
+    }
 
     private final SettingMapper settingMapper;
     private final DeepSeekProperties props;

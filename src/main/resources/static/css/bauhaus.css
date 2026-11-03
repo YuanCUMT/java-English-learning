@@ -111,7 +111,7 @@ main > section { width: var(--page); margin: 0 auto; }
   transition: background .14s linear, color .14s linear, border-color .14s linear;
   white-space: nowrap;
 }
-.btn:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn:hover { background: var(--blue); border-color: var(--blue); color: var(--solid-fg); }
 .btn:active { transform: none; }
 .btn:disabled { opacity: .38; cursor: not-allowed; background: transparent; color: var(--ink); border-color: var(--ink); }
 .btn.primary { background: var(--solid); border-color: var(--solid); color: var(--solid-fg); }
@@ -583,7 +583,7 @@ textarea { resize: vertical; font-family: var(--mono); font-size: 12.5px; line-h
   margin-right: -1px; color: var(--muted);
 }
 .tab:hover { background: var(--tint); color: var(--ink); }
-.tab.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tab.active { background: var(--solid); border-color: var(--solid); color: var(--solid-fg); }
 
 /* ---------------------------------------------------------------- 截图识别 */
 .dropzone {
@@ -604,7 +604,7 @@ kbd {
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .thumb-x {
   position: absolute; top: 0; right: 0; border: 0; width: 20px; height: 20px;
-  line-height: 1; cursor: pointer; background: var(--ink); color: #fff; font-size: 11px; padding: 0;
+  line-height: 1; cursor: pointer; background: var(--solid); color: var(--solid-fg); font-size: 11px; padding: 0;
 }
 .thumb-x:hover { background: var(--red); }
 .row-inline { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 12px 0 10px; }
@@ -689,7 +689,7 @@ kbd {
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 90;
   max-width: 82vw; padding: 10px 16px;
-  background: var(--ink); color: #fff; font-size: 12.5px;
+  background: var(--solid); color: var(--solid-fg); font-size: 12.5px;
   border: 2px solid var(--ink);
 }
 .toast.error { background: var(--red); border-color: var(--red); }
@@ -744,7 +744,7 @@ kbd {
   border: 1px solid var(--line); background: transparent; border-radius: 999px;
   padding: 5px 14px; cursor: pointer; font-size: 13px; color: var(--ink);
 }
-.vtab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.vtab.active { background: var(--solid); color: var(--solid-fg); border-color: var(--solid); }
 /* 选中态是黑底，徽标要跟着反色：用红色小方块，白字压上去才看得清 */
 .vtab.active .count { background: var(--red); color: #fff; }
 .vocab-tools { display: flex; gap: 8px; align-items: center; }
@@ -1214,7 +1214,7 @@ kbd {
   padding: 6px 16px; cursor: pointer; color: var(--ink); transition: .18s;
 }
 .mine-tab:hover { border-color: var(--ink); }
-.mine-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.mine-tab.active { background: var(--solid); color: var(--solid-fg); border-color: var(--solid); }
 .mine-tab.active .count { background: var(--red); color: #fff; }
 
 /* ================= Java 版增补：借用 bauhaus.css 的页面里补几处 ================= */
@@ -1264,7 +1264,6 @@ kbd {
 
 /* 单词本 / 历史文章用宽的容器，首页那种窄栏只给首页 */
 .vocab-main, .archive-main { max-width: 1200px; margin: 0 auto; padding: 0 40px 90px; }
-.vocab-main .stats, .archive-main .stats { max-width: 780px; }
 @media (max-width: 900px) { .vocab-main, .archive-main { padding: 0 20px 60px; } }
 
 /* bauhaus.css 里 main > section 被固定成 --page 宽，单词本/历史页要占满容器 */
@@ -1763,3 +1762,23 @@ html[data-theme="dark"] .para .en { color: var(--ink); }
 /* 章节标题与正文之间留一口气，不要贴死 */
 .page-head h1, .hero h1 { letter-spacing: -1.4px; }
 .section-heading h2 { letter-spacing: -.6px; }
+
+/* ---------------- 统计条：和首页便当盒统一 ---------------- */
+.stats {
+  display: grid; gap: 12px; border: 0; padding: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 22px;
+}
+.stats.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stats.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stats .stat,
+.stats > .stat {
+  border: 1px solid var(--grid); border-right: 1px solid var(--grid);
+  padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 2px;
+}
+.stats .stat:last-child { border-right: 1px solid var(--grid); }
+.stats .num { font-size: 34px; font-weight: 800; line-height: 1.05; letter-spacing: -1.2px; font-variant-numeric: tabular-nums; }
+.stats .label { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+@media (max-width: 720px) {
+  .stats, .stats.three, .stats.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

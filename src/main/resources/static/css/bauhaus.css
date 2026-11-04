@@ -1782,3 +1782,32 @@ html[data-theme="dark"] .para .en { color: var(--ink); }
 @media (max-width: 720px) {
   .stats, .stats.three, .stats.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* ---------- 设置页：面板留白 + 外观改成独立按钮 ---------- */
+main .settings-panel { padding: 18px 22px 20px; }
+main .settings-panel .panel-code { margin: 0 0 10px; }
+main .settings-panel h2 { padding: 0 0 6px; }
+main .settings-panel .settings-note { margin: 0 0 16px; }
+
+.theme-picker { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 12px; }
+.theme-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 16px; border: 1px solid var(--grid); background: var(--paper-white);
+  color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 650; line-height: 1;
+  cursor: pointer; transition: background .12s linear, color .12s linear, border-color .12s linear;
+}
+.theme-btn:hover { border-color: var(--ink); }
+.theme-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.theme-dot {
+  width: 13px; height: 13px; border: 1px solid var(--grid); display: inline-block; flex: none;
+}
+.dot-light { background: #f4f2eb; }
+.dot-dark { background: #16150f; }
+.dot-auto { background: linear-gradient(90deg, #f4f2eb 0 50%, #16150f 50% 100%); }
+.theme-btn.active {
+  background: var(--solid); color: var(--solid-fg); border-color: var(--solid);
+}
+.theme-btn.active .theme-dot { border-color: currentColor; }
+.theme-btn.active .dot-light { background: #f4f2eb; }
+.theme-btn.active .dot-dark { background: #16150f; }

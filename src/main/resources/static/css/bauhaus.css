@@ -1824,3 +1824,19 @@ main .settings-panel .settings-note { margin: 0 0 16px; }
 .vocab-main .mark-cards { gap: 14px; }
 /* 生词页的「学习中 / 已掌握」小节标题也别顶边 */
 .vocab-main .mk-sec-head { padding: 0 0 2px; }
+
+/* ---------- 我的生词：学习中 / 已掌握 快捷切换 ---------- */
+.mk-switch { gap: 6px; }
+.mk-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--grid); background: transparent; border-radius: 999px;
+  padding: 4px 12px; font: inherit; font-size: 12.5px; color: var(--ink);
+  cursor: pointer; white-space: nowrap;
+}
+.mk-tab:hover { border-color: var(--ink-soft); }
+.mk-tab .count {
+  background: var(--accent-soft); color: var(--accent);
+  border-radius: 999px; padding: 0 6px; font-size: 11px; line-height: 1.5;
+}
+.mk-tab.is-on { background: var(--solid); color: var(--solid-fg); border-color: var(--solid); }
+.mk-tab.is-on .count { background: rgba(255, 255, 255, .22); color: var(--solid-fg); }

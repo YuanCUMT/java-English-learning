@@ -16,12 +16,24 @@ const phraseList = $('#phraseList');
 const tabPhraseCount = $('#tabPhraseCount');
   const sortSel = $('#vocabSort');
   const searchInput = $('#vocabSearch');
+  const mkSwitch = $('#mkSwitch');
+  const mkCountLearning = $('#mkCountLearning');
+  const mkCountMastered = $('#mkCountMastered');
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
   let allDays = [];
+  // 我的生词：两个快捷视图（学习中 / 已掌握），各自记一份排序
+  let mkView = 'learning';
+  let activeTab = 'daily';
+  const sortMemory = { daily: 'time-desc', 'marks:learning': 'time-desc', 'marks:mastered': 'time-desc', phrases: 'time-desc' };
+  const sortSlot = () => (activeTab === 'daily' ? 'daily' : activeTab === 'phrases' ? 'phrases' : 'marks:' + mkView);
+  const currentSort = () => (sortSel && sortSel.value) || sortMemory[sortSlot()] || 'time-desc';
+  function syncSortUi() {
+    if (sortSel) sortSel.value = sortMemory[sortSlot()] || 'time-desc';
+  }
   let allMarks = [];
   let toastTimer = null;
   function toast(msg, isError) {
@@ -90,17 +102,19 @@ const tabPhraseCount = $('#tabPhraseCount');
     const pick = (st) => marks.filter((m) => (m.status === 'mastered') === st);
     const learningList = pick(false);
     const masteredList = pick(true);
+    if (mkCountLearning) mkCountLearning.textContent = learningList.length;
+    if (mkCountMastered) mkCountMastered.textContent = masteredList.length;
 
-    let html = '';
-    if (learningList.length) {
-      html += `<h3 class="mk-sec">学习中 <span class="count">${learningList.length}</span></h3>`;
-      html += learningList.map(card).join('');
+    const shown = mkView === 'mastered' ? masteredList : learningList;
+    const label = mkView === 'mastered' ? '已掌握' : '学习中';
+    if (!shown.length) {
+      list.innerHTML = `<p class="empty-hint">${label}里还没有词。</p>`;
+      renderPhrases(marks);
+      return;
     }
-    if (masteredList.length) {
-      html += `<h3 class="mk-sec">已掌握 <span class="count">${masteredList.length}</span></h3>`;
-      html += masteredList.map(card).join('');
-    }
-    list.innerHTML = html;
+    list.innerHTML =
+      `<h3 class="mk-sec">${label} <span class="count">${shown.length}</span></h3>` +
+      shown.map(card).join('');
 
     renderPhrases(marks);
   }
@@ -215,7 +229,7 @@ const tabPhraseCount = $('#tabPhraseCount');
   /// 排序 + 搜索都在前端做：一个人导入过的词，几千条以内完全够用
   function paintDays() {
     const q = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
-    const mode = sortSel ? sortSel.value : 'time-desc';
+    const mode = currentSort();
 
     let days = allDays.map((d) => ({
       ...d,
@@ -248,7 +262,21 @@ const tabPhraseCount = $('#tabPhraseCount');
     dailyPanel.hidden = name !== 'daily';
     markPanel.hidden = name !== 'mine';
     phrasePanel.hidden = name !== 'phrases';
+    activeTab = name;
+    syncSortUi();
   }
+
+  // 学习中 / 已掌握 快捷切换：每个视图各自记排序
+  document.querySelectorAll('[data-mkview]').forEach((b) => {
+    b.addEventListener('click', () => {
+      mkView = b.dataset.mkview;
+      document.querySelectorAll('[data-mkview]').forEach((x) => {
+        x.classList.toggle('is-on', x === b);
+      });
+      syncSortUi();
+      paintMarks();
+    });
+  });
 
   document.querySelectorAll('.vtab').forEach((b) => {
     b.addEventListener('click', () => switchTab(b.dataset.tab));
@@ -259,7 +287,7 @@ const tabPhraseCount = $('#tabPhraseCount');
   }
 
   function sortList(items, key) {
-    const mode = sortSel ? sortSel.value : 'time-desc';
+    const mode = currentSort();
     const arr = items.slice();
     if (mode === 'alpha') {
       arr.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en'));
@@ -293,7 +321,12 @@ const tabPhraseCount = $('#tabPhraseCount');
     paintPhrases();
   }
 
-  if (sortSel) sortSel.addEventListener('change', paintAll);
+  if (sortSel) {
+    sortSel.addEventListener('change', () => {
+      sortMemory[sortSlot()] = sortSel.value;
+      paintAll();
+    });
+  }
   if (searchInput) searchInput.addEventListener('input', paintAll);
 
   async function load() {

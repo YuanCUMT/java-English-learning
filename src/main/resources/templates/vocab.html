@@ -95,7 +95,13 @@
     <div class="panel-head">
       <div class="panel-code">02 / marks</div>
       <h2>我的生词</h2>
-      <div class="panel-tools">
+      <div class="panel-tools mk-switch" id="mkSwitch">
+        <button class="mk-tab is-on" type="button" data-mkview="learning" role="tab">
+          学习中 <span class="count" id="mkCountLearning">0</span>
+        </button>
+        <button class="mk-tab" type="button" data-mkview="mastered" role="tab">
+          已掌握 <span class="count" id="mkCountMastered">0</span>
+        </button>
         <button class="btn ghost" id="btnClearAll" type="button">清空</button>
       </div>
     </div>

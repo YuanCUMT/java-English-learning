@@ -1811,3 +1811,16 @@ main .settings-panel .settings-note { margin: 0 0 16px; }
 .theme-btn.active .theme-dot { border-color: currentColor; }
 .theme-btn.active .dot-light { background: #f4f2eb; }
 .theme-btn.active .dot-dark { background: #16150f; }
+
+/* ---------- 覆盖：单词卡别贴着面板边框 ---------- */
+/* .panel 的 padding 是 0，卡片容器原来直接顶到边框上；这里和 .panel-head 的 18px 对齐 */
+.vocab-main .panel > .day-list,
+.vocab-main .panel > .mark-cards,
+.vocab-main .panel > .empty-hint {
+  padding: 16px 18px 20px;
+}
+/* 卡片之间再松一点 */
+.vocab-main .vcards { gap: 12px; }
+.vocab-main .mark-cards { gap: 14px; }
+/* 生词页的「学习中 / 已掌握」小节标题也别顶边 */
+.vocab-main .mk-sec-head { padding: 0 0 2px; }

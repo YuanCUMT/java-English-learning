@@ -153,6 +153,33 @@ public class WordService {
      * 模型返回的释义写进 lookup_cache，之后同一个词不再花钱。
      */
     public Map<String, Object> fillMeanings(Long userId, List<String> rawWords) throws Exception {
+        return fill(userId, rawWords);
+    }
+
+    /**
+     * 扫这个人名下「所有天数」的词，把还缺释义的补一批。
+     * 每次最多 40 个，返回 remaining（还有多少没补），前端可以接着调，
+     * 这样一次导入几百个词也不会撑爆单次请求。
+     */
+    public Map<String, Object> fillMissingAll(Long userId) throws Exception {
+        List<String> all = new ArrayList<>();
+        for (var w : wordMapper.listAllByUser(userId)) {
+            if (w.getWord() != null) all.add(w.getWord());
+        }
+        Map<String, Object> out = fill(userId, all);
+        // fill() 已经把这一批里能补的都补了，这里再算一次还剩多少
+        int remaining = 0;
+        for (String w : all) {
+            if (dictService.lookup(w) == null && lookupCacheMapper.findPayload(userId, w) == null) {
+                remaining++;
+            }
+        }
+        out.put("scanned", all.size());
+        out.put("remaining", remaining);
+        return out;
+    }
+
+    private Map<String, Object> fill(Long userId, List<String> rawWords) throws Exception {
         LinkedHashSet<String> want = new LinkedHashSet<>();
         if (rawWords != null) {
             for (String raw : rawWords) {

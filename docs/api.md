@@ -63,7 +63,7 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 | 单词 | GET | `/api/words?date=` | 某天的作业词（默认今天） |
 | 单词 | POST | `/api/words` | 粘贴文本导入 |
 | 单词 | POST | `/api/words/ocr` | 上传图片识别导入（multipart） |
-| 单词 | POST | `/api/words/fill-meanings` | 给内置词典查不到的词补释义（一次最多 40 个）；模型判定不是词的碎片会被顺手删掉 |
+| 单词 | POST | `/api/words/fill-meanings` | 给内置词典查不到的词补释义（一次最多 40 个）；模型判定不是词的碎片会被顺手删掉；`{"all":true}` 会扫该用户全部天数，返回 `scanned / filled / removed / remaining` |
 | 单词 | DELETE | `/api/words?date=` | 清空某天（默认今天） |
 | 生词本 | GET | `/api/marks` | 全部生词 + 两摞计数 |
 | 生词本 | POST | `/api/marks` | 收藏（已存在则更新） |

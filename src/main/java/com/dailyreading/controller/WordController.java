@@ -52,6 +52,14 @@ public class WordController {
     @PostMapping("/fill-meanings")
     public ApiResponse fillMeanings(@RequestBody(required = false) Map<String, Object> body,
                                     @RequestAttribute("userId") Long userId) {
+        // all=true：把我名下所有天数里还缺释义的词扫一遍（每次最多 40 个，前端可循环调）
+        if (body != null && Boolean.TRUE.equals(body.get("all"))) {
+            try {
+                return ApiResponse.ok(wordService.fillMissingAll(userId));
+            } catch (Exception e) {
+                return ApiResponse.fail(500, "补释义失败：" + e.getMessage());
+            }
+        }
         List<String> words = new ArrayList<>();
         if (body != null && body.get("words") instanceof List<?> list) {
             for (Object o : list) {

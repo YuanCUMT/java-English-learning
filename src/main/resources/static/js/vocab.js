@@ -197,6 +197,16 @@ const tabPhraseCount = $('#tabPhraseCount');
     }
     fillBtn.dataset.words = missing.slice(0, 40).join(',');
     fillBtn.textContent = '补全释义（' + missing.length + ' 个）';
+    autoFillOnce(missing);
+  }
+
+  // 进了单词本就别让缺口留着：自动补，一次最多 40 个，最多跑 3 轮
+  // （补完 missing 会变少甚至归零，自然就停了；坏了还有上面那个按钮兜底）
+  let autoRounds = 0;
+  function autoFillOnce(missing) {
+    if (autoRounds >= 3) return;
+    autoRounds++;
+    setTimeout(() => fillMeanings(missing.slice(0, 40)), 250);
   }
 
   async function fillMeanings(words) {
@@ -207,7 +217,11 @@ const tabPhraseCount = $('#tabPhraseCount');
     try {
       const body = await api('/api/words/fill-meanings', { method: 'POST', body: JSON.stringify({ words }) });
       const n = body.data.filled || 0;
-      toast(n ? '补好了 ' + n + ' 个词的释义' : '模型没返回新的释义，稍后再试');
+      const removed = Array.isArray(body.data.removed) ? body.data.removed : [];
+      const parts = [];
+      if (n) parts.push('补好了 ' + n + ' 个词的释义');
+      if (removed.length) parts.push('删掉 ' + removed.length + ' 个认错的词（' + removed.slice(0, 4).join('、') + (removed.length > 4 ? '…' : '') + '）');
+      toast(parts.length ? parts.join('，') : '模型没返回新的释义，稍后再试');
       await loadDays();
     } catch (e) {
       toast(e.message, true);

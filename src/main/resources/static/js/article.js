@@ -469,7 +469,12 @@
         }),
       });
       render(data);
-      toast('文章生成好了');
+      const skipped = Array.isArray(data.skippedWords) ? data.skippedWords : [];
+      toast(
+        skipped.length
+          ? `文章生成好了（跳过 ${skipped.length} 个像认错的词：${skipped.slice(0, 4).join('、')}${skipped.length > 4 ? '…' : ''}）`
+          : '文章生成好了'
+      );
     } catch (err) {
       toast(err.message, true);
       box.hidden = !!state.article;

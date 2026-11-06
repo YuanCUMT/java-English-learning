@@ -63,7 +63,7 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 | 单词 | GET | `/api/words?date=` | 某天的作业词（默认今天） |
 | 单词 | POST | `/api/words` | 粘贴文本导入 |
 | 单词 | POST | `/api/words/ocr` | 上传图片识别导入（multipart） |
-| 单词 | POST | `/api/words/fill-meanings` | 给内置词典查不到的词补释义（一次最多 40 个） |
+| 单词 | POST | `/api/words/fill-meanings` | 给内置词典查不到的词补释义（一次最多 40 个）；模型判定不是词的碎片会被顺手删掉 |
 | 单词 | DELETE | `/api/words?date=` | 清空某天（默认今天） |
 | 生词本 | GET | `/api/marks` | 全部生词 + 两摞计数 |
 | 生词本 | POST | `/api/marks` | 收藏（已存在则更新） |
@@ -159,7 +159,8 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 `multipart/form-data`，字段名 `file`。可选 `date`，可选 `save`（默认 `true`）。
 
 - `save=true`：识别完直接入库，返回 `added / skipped / total / words / engine`
-- `save=false`：**只识别不入库**，返回 `{words, total, engine, degraded, cached}` 给前端做候选词确认
+- `save=false`：**只识别不入库**，返回 `{words, total, engine, degraded, cached, dropped}` 给前端做候选词确认；
+  `dropped` 是被判为「截图认错的碎片」而自动去掉的词（如 `bl`、`kb`）
 
 ```bash
 # 直接入库

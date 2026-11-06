@@ -3,6 +3,7 @@ package com.dailyreading.controller;
 import com.dailyreading.common.ApiResponse;
 import com.dailyreading.entity.Word;
 import com.dailyreading.service.OcrCacheService;
+import com.dailyreading.service.WordFilter;
 import com.dailyreading.service.WordService;
 import com.dailyreading.service.ocr.OcrResolver;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class WordController {
     private final WordService wordService;
     private final OcrResolver ocrResolver;
     private final OcrCacheService ocrCacheService;
+    private final WordFilter wordFilter;
 
     @GetMapping
     public ApiResponse list(@RequestParam(required = false)
@@ -112,6 +114,15 @@ public class WordController {
         if (words == null || words.isEmpty()) {
             return ApiResponse.fail(400, "没从图片里识别出英文单词");
         }
+        // 截图常把词拦腰截断（bl、kb）或糊成一行（levv）：先过一遍，别让用户手动删
+        WordFilter.Result cleaned = wordFilter.filter(userId, words);
+        List<String> dropped = cleaned.dropped();
+        if (cleaned.kept().isEmpty()) {
+            // 全被判成碎片时不敢乱删，原样留着让用户自己看
+            dropped = List.of();
+        } else {
+            words = cleaned.kept();
+        }
         // engine 用「这一次实际干活的引擎」，不是链首那个，降级时页面才不会骗人
         // save=false：只把识别结果当「候选词」返回，由前端确认/改错/删掉后再入库
         if (!save) {
@@ -121,12 +132,14 @@ public class WordController {
             preview.put("engine", result.engine());
             preview.put("degraded", result.degraded());
             preview.put("cached", fromCache);
+            preview.put("dropped", dropped);
             return ApiResponse.ok(preview);
         }
         Map<String, Object> data = wordService.importWords(userId, d, words);
         data.put("engine", result.engine());
         data.put("degraded", result.degraded());
         data.put("cached", fromCache);
+        data.put("dropped", dropped);
         return ApiResponse.ok(data);
     }
 

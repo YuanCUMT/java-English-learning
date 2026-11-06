@@ -101,6 +101,33 @@
     } catch (e) { /* 生词面板挂了不影响记单词 */ }
   }
 
+  /** 保存完自动补释义：词典里没有的词交给模型，顺便把模型判定「不是词」的碎片删掉 */
+  async function autoFillMeanings() {
+    let words = [];
+    try {
+      const body = await api('/api/words');
+      words = (body.data.words || []).map((w) => w.word || w).filter(Boolean);
+    } catch { return; }
+    if (!words.length) return;
+    try {
+      toast('正在补全没有释义的词…');
+      const body = await api('/api/words/fill-meanings', {
+        method: 'POST',
+        body: JSON.stringify({ words }),
+      });
+      const d = body.data || {};
+      const filled = d.filled || 0;
+      const removed = Array.isArray(d.removed) ? d.removed : [];
+      const parts = [];
+      if (filled) parts.push('补了 ' + filled + ' 个释义');
+      if (removed.length) parts.push('删掉 ' + removed.length + ' 个认错的词（' + removed.slice(0, 4).join('、') + (removed.length > 4 ? '…' : '') + '）');
+      if (parts.length) {
+        toast(parts.join('，'));
+        await load();
+      }
+    } catch { /* 补释义失败不影响已经存好的词 */ }
+  }
+
   async function load() {
     try {
       const body = await api('/api/words');
@@ -178,12 +205,16 @@
       }
       renderPending();
       const engine = String(d.engine || '');
+      const dropped = Array.isArray(d.dropped) ? d.dropped : [];
+      const tail = dropped.length
+        ? '；已自动去掉 ' + dropped.length + ' 个像认错的（' + dropped.slice(0, 4).join('、') + (dropped.length > 4 ? '…' : '') + '）'
+        : '';
       if (d.degraded) {
-        toast('识别到 ' + d.total + ' 个词，但真实 OCR 这次失败了，用的是备用引擎（' + engine + '），结果可能不准', true);
+        toast('识别到 ' + d.total + ' 个词' + tail + '。真实 OCR 这次失败了，用的是备用引擎（' + engine + '），结果可能不准', true);
       } else if (engine.toLowerCase().startsWith('mock')) {
-        toast('识别到 ' + d.total + ' 个词，但当前是 mock 模拟数据，不是从图片里认出来的，请手动核对', true);
+        toast('识别到 ' + d.total + ' 个词' + tail + '。当前是 mock 模拟数据，不是从图片里认出来的，请手动核对', true);
       } else {
-        toast('识别到 ' + d.total + ' 个词，确认后点「保存这些词」');
+        toast('识别到 ' + d.total + ' 个词' + tail);
       }
     } catch (e) {
       toast(e.message, true);
@@ -203,6 +234,7 @@
       pending = [];
       renderPending();
       await load();
+      await autoFillMeanings();
     } catch (e) {
       toast(e.message, true);
     }

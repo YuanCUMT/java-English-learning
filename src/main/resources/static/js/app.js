@@ -103,24 +103,28 @@
 
   /** 保存完自动补释义：词典里没有的词交给模型，顺便把模型判定「不是词」的碎片删掉 */
   async function autoFillMeanings() {
-    let words = [];
-    try {
-      const body = await api('/api/words');
-      words = (body.data.words || []).map((w) => w.word || w).filter(Boolean);
-    } catch { return; }
-    if (!words.length) return;
+// 扫「我名下所有天数」，不只是今天：每次导入完都把缺口补上，最多 3 轮（每轮 40 个）
+    let filledTotal = 0;
+    const removedAll = [];
     try {
       toast('正在补全没有释义的词…');
-      const body = await api('/api/words/fill-meanings', {
-        method: 'POST',
-        body: JSON.stringify({ words }),
-      });
-      const d = body.data || {};
-      const filled = d.filled || 0;
-      const removed = Array.isArray(d.removed) ? d.removed : [];
+      for (let round = 0; round < 3; round++) {
+        const body = await api('/api/words/fill-meanings', {
+          method: 'POST',
+          body: JSON.stringify({ all: true }),
+        });
+        const d = body.data || {};
+        filledTotal += d.filled || 0;
+        if (Array.isArray(d.removed)) removedAll.push(...d.removed);
+        const remaining = d.remaining || 0;
+        if (!remaining || ((d.filled || 0) === 0 && removedAll.length === 0)) break;
+      }
       const parts = [];
-      if (filled) parts.push('补了 ' + filled + ' 个释义');
-      if (removed.length) parts.push('删掉 ' + removed.length + ' 个认错的词（' + removed.slice(0, 4).join('、') + (removed.length > 4 ? '…' : '') + '）');
+      if (filledTotal) parts.push('补了 ' + filledTotal + ' 个释义');
+      if (removedAll.length) {
+        parts.push('删掉 ' + removedAll.length + ' 个认错的词（'
+          + removedAll.slice(0, 4).join('、') + (removedAll.length > 4 ? '…' : '') + '）');
+      }
       if (parts.length) {
         toast(parts.join('，'));
         await load();
@@ -159,6 +163,7 @@
       toast('新增 ' + d.added + ' 个，跳过重复 ' + d.skipped + ' 个');
       $('#pasteText').value = '';
       await load();
+      await autoFillMeanings();
     } catch (e) {
       toast(e.message, true);
     }

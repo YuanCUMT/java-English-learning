@@ -28,14 +28,12 @@ public class ArticleService {
     private final SettingService settingService;
     private final ArticleStore articleStore;
     private final ArticleMapper articleMapper;
-    private final DictService dictService;
-    private final com.dailyreading.mapper.LookupCacheMapper lookupCacheMapper;
+    private final WordFilter wordFilter;
     private final ObjectMapper mapper;
 
     public record Result(Article article, Map<String, Object> body) {}
 
-    /** 过滤的结果：能用的词、被判为认错碎片的词。 */
-    record Targets(List<String> kept, List<String> dropped) {}
+
 
     public boolean aiConfigured(Long userId) {
         return settingService.deepSeekConfigured(userId);
@@ -47,7 +45,7 @@ public class ArticleService {
             throw new IllegalArgumentException("今天还没有单词，先导入再生成。");
         }
         // 截图识别会带出点碎片（bl、da 这种），先剔掉再喂给模型
-        Targets targets = pickTargets(userId, words);
+        WordFilter.Result targets = wordFilter.filter(userId, words);
         if (targets.kept().isEmpty()) {
             throw new IllegalArgumentException("今天的词看着都是截图认错的（"
                     + String.join("、", targets.dropped()) + "），重新导一次截图吧。");
@@ -88,28 +86,6 @@ public class ArticleService {
             body.put("skippedWords", targets.dropped());
         }
         return new Result(a, body);
-    }
-
-    /**
-     * 挑出真正能进文章的词。
-     * 判定「像词」：词典或查词缓存里查得到，或者长度 ≥3 且含元音；
-     * 否则当作截图识别的碎片丢掉（bl、da、bsh 这种）。
-     */
-    Targets pickTargets(Long userId, List<String> words) {
-        List<String> kept = new ArrayList<>();
-        List<String> dropped = new ArrayList<>();
-        for (String raw : words) {
-            String w = raw == null ? "" : raw.trim();
-            if (w.isEmpty()) continue;
-            String t = w.toLowerCase();
-            boolean known = dictService.lookup(t) != null
-                    || lookupCacheMapper.findPayload(userId, t) != null;
-            boolean plausible = t.length() >= 3
-                    && t.chars().anyMatch(c -> "aeiouy".indexOf(c) >= 0);
-            if (known || plausible) kept.add(w);
-            else dropped.add(w);
-        }
-        return new Targets(kept, dropped);
     }
 
     /** 当天最新一篇文章（任意模式），没有就返回 null。 */

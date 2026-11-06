@@ -32,6 +32,9 @@ public interface WordMapper {
     @Select("SELECT DISTINCT batch_date FROM words WHERE user_id = #{userId} ORDER BY batch_date DESC")
     List<LocalDate> listDates(@Param("userId") Long userId);
 
+    @Delete("DELETE FROM words WHERE user_id = #{userId} AND word = #{word}")
+    int deleteByWord(@Param("userId") Long userId, @Param("word") String word);
+
     @Delete("DELETE FROM words WHERE user_id = #{userId} AND batch_date = #{date}")
     int deleteByDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 

@@ -171,20 +171,30 @@ public class WordService {
         }
 
         String system = """
-                你是考研英语词汇老师。我只给你一批英文单词，请给每个词最常见的中文释义。
+                你是考研英语词汇老师。我只给你一批字符串，它们来自手机截图识别，其中可能混着认错的碎片。
+                请对每一个字符串判断它是不是真正的英文单词，然后：
+                - 是单词：给最常见的中文释义
+                - 不是单词（比如 bl、kb、levv 这种被截断或糊在一起的）：cn 填空字符串，并标 notWord=true
                 只输出 JSON 数组，不要任何解释，格式：
-                [{"word":"原词","phonetic":"音标，没有就空字符串","pos":"词性，如 n./v./adj.","cn":"中文释义；多个义项用分号隔开，尽量简短"}]
-                必须把给定的每一个词都返回；不要编造音标。
+                [{"word":"原词","notWord":false,"phonetic":"音标，没有就空字符串","pos":"词性，如 n./v./adj.","cn":"中文释义；多个义项用分号隔开，尽量简短"}]
+                必须把给定的每一个字符串都返回；不要编造音标。
                 """;
         String user = "单词列表：" + String.join(", ", want);
 
         JsonNode node = deepSeek.completeJson(system, user, 0.2, settingService.effectiveDeepSeekKey(userId));
         List<String> filled = new ArrayList<>();
+        List<String> removed = new ArrayList<>();
         if (node != null && node.isArray()) {
             for (JsonNode item : node) {
                 String word = item.path("word").asText("").trim().toLowerCase();
                 String cn = item.path("cn").asText("").trim();
-                if (word.isEmpty() || cn.isEmpty() || !want.contains(word)) continue;
+                if (word.isEmpty() || !want.contains(word)) continue;
+                // 模型说这不是个词（截图认错的碎片）：直接从当天的词表里删掉，免得占着位置没释义
+                if (item.path("notWord").asBoolean(false) || cn.isEmpty()) {
+                    wordMapper.deleteByWord(userId, word);
+                    removed.add(word);
+                    continue;
+                }
                 Map<String, Object> data = new LinkedHashMap<>();
                 data.put("word", word);
                 data.put("phonetic", item.path("phonetic").asText(""));
@@ -200,6 +210,7 @@ public class WordService {
         }
         out.put("filled", filled.size());
         out.put("words", filled);
+        out.put("removed", removed);
         out.put("requested", want.size());
         return out;
     }

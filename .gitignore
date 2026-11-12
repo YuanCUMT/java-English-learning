@@ -42,3 +42,6 @@ secret.key
 
 # 渲染/转换过程中的临时目录
 .dsh-office-*/
+
+# 课程报告与答辩 PPT 含学号/姓名/教师等个人信息，不进仓库
+docs/report/

@@ -23,7 +23,7 @@
 | 技术栈 | Spring Boot 3.3.5 + Thymeleaf + MyBatis 3.0.3 + MySQL 8 |
 | JDK | 21（`JAVA_HOME` 指向 JDK 21，PATH 上的 java 可能是 25） |
 | 构建 | `.\tools\apache-maven-3.9.9\bin\mvn.cmd -B -q package -DskipTests` |
-| 测试 | `mvn -B test`（当前 54 个用例） |
+| 测试 | `mvn -B test`（当前 63 个用例） |
 | 启动 | `启动.cmd`（自动拉起 MySQL + jar + 浏览器） |
 | 端口 | 8080（应用）、3306（MySQL） |
 | 数据目录 | `D:\MySQLServer`（免安装版，含 `mysql-start.ps1` / `stop-mysql.cmd`） |
@@ -133,7 +133,7 @@ POST /api/articles/generate {mode, difficulty}
 
 ## 9. 验证清单（提交前逐条过）
 
-- [ ] `mvn -B test` 全绿（54 个）
+- [ ] `mvn -B test` 全绿（63 个）
 - [ ] 启动后三条主链路手工跑通：截图识别 → 保存 → 生成文章 → 点词查词
 - [ ] 未登录访问 `/` 跳登录页；登录后导航四项都在
 - [ ] 改过表结构 → `sql/init.sql` 与 `docs/er.md` 同步
@@ -160,7 +160,7 @@ POST /api/articles/generate {mode, difficulty}
 
 | 文件 | 说明 |
 |---|---|
-| `docs/report/08242051_裴思远_Java课程报告.docx` | 课程报告正文（17 页，15 张表） |
+| 课程报告（docx） | 正文与图表；含个人信息，**不随仓库发布** |
 | `docs/sdd/sdd.md` | 规约驱动开发说明书 |
 | `docs/sdd/eval-set.md` | 评测集（规约条目 ↔ 检查项） |
 | `docs/sdd/acceptance.md` | 里程碑验收记录 |

@@ -51,7 +51,7 @@
 mvn -B test
 ```
 
-62 个单测：`ArticleValidatorTest`（标题/段数/题数/选项数/选项序号前缀/答案范围/目标词是否真写进正文）、`DictServiceTest`（原形命中、变形还原、查不到、normalize）、`OcrResolverTest`（三个 OCR 引擎的 Bean 装配、链路顺序、mock 兜底）、`OcrCacheServiceTest`（缓存命中/坏数据/空输入）、`WordServiceHistoryTest`（历史一次取全量、不再按天 N+1）、`ArticleServiceTargetsTest`（截图认错的碎片不进提示词）。全部跑在内存里，不碰 MySQL、不调外部服务。
+63 个单测（11 个测试类）：`ArticleValidatorTest`（标题/段数/题数/选项数/选项序号前缀/答案范围/目标词是否真写进正文）、`DictServiceTest`（原形命中、变形还原、查不到、normalize）、`OcrResolverTest`（三个 OCR 引擎的 Bean 装配、链路顺序、mock 兜底）、`OcrCacheServiceTest`（缓存命中/坏数据/空输入）、`WordFilterTest`（碎片剔除：短词、无元音长串、词典与缓存命中）、`WordServiceHistoryTest`（历史一次取全量、不再按天 N+1）、`WordServiceFillTest`（词典命中不调模型、模型结果写缓存）、`LoginAttemptServiceTest`（阈值/窗口/锁定/成功清零）、`SecretBoxTest`（加解密往返、密文前缀、篡改检测）、`SettingServiceTest`（用户 Key 优先级、掩码、删除回退）、`ApiExceptionHandlerTest`（参数错误、媒体类型错误、未知异常）。全部跑在内存里，不碰 MySQL、不调外部服务。
 
 ## 怎么跑起来
 
@@ -172,7 +172,7 @@ java-reader/
 ├─ tools/export-dict-sql.js    把 gz 导成 SQL
 └─ src/main/
    ├─ java/com/dailyreading/
-   │  ├─ controller/           接口层（8 个 Controller）
+   │  ├─ controller/           接口层（9 个 Controller）
    │  ├─ service/              业务层（含 ocr/ 下三个引擎实现）
    │  ├─ mapper/               MyBatis Mapper
    │  ├─ entity/               实体
@@ -185,5 +185,5 @@ java-reader/
 ## 环境
 
 - **JDK 21**（`JAVA_HOME` 要指过去。我机器上 PATH 里的 java 是 25，Spring Boot 3.x 对它支持还不完整，踩过）
-- Maven 3.9+
+- Maven 3.9+（仓库里没放 `mvnw`，`tools/apache-maven-3.9.9` 是本地解压的、被 `.gitignore` 排除；换台机器要么自己装一个，要么直接用 IDE 自带的 Maven）
 - MySQL 8.0（我在 8.0.29 上测的）

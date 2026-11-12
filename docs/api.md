@@ -48,7 +48,8 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 | POST | `/login` | 提交登录（表单 `username` / `password`），成功跳 `/` |
 | GET | `/register` | 注册页 |
 | POST | `/register` | 提交注册（`username` / `password` / `confirm`） |
-| GET | `/logout` | 退出，清 session |
+| POST | `/logout` | 退出，清 session（只接受 POST；GET 不会登出） |
+| GET | `/logout` | 只跳回 `/`，不做任何事（防止跨站链接把人踢下线） |
 | GET | `/vocab` | 单词本：学习中 / 已掌握两摞 |
 | GET | `/archive` | 历史文章列表 |
 | GET | `/article/{id}` | 读某一篇；不存在或不属于当前用户 → 302 回 `/archive` |
@@ -89,7 +90,7 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
 
 ### GET /api/lookup?word=takes
 
-先查 `lookup_cache` → 再查本地词典（`dict_forms` 还原词形后查 `dict_entries`）→ 都没有才问模型。
+先查本地词典（`dict_forms` 还原词形后查 `dict_entries`）；查不到返回 `code=404` + `canAskModel:true`，前端再决定要不要带 `ai=1` 问模型（问模型的结果写进 `lookup_cache`，同一个词以后不再花钱）。
 
 ```json
 {
@@ -133,7 +134,8 @@ curl -s -b jar.txt http://127.0.0.1:8080/api/marks
   "data": {
     "date": "2026-10-31",
     "count": 0,
-    "words": []
+    "words": [],
+    "engine": "baidu 高精度版"
   }
 }
 ```
@@ -311,17 +313,23 @@ curl -b jar.txt -F "file=@word-card.png" "http://127.0.0.1:8080/api/words/ocr?sa
   "message": "ok",
   "data": {
     "id": 1,
-    "title": "The Quiet Harvest: How Digital Ledgers Are Changing Charity",
-    "subtitle": "静默的收获：数字账本如何改变慈善",
-    "wordCount": 347,
     "mode": "exam",
-    "articleDate": "2026-10-30",
-    "content": { "paragraphs": [], "words": [], "sentences": [], "questions": [] }
+    "date": "2026-10-30",
+    "difficulty": "C1",
+    "wordCount": 347,
+    "body": {
+      "title": "The Quiet Harvest: How Digital Ledgers Are Changing Charity",
+      "subtitle": "静默的收获：数字账本如何改变慈善",
+      "paragraphs": [],
+      "words": [],
+      "sentences": [],
+      "questions": []
+    }
   }
 }
 ```
 
-`content` 里四段结构：
+`body` 就是模型返回的整篇文章，结构见下表；`GET /api/articles/today` 和 `/api/articles/{id}` 返回的 `data` 是同一套字段（`body` 的内容由库里存的 JSON 解析出来）。截图里有碎片被剔掉时，`body` 里还会多一个 `skippedWords`。
 
 | 字段 | 内容 |
 |---|---|
@@ -365,7 +373,8 @@ curl -b jar.txt http://127.0.0.1:8080/api/settings
   "data": {
     "deepseekKeyMasked": "sk-4d53****1fe4",
     "deepseekConfigured": true,
-    "usingOwnKey": false
+    "usingOwnKey": false,
+    "theme": "auto"
   }
 }
 ```

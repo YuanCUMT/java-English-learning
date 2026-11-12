@@ -42,9 +42,9 @@ function Find-MySqlStart {
   return $null
 }
 function Find-Java {
-  $home = $env:JAVA_HOME
-  if ($home) {
-    $j = Join-Path $home 'bin\java.exe'
+  $javaHome = $env:JAVA_HOME
+  if ($javaHome) {
+    $j = Join-Path $javaHome 'bin\java.exe'
     if (Test-Path $j) { return $j }
   }
   # JAVA_HOME 没设时别直接用 PATH 上那个：这台机器 PATH 上是 JDK 25，
@@ -97,12 +97,29 @@ if (Test-Port 8080) {
     Write-Host "       端口在监听但还没响应，等一下再刷新页面" -ForegroundColor Yellow
   }
 } else {
-  $jar = Get-ChildItem -Path (Join-Path $Root 'target') -Filter 'daily-reading-*.jar' -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -notlike '*sources*' -and $_.Name -notlike '*javadoc*' } |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  # jar 依次找 app（随包提供）/ target（自行构建）/ 根目录
+  $jar = $null
+  foreach ($dir in @((Join-Path $Root 'app'), (Join-Path $Root 'target'), $Root)) {
+    if (-not (Test-Path $dir)) { continue }
+    $cand = Get-ChildItem -Path $dir -Filter 'daily-reading-*.jar' -File -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -notlike '*sources*' -and $_.Name -notlike '*javadoc*' } |
+      Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($cand) { $jar = $cand; break }
+  }
   if (-not $jar) {
-    Write-Host "  [x] target 下没有可运行的 jar" -ForegroundColor Red
-    Write-Host "      先构建：mvn package -DskipTests" -ForegroundColor DarkGray
+    $mvn = Join-Path $Root 'tools\apache-maven-3.9.9\bin\mvn.cmd'
+    if (Test-Path $mvn) {
+      Write-Host "  [2/3] 没有现成 jar，用自带 Maven 构建（首次需联网下载依赖，可能几分钟）..." -ForegroundColor Cyan
+      & $mvn -B -DskipTests package
+      $cand = Get-ChildItem -Path (Join-Path $Root 'target') -Filter 'daily-reading-*.jar' -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -notlike '*sources*' -and $_.Name -notlike '*javadoc*' } |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+      if ($cand) { $jar = $cand }
+    }
+  }
+  if (-not $jar) {
+    Write-Host "  [x] 找不到可运行的 jar（app\ 与 target\ 都没有）" -ForegroundColor Red
+    Write-Host "      app\ 里应有一个 daily-reading-*.jar；没有就用 tools\apache-maven-3.9.9\bin\mvn.cmd package -DskipTests 构建" -ForegroundColor DarkGray
     Read-Host "按回车关闭"
     exit 1
   }
@@ -127,5 +144,5 @@ if (Test-Port 8080) {
 
 # 3. 浏览器
 Write-Host "  [3/3] http://127.0.0.1:8080" -ForegroundColor Yellow
-Start-Process 'explorer.exe' -ArgumentList 'http://127.0.0.1:8080'
+Start-Process 'http://127.0.0.1:8080'
 Start-Sleep -Seconds 2

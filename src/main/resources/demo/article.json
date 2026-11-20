@@ -1,0 +1,173 @@
+{
+  "title": "The Library of Shared Tools",
+  "subtitle": "共享工具图书馆 示例文章",
+  "gist": "随包提供的固定示例，用于离线体验阅读、查词与练习；不是现场 AI 生成。",
+  "paragraphs": [
+    {
+      "en": "A neighbourhood library has begun lending tools as well as books. Its shelves now hold drills, ladders and sewing machines. The aim is modest: residents should not have to buy an expensive object for a single afternoon. Yet a useful idea still needs a reliable procedure if it is to survive beyond its first enthusiastic month.",
+      "cn": "一家社区图书馆开始在借书之外借出工具，货架上有电钻、梯子和缝纫机。目标很朴素：居民不必为使用一个下午而购买昂贵物品。但好想法要长期运行，也需要可靠的流程。"
+    },
+    {
+      "en": "At first, some volunteers were reluctant to accept responsibility for damaged equipment. They worried that a broken drill would lead to an argument between strangers. The library responded by recording the condition of each item before and after a loan. A short checklist helped both borrowers and staff understand what they were agreeing to.",
+      "cn": "起初，部分志愿者不愿承担设备损坏的责任，担心坏电钻引发争执。图书馆因此记录借出与归还时的状态，简短清单让双方了解约定。"
+    },
+    {
+      "en": "The organisers also had to be cautious about safety. Not every resident knew how to use a ladder or adjust a sewing machine. Rather than abandon the project, they introduced short demonstrations. Experienced users could witness a beginner's first attempt and offer practical advice. Training became part of the service, not an obstacle placed in front of it.",
+      "cn": "组织者还必须谨慎对待安全。并非所有居民都知道工具的用法。他们没有放弃项目，而是增加简短示范，让熟练用户见证并指导初次操作。"
+    },
+    {
+      "en": "Supporters describe sharing as an obvious environmental benefit. That claim has force, but the evidence is more complicated. A tool that travels across the city for every loan may save materials while increasing transport. The library therefore measures how far borrowers travel and how often each item is used. Good intentions do not remove the need to examine results.",
+      "cn": "支持者认为共享显然有利于环保，但证据更复杂。每次跨城借工具可能节约材料却增加交通。图书馆因此记录出行距离与使用次数，善意不能取代效果检验。"
+    },
+    {
+      "en": "After six months, the shelves tell a vivid story of local demand. Some tools are borrowed every week; others remain untouched. The next decision is whether to expand the collection or improve access to what already exists. For a small institution with limited staff, the answer depends on which residents still find the service difficult to use.",
+      "cn": "半年后，货架生动反映了本地需求，有些工具每周借出，有些无人问津。下一步是扩大收藏还是改善现有工具的可及性，取决于哪些居民仍难以使用服务。"
+    }
+  ],
+  "words": [
+    {
+      "word": "modest",
+      "pos": "adj.",
+      "cn": "朴素的",
+      "example": "The aim is modest.",
+      "phonetic": "",
+      "examSense": "朴素的",
+      "collocation": ""
+    },
+    {
+      "word": "procedure",
+      "pos": "n./v.",
+      "cn": "流程",
+      "example": "Follow the procedure.",
+      "phonetic": "",
+      "examSense": "流程",
+      "collocation": ""
+    },
+    {
+      "word": "reluctant",
+      "pos": "adj.",
+      "cn": "不情愿的",
+      "example": "They were reluctant to agree.",
+      "phonetic": "",
+      "examSense": "不情愿的",
+      "collocation": ""
+    },
+    {
+      "word": "cautious",
+      "pos": "adj.",
+      "cn": "谨慎的",
+      "example": "Be cautious about safety.",
+      "phonetic": "",
+      "examSense": "谨慎的",
+      "collocation": ""
+    },
+    {
+      "word": "abandon",
+      "pos": "n./v.",
+      "cn": "放弃",
+      "example": "Do not abandon the project.",
+      "phonetic": "",
+      "examSense": "放弃",
+      "collocation": ""
+    },
+    {
+      "word": "witness",
+      "pos": "n./v.",
+      "cn": "见证",
+      "example": "They witness the attempt.",
+      "phonetic": "",
+      "examSense": "见证",
+      "collocation": ""
+    },
+    {
+      "word": "vivid",
+      "pos": "adj.",
+      "cn": "生动的",
+      "example": "It tells a vivid story.",
+      "phonetic": "",
+      "examSense": "生动的",
+      "collocation": ""
+    }
+  ],
+  "sentences": [
+    {
+      "sent": "A tool that travels across the city for every loan may save materials while increasing transport.",
+      "structure": "主句 A tool ... may save ...；that 引导定语从句；while 引出对比。",
+      "meaning": "每次借用都跨城运输的工具，可能节约材料却增加交通。"
+    },
+    {
+      "sent": "For a small institution with limited staff, the answer depends on which residents still find the service difficult to use.",
+      "structure": "主句 the answer depends on ...；which 引导宾语从句；with 短语说明条件。",
+      "meaning": "对人手有限的小机构，答案取决于哪些居民仍难以使用服务。"
+    }
+  ],
+  "questions": [
+    {
+      "type": "细节题",
+      "q": "Why did the library introduce a checklist?",
+      "options": [
+        "A. To record equipment condition.",
+        "B. To sell more drills.",
+        "C. To reduce book loans.",
+        "D. To charge volunteers."
+      ],
+      "answer": "A",
+      "locate": "The library responded by recording the condition of each item before and after a loan.",
+      "explain": "清单用于记录借还状态，减少责任争议。"
+    },
+    {
+      "type": "推断题",
+      "q": "What can be inferred about training?",
+      "options": [
+        "A. It replaced all borrowing.",
+        "B. It helped make sharing safer.",
+        "C. It was unnecessary for beginners.",
+        "D. It required buying new equipment."
+      ],
+      "answer": "B",
+      "locate": "Training became part of the service, not an obstacle placed in front of it.",
+      "explain": "培训让新手更安全地使用工具，支持服务正常开展。"
+    },
+    {
+      "type": "词义句意题",
+      "q": "What does modest suggest about the aim?",
+      "options": [
+        "A. Unrealistic.",
+        "B. Secret.",
+        "C. Limited and practical.",
+        "D. Very expensive."
+      ],
+      "answer": "C",
+      "locate": "The aim is modest: residents should not have to buy an expensive object for a single afternoon.",
+      "explain": "这里 modest 表示目标朴素、实际，帮助居民避免低频购买。"
+    },
+    {
+      "type": "态度题",
+      "q": "How does the author view environmental claims?",
+      "options": [
+        "A. With complete rejection.",
+        "B. With uncritical praise.",
+        "C. With indifference.",
+        "D. With cautious attention to evidence."
+      ],
+      "answer": "D",
+      "locate": "Good intentions do not remove the need to examine results.",
+      "explain": "作者认可善意，同时强调用数据评估实际影响。"
+    },
+    {
+      "type": "主旨题",
+      "q": "What is the main idea of the passage?",
+      "options": [
+        "A. A sharing service needs careful practical design.",
+        "B. All libraries should stop lending books.",
+        "C. Transport is the only environmental problem.",
+        "D. Volunteers should buy their own tools."
+      ],
+      "answer": "A",
+      "locate": "Yet a useful idea still needs a reliable procedure if it is to survive beyond its first enthusiastic month.",
+      "explain": "文章围绕流程、安全、环境评估与需求说明共享服务需要细致设计。"
+    }
+  ],
+  "source": "bundled-example",
+  "example": true
+}

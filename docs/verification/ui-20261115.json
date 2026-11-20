@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-15",
+  "changes": [
+    "Shared light and dark tokens; teal actions and separate error palette",
+    "Login and register layout, password visibility, duplicate form submit guard",
+    "Reading width, spacing, translation panels and explicit answer feedback",
+    "Recoverable form CSRF errors; API JSON contract unchanged",
+    "Accessible statuses, persistent session notice, no automatic service retry"
+  ],
+  "tests": {
+    "tests": 127,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19
+  },
+  "passed": 108,
+  "mysqlIntegration": "19 skipped; no isolated MySQL rerun for this change",
+  "browserChecks": [
+    "light login and home",
+    "light/dark reading",
+    "390x844 home, reading and registration: no horizontal overflow observed",
+    "password visibility",
+    "isolated guest sample load",
+    "translation toggle",
+    "correct and wrong answer feedback"
+  ],
+  "httpChecks": {
+    "expiredHtmlForm": 403,
+    "expiredApiJson": 403
+  },
+  "browserErrorsObservedBeforeIntentionalErrorTests": 0,
+  "cloudCalls": 0,
+  "jarSha256": "b8ff84be1969c7c19518964e7aaf894dbef684e9531cf6779b9a343deb16f225",
+  "scope": "UI and failure presentation; personal database and private files excluded; historic Nov13 report evidence remains dated historical evidence"
+}

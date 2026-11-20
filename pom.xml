@@ -24,6 +24,7 @@
   </properties>
 
   <dependencies>
+    <dependency><groupId>com.h2database</groupId><artifactId>h2</artifactId><scope>runtime</scope></dependency>
     <!-- 离线 OCR：Tesseract 的 Java 封装，不需要任何账号 -->
     <dependency>
       <groupId>net.sourceforge.tess4j</groupId>

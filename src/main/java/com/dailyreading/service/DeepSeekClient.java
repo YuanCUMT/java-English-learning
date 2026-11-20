@@ -26,6 +26,7 @@ public class DeepSeekClient {
 
     private final DeepSeekProperties props;
     private final ObjectMapper mapper;
+    private final java.util.Set<String> active = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     private RestClient client(String apiKey) {
         HttpClient http = HttpClient.newBuilder()
@@ -72,6 +73,13 @@ public class DeepSeekClient {
                 "response_format", Map.of("type", "json_object")
         );
 
+        String activeKey = keyOr(apiKey);
+        if (!active.add(activeKey)) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,"已有模型请求正在处理，请稍候");
+        try { return execute(payload, apiKey); }
+        finally { active.remove(activeKey); }
+    }
+
+    private JsonNode execute(Map<String,Object> payload, String apiKey) {
         String raw;
         try {
             raw = client(keyOr(apiKey)).post()
@@ -81,8 +89,8 @@ public class DeepSeekClient {
                     .retrieve()
                     .body(String.class);
         } catch (Exception e) {
-            log.warn("调用 DeepSeek 失败: {}", e.getMessage());
-            throw new IllegalStateException("调用 DeepSeek 失败：" + e.getMessage(), e);
+            log.warn("模型请求失败，异常类型：{}", e.getClass().getSimpleName());
+            throw new IllegalStateException("模型服务暂时不可用或请求超时，请检查网络与 Key 后手动重试。", e);
         }
 
         try {
@@ -95,7 +103,7 @@ public class DeepSeekClient {
         } catch (IllegalStateException e) {
             throw e;
         } catch (Exception e) {
-            throw new IllegalStateException("模型返回的不是合法 JSON：" + e.getMessage(), e);
+            throw new IllegalStateException("模型返回的内容无法解析，请手动重试。", e);
         }
     }
 

@@ -21,6 +21,8 @@ public class AuthController {
 
     private final UserService userService;
     private final LoginAttemptService attempts;
+    @org.springframework.beans.factory.annotation.Value("${app.demo:false}") private boolean demoMode;
+    @org.springframework.web.bind.annotation.ModelAttribute("demoMode") public boolean demoMode() { return demoMode; }
 
     @GetMapping("/login")
     public String loginPage(HttpSession session) {
@@ -71,6 +73,8 @@ public class AuthController {
                              Model model) {
         try {
             User user = userService.register(username, password, confirm);
+            HttpSession old = request.getSession(false);
+            if (old != null) old.invalidate();
             HttpSession session = request.getSession(true);
             session.setAttribute(SESSION_USER_ID, user.getId());
             session.setAttribute(SESSION_USERNAME, user.getUsername());

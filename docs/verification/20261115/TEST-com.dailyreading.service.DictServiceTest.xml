@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.service.DictServiceTest" time="0.04" tests="4" errors="0" skipped="0" failures="0">
+  <testcase name="normalize_去首尾空格并小写" classname="com.dailyreading.service.DictServiceTest" time="0.033" />
+  <testcase name="查不到返回null" classname="com.dailyreading.service.DictServiceTest" time="0.004" />
+  <testcase name="原形直接命中" classname="com.dailyreading.service.DictServiceTest" time="0.001" />
+  <testcase name="变形能查到原形" classname="com.dailyreading.service.DictServiceTest" time="0.001" />
+</testsuite>

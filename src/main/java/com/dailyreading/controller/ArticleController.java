@@ -36,6 +36,7 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final WordService wordService;
+    private final com.dailyreading.service.RequestGuard guard;
 
     public record GenerateRequest(String mode, String difficulty, Integer paragraphs,
                                   Integer questions, String topic) {}
@@ -63,7 +64,10 @@ public class ArticleController {
     public ApiResponse generate(@RequestAttribute("userId") Long userId,
                                                      @RequestBody(required = false) GenerateRequest req) {
         GenerateRequest r = req == null ? new GenerateRequest(null, null, null, null, null) : req;
-        String mode = "exam".equalsIgnoreCase(r.mode()) ? "exam" : "review";
+        String mode = blankTo(r.mode(), defaultMode);
+        if (!List.of("review","exam").contains(mode)) throw new IllegalArgumentException("模式只能是 review 或 exam");
+        if (!List.of("B2","C1","C2").contains(blankTo(r.difficulty(),defaultDifficulty))) throw new IllegalArgumentException("难度只能是 B2/C1/C2");
+        if (r.topic()!=null && r.topic().length()>200) throw new IllegalArgumentException("主题最多 200 字");
 
         List<String> words = wordService.listByDate(userId, LocalDate.now()).stream()
                 .map(w -> w.getWord())
@@ -104,6 +108,7 @@ public class ArticleController {
 
     private int clamp(Integer v, int min, int max, int dflt) {
         if (v == null) return dflt;
-        return Math.max(min, Math.min(max, v));
+        if (v<min || v>max) throw new IllegalArgumentException("段落和题数必须在 3–8 之间");
+        return v;
     }
 }

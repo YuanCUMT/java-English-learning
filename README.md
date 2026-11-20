@@ -1,189 +1,56 @@
-# 每日阅读 · 考研英语
+# 每日阅读
 
-这是我 Java 课的结课作业。
+这是 Java 语言及网络编程课程项目。可以导入单词、阅读英语文章、查词收藏和做理解题。项目使用 Spring Boot、MyBatis、Thymeleaf 和 MySQL，附带独立的 H2 体验模式。
 
-起因很简单：我每天用百词斩背单词，背完就只剩一堆孤零零的词，没有语境。我想要的是——**每天读一篇用我当天背的那些词写成的文章**，顺便当考研阅读练手。
+## 从 GitHub 源码启动
 
-先说明：我先用 Node.js 写过一个一模一样的版本，跑起来是能用的；这学期要求用 Java，所以我把整套东西用 **Spring Boot + MyBatis + Thymeleaf + MySQL** 重做了一遍。重做的时候顺手把原来不满意的地方也改了，比如查词从"一律问模型"改成"本地词典优先"。
+在 Windows 上安装 JDK 21 和 Maven 3.9 后，在仓库根目录打开 PowerShell，执行：
 
-需求文档在 [REQUIREMENTS.md](REQUIREMENTS.md)，数据库设计在 [docs/er.md](docs/er.md)，接口文档在 [docs/api.md](docs/api.md)。
-**怎么用（带截图、一步一步）写在 [docs/使用说明.md](docs/使用说明.md)。**
-
-界面在 ≤720px 会切窄屏版式，手机截图见 [使用说明 · 7. 手机上能不能用](docs/使用说明.md#7-手机上能不能用)。
-
-> 安全相关的做法：密码用 BCrypt 存；API Key 在库里用 AES-GCM 加密（`enc:v1:` 前缀，密钥在 `data/secret.key`，读到老明文会自动加密写回）；
-> 登录失败 5 次锁 5 分钟（按「用户名 + IP」计数）；退出只接受 POST，避免被链接预览、浏览器预取之类的东西「顺手登出」。
-
-## 它现在能干什么
-
-一条完整的链路，从截图到读完做题：
-
-1. **导入单词** —— 截图**拖进面板**、**Ctrl+V 粘贴**、或点「选图识别」选文件，OCR 认字；也可以直接粘贴一段词表
-2. **生成文章** —— 调 DeepSeek 写成考研阅读的风格，两种模式（复习 / 真题）
-3. **读** —— 逐段英文，想看图中文就开；当天背的词在文里高亮
-4. **查词** —— 读到生词点一下，浮层出释义，一键收藏进生词本
-5. **做题** —— 五道理解题，点选项才显示答案和原文定位；键盘 `1`–`4` 就能选
-6. **复习** —— 单词本分"学习中 / 已掌握"两摞，历史文章按天存着，随时能重读
-7. **夜间模式** —— 设置页里选「浅色 / 深色 / 跟随系统」，按账号保存，换台电脑打开还是它
-
-首页那块进度统计做成了便当盒（Bento Grid）：一个大格放"今日单词"，旁边三小格放累计、生词、历史文章。数字的层级一眼能分清。
-
-## 做到哪一步了
-
-| 里程碑 | 内容 | 状态 |
-|---|---|---|
-| M1 | 工程骨架 + 10 张表 + ECDICT 本地词典导入 | ✅ |
-| M2-1 | 注册 / 登录 / BCrypt / 拦截器 | ✅ |
-| M2-2 | 单词导入（粘贴 + 图片上传，OCR 可插拔） | ✅ |
-| M2-3 | 截图识别（百度云 / 离线 Tesseract） | ✅ |
-| M3 | 文章生成 + 阅读查词 | ✅ |
-| M4 | 单词本 / 历史文章 / 快捷键 / 文档 | ✅ |
-
-几个具体数字，都是我实际跑出来的：
-
-- 本地词典 **21,339 词条 + 27,278 个变形**，从 ECDICT 里抽的（MIT，见 [dict/README.md](dict/README.md)）。源 JSON 里 21,699 条，入库时同原形的重复行被主键去重，所以表里是 21,339
-- 生成一篇 **347 词**的文章，DeepSeek 那边大概 **16 秒**
-- 一张单词表截图，百度 OCR 能干净地认出 **6 个词**，没有杂字
-
-## 测试
-
-```bash
-mvn -B test
+```powershell
+mvn -B package
+if ($LASTEXITCODE -ne 0) { throw '构建失败' }
+New-Item -ItemType Directory -Force app | Out-Null
+Copy-Item target/daily-reading-0.1.0.jar app/
+.\启动.cmd
 ```
 
-63 个单测（11 个测试类）：`ArticleValidatorTest`（标题/段数/题数/选项数/选项序号前缀/答案范围/目标词是否真写进正文）、`DictServiceTest`（原形命中、变形还原、查不到、normalize）、`OcrResolverTest`（三个 OCR 引擎的 Bean 装配、链路顺序、mock 兜底）、`OcrCacheServiceTest`（缓存命中/坏数据/空输入）、`WordFilterTest`（碎片剔除：短词、无元音长串、词典与缓存命中）、`WordServiceHistoryTest`（历史一次取全量、不再按天 N+1）、`WordServiceFillTest`（词典命中不调模型、模型结果写缓存）、`LoginAttemptServiceTest`（阈值/窗口/锁定/成功清零）、`SecretBoxTest`（加解密往返、密文前缀、篡改检测）、`SettingServiceTest`（用户 Key 优先级、掩码、删除回退）、`ApiExceptionHandlerTest`（参数错误、媒体类型错误、未知异常）。全部跑在内存里，不碰 MySQL、不调外部服务。
+GitHub 源码不附带 JAR、Java 运行时、Maven 或课程报告；下面的免安装步骤仅适用于课程提交包。
 
-## 怎么跑起来
+## 从课程提交包快速体验
 
-### 1. 建库建表
+1. 完整解压压缩包，进入「项目源码」，双击 **启动.cmd**。
+2. 等启动窗口显示访问地址。默认端口为 8080，被占用时会尝试 8081–8099。浏览器没有弹出时，手动打开窗口给出的地址。
+3. 登录页点击「直接体验示例阅读」，进入首页后在首页使用指南点「体验示例阅读」，即可展开译文、查词收藏和答题。
+4. 用完双击 **停止.cmd**。启动窗口按任意键只会关闭窗口。
 
-```bash
-mysql -uroot -p < sql/init.sql
-```
+随包提供 Windows x64 Java 运行时。体验模式无需另装 Java、Maven、MySQL 或配置 API Key。首次启动会自动建库、导入词典，并生成 `data/`，存放体验数据库、密钥和日志。交作业时使用原始 ZIP。
 
-10 张表，全 utf8mb4。表结构和设计思路在 [docs/er.md](docs/er.md)。
+固定示例可离线试读。生成新文章、AI 查词和 Key 连通性测试需要自己的 DeepSeek Key，可能产生费用。离线 OCR 使用 Tesseract，可以在保存前校对候选词。
 
-### 2. 导入词典
+## 使用 MySQL
 
-```bash
-# 把 dict/ecdict.json.gz 导成 SQL（约 2.6 MB）
-node tools/export-dict-sql.js
+启动自己的 MySQL 8.0 服务。首次使用可在项目目录导入建表脚本和词典。
+
+```bat
+mysql -uroot -p --default-character-set=utf8mb4 < sql/init.sql
 mysql -uroot -p --default-character-set=utf8mb4 < sql/dict-data.sql
 ```
 
-> `sql/dict-data.sql` 是生成物，没进仓库。源数据是 `dict/ecdict.json.gz`。
+脚本可重复执行。已有表结构不兼容时应先备份并检查字段。复制 `application-local.yml.example` 为 `application-local.yml`，填写自己的连接配置，然后双击 **启动MySQL.cmd**。两种模式的账号和学习记录分别保存。迁移时需配套备份数据库与 Key 加密密钥。
 
-### 3. 要不要填自己的 Key？
+## 源码与测试
 
-先看清楚自己是哪种情况，别一上来就去申请 Key：
+源码的目标版本为 Java 21。随包运行时用于启动，重新编译需要完整 JDK。
 
-| 你的情况 | 要不要填 | 原因 |
-| --- | --- | --- |
-| 自己一个人用，就跑在自己电脑上 | **不用** | 程序会先用 `application-local.yml` 里那份 |
-| 把项目发给别人用 / 交作业 | **对方要自己填** | 你的 Key 只在你机器上，不会跟着仓库走 |
-| 老师在自己的电脑上检查 | **老师要自己填**，或者用你的电脑演示 | 同上；不建议把 Key 一起交上去 |
-
-怎么判断自己现在走的是哪一份：打开「设置」页，输入框下面那行小字会直接写「我用的是 application-local.yml 里那份」或者「已保存你自己的 Key」，一眼能看出来。
-
-真需要填的时候，两种方式任选：
-
-**A. 在网页里填（推荐，不用改文件）**：登录后点右上角「设置」，把 `sk-` 开头的 Key 粘进去，点保存。立刻生效，不用重新打包。Key 存在本机 MySQL 的 `user_settings` 表，按用户隔离，换个人登录就是另一个人的 Key。
-
-![设置页](docs/img/settings.png)
-
-**B. 写进配置文件**（适合只自己用）：
-
-新建 `src/main/resources/application-local.yml`（这个文件在 `.gitignore` 里，不会进仓库）：
-
-```yaml
-app:
-  deepseek:
-    api-key: "sk-..."        # 生成文章要用，去 platform.deepseek.com 申请
-  ocr:
-    provider: auto           # auto | baidu | tesseract | mock
-    baidu:
-      api-key: "..."
-      secret-key: "..."
-      accurate: true
+```bat
+tools\apache-maven-3.9.9\bin\mvn.cmd -B test
+tools\apache-maven-3.9.9\bin\mvn.cmd -B package
 ```
 
-再改 `application.yml` 里的 `spring.datasource.username / password`。
+修改后先停止应用，再把 `target/daily-reading-0.1.0.jar` 复制到 `app/`。启动脚本从 `app/` 读取 JAR。
 
-网页里填的 Key 优先级高于配置文件：填了就用自己的，清掉就退回配置文件那份。
+- 2026 年 11 月 15 日自动化回归记录见 `docs/verification/20261115-ui/`。127 项中 108 项通过，19 项隔离 MySQL 用例跳过，失败和错误均为 0。需要补跑 MySQL 用例时，仅将 `MYSQL_TEST_URL` 指向专用测试库。
+- 2026 年 11 月 19 日调整界面后复跑同一套测试，结果相同。结果 XML 见 `docs/verification/20261119/`。
+- 2026 年 11 月 19 日的界面验证和截图见实验报告第九、十章。首页和阅读区共用暖米白、象牙白与栗棕色主题。
 
-> 注意：`application-local.yml` 会被打进 jar，**改完要重新 `mvn package`**，光重启不生效。我第一次就被这个坑了。
-
-### 4. 启动
-
-```bash
-mvn spring-boot:run
-```
-
-浏览器开 <http://127.0.0.1:8080>，注册个账号就能用了。
-
-## 截图识别用哪个引擎
-
-我做了两个引擎，各有各的用武之地，改一行配置就能换：
-
-| provider | 要账号吗 | 我用它识别什么 |
-|---|---|---|
-| `baidu` | 要 | **单词表截图**（一屏好几个词）——逐行识别，字准、快。配了 Key 时自动优先用它 |
-| `tesseract` | 不要 | **单词卡截图**（一个大词 + 例句）——按字号筛词，不会把例句里的 the / this 捞进来。没配百度 Key 时它顶上 |
-| `mock` | 不要 | 一个 Key 都没配时的兜底，固定返回几个词，保证链路能跑通 |
-
-为什么不能只留一个？因为我两种截图都会传：
-
-- 百度是**整张图逐行识别、把所有英文词都抽出来**。传单词表很干净；传单词卡就糟了，例句里的 `the`、`this`、`to`、`was` 全被当成生词捞进来。
-- Tesseract 是**按框的高度筛**：单词卡上目标词字号最大，音标、释义、例句都小一号，只留接近最大字号的那批，杂字自然被滤掉。
-
-所以我的用法是：**单词表用百度，单词卡用 Tesseract**。两边识别结果都会进候选列表，可以自己勾选、改拼写，不用指望 100% 干净。
-
-## 踩过的坑
-
-写这份作业踩了不少坑，记下来免得以后忘：
-
-**1. `${DB_USERNAME:root}` 里的中文密码炸了**
-早期用 `characterEncoding=utf8mb4` 连 MySQL，启动直接报 `UnsupportedEncodingException: utf8mb4` —— JDBC 要的是 `utf8`，`utf8mb4` 是 MySQL 的字符集名，不是 Java 的编码名。
-
-**2. Lombok 突然不生效**
-编译报一堆"找不到 getXxx/setXxx"。不是注解没写，是**这台机器的 JDK 21 默认不跑 classpath 上的注解处理器**了。要在 `maven-compiler-plugin` 里显式写 `<proc>full</proc>`，再加上 lombok 的 `annotationProcessorPaths`。
-
-**3. application.yml 重复的顶层键**
-我用脚本往文件末尾追配置，结果 `app:` 出现了两次，SnakeYAML 直接拒绝启动。改完才知道 YAML 不允许重复键，报错信息还很不明显。
-
-**4. 百度 OCR 一直返回错误 18**
-`Open api qps request limit reached`。以为是调用太快，间隔 10 秒重试还是一样。最后才想明白：**账号没实名，配额就是 0**，跟速度无关。实名通过当天就正常了。
-
-**5. 阅读页整页空白**
-`article.html` 里 `#articleBox` 把 `#articleBody` 整个包住了，脚本里 `box.hidden = true` 一执行，标题和正文一起消失。查了半小时才发现是嵌套关系写错。
-
-**6. 快捷键按了没反应**
-`1`–`4` 选答案的代码写的是 `querySelectorAll('.opt')`，而模板里选项的类名是 `.q-opt`。一个类名对不上，功能就整个是死的。
-
-手机（≤720px）也适配了，截图见 [docs/使用说明.md](docs/使用说明.md#7-手机上能不能用)。
-
-## 目录结构
-
-```
-java-reader/
-├─ sql/init.sql                10 张表
-├─ dict/ecdict.json.gz         词典源数据（21,699 词 + 27,278 变形，0.8 MB；入库去重后 21,339 条）
-├─ tessdata/eng.traineddata    离线 OCR 的英文模型（3.9 MB）
-├─ tools/export-dict-sql.js    把 gz 导成 SQL
-└─ src/main/
-   ├─ java/com/dailyreading/
-   │  ├─ controller/           接口层（9 个 Controller）
-   │  ├─ service/              业务层（含 ocr/ 下三个引擎实现）
-   │  ├─ mapper/               MyBatis Mapper
-   │  ├─ entity/               实体
-   │  └─ config/               配置类 + 登录拦截器
-   └─ resources/
-      ├─ templates/            Thymeleaf 页面（首页/登录/注册/单词本/历史/阅读）
-      └─ static/               CSS + JS
-```
-
-## 环境
-
-- **JDK 21**（`JAVA_HOME` 要指过去。我机器上 PATH 里的 java 是 25，Spring Boot 3.x 对它支持还不完整，踩过）
-- Maven 3.9+（仓库里没放 `mvnw`，`tools/apache-maven-3.9.9` 是本地解压的、被 `.gitignore` 排除；换台机器要么自己装一个，要么直接用 IDE 自带的 Maven）
-- MySQL 8.0（我在 8.0.29 上测的）
+实验报告在压缩包根目录。接口和数据库设计见 `docs/api.md` 与 `docs/er.md`，操作说明见 `docs/使用说明.md`。阅读排版和词汇状态的设计参考 [Readest](https://github.com/readest/readest/blob/main/apps/readest-app/DESIGN.md) 与 [LinguaCafe](https://github.com/simjanos-dev/LinguaCafe/wiki/3.-Usage-and-features)。

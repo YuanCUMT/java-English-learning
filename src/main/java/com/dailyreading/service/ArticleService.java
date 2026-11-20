@@ -29,6 +29,8 @@ public class ArticleService {
     private final ArticleStore articleStore;
     private final ArticleMapper articleMapper;
     private final WordFilter wordFilter;
+    private final TargetWordMatcher matcher;
+    private final RequestGuard guard;
     private final ObjectMapper mapper;
 
     public record Result(Article article, Map<String, Object> body) {}
@@ -50,7 +52,7 @@ public class ArticleService {
             throw new IllegalArgumentException("今天的词看着都是截图认错的（"
                     + String.join("、", targets.dropped()) + "），重新导一次截图吧。");
         }
-        JsonNode json = deepSeek.completeJson(promptBuilder.system(), promptBuilder.user(targets.kept(), opt), 0.75, settingService.effectiveDeepSeekKey(userId));
+        JsonNode json = guard.run(userId, () -> deepSeek.completeJson(promptBuilder.system(), promptBuilder.user(targets.kept(), opt), 0.75, settingService.effectiveDeepSeekKey(userId)));
         validate(json, opt);
 
         int wordCount = countWords(json.path("paragraphs"));
@@ -75,7 +77,16 @@ public class ArticleService {
         a.setContent(content);
 
         // 先删同一天的旧文再插入 + 写 article_words，整段在一个事务里
-        List<String> actualUsed = ArticleValidator.matchWords(json, targets.kept());
+        TargetWordMatcher.Coverage coverage = matcher.measure(json, targets.kept(), opt.mode(), opt.examWordLimit());
+        List<String> actualUsed = coverage.matched();
+        if (actualUsed.size() < coverage.required()) {
+            throw new IllegalStateException("目标词覆盖不达标：命中 " + actualUsed.size() + "/" + coverage.targets().size()
+                    + "，至少需要 " + coverage.required() + " 个。原文章已保留。");
+        }
+        ((com.fasterxml.jackson.databind.node.ObjectNode)json).set("coverage", mapper.valueToTree(coverage));
+        try { content = mapper.writeValueAsString(json); }
+        catch (Exception e) { throw new IllegalStateException("文章序列化失败",e); }
+        a.setContent(content);
         if (actualUsed.isEmpty()) {
             throw new IllegalStateException("生成的文章里一个目标词都没用上，再生成一次试试。");
         }
@@ -131,17 +142,6 @@ public class ArticleService {
         return n;
     }
 
-    private List<String> usedWords(JsonNode json) {
-        Set<String> out = new LinkedHashSet<>();
-        JsonNode ws = json.path("words");
-        if (ws.isArray()) {
-            for (JsonNode w : ws) {
-                String v = w.path("word").asText("").trim();
-                if (!v.isEmpty()) out.add(v.length() > 64 ? v.substring(0, 64) : v);
-            }
-        }
-        return new ArrayList<>(out);
-    }
 
     private String trim(String s, int max) {
         if (s == null) return null;

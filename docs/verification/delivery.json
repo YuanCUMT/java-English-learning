@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-13",
+  "jarSha256": "b8ff84be1969c7c19518964e7aaf894dbef684e9531cf6779b9a343deb16f225",
+  "jarMatchesBuild": true,
+  "reportPages": 17,
+  "scriptPages": 4,
+  "documentReview": "2026-11-15 Word updated TOC/page fields; all 17 rendered report pages visually reviewed; four current UI screenshots",
+  "runtime": "Windows x64 Temurin 25.0.4 jlink",
+  "cloudCalls": 0,
+  "excluded": [
+    "data",
+    "target",
+    "application-local.yml",
+    "secret.key",
+    "temporary logs",
+    "backups"
+  ],
+  "portableCheck": {
+    "date": "2026-11-13",
+    "cleanExtractedCopy": true,
+    "pathContainsChineseAndSpace": true,
+    "usedBundledRuntimeWithInvalidJavaHome": true,
+    "existing8080Preserved": true,
+    "autoSelectedPort": 8081,
+    "dictionaryEntries": 21699,
+    "sampleWords": 284,
+    "coverage": {
+      "targets": [
+        "modest",
+        "procedure",
+        "reluctant",
+        "cautious",
+        "abandon",
+        "witness",
+        "vivid"
+      ],
+      "matched": [
+        "modest",
+        "procedure",
+        "reluctant",
+        "cautious",
+        "abandon",
+        "witness",
+        "vivid"
+      ],
+      "missing": [],
+      "required": 6,
+      "ratio": 1.0
+    },
+    "externalKeysUsed": false
+  },
+  "latestRevision": "2026-11-15 UI refinements; evidence ui-20261115.json",
+  "reportSha256": "f055b30e18b837573238198db1d6e2129e8d1a041890744ccfee6931150568d8",
+  "latestReportRevision": "2026-11-15; report-sync-20261115.json"
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.common.ApiExceptionHandlerTest" time="0.096" tests="3" errors="0" skipped="0" failures="0">
+  <testcase name="参数错误是400" classname="com.dailyreading.common.ApiExceptionHandlerTest" time="0.014" />
+  <testcase name="格式不对时给出能看懂的提示" classname="com.dailyreading.common.ApiExceptionHandlerTest" time="0.006" />
+  <testcase name="未预期异常是500且不暴露细节" classname="com.dailyreading.common.ApiExceptionHandlerTest" time="0.005">
+    </testcase>
+</testsuite>

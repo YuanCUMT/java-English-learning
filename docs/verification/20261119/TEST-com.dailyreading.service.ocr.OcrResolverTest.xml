@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.service.ocr.OcrResolverTest" time="0.216" tests="6" errors="0" skipped="0" failures="0">
+  <testcase name="默认配置下三个引擎都会注册进来" classname="com.dailyreading.service.ocr.OcrResolverTest" time="0.098" />
+  <testcase name="mock_永远排在最后当兜底" classname="com.dailyreading.service.ocr.OcrResolverTest" time="0.022" />
+  <testcase name="provider_tesseract_时链路会把离线引擎排前面" classname="com.dailyreading.service.ocr.OcrResolverTest" time="0.017" />
+  <testcase name="provider为mock时链路只有mock" classname="com.dailyreading.service.ocr.OcrResolverTest" time="0.016" />
+  <testcase name="状态列表能反映每个引擎是否可用" classname="com.dailyreading.service.ocr.OcrResolverTest" time="0.017" />
+  <testcase name="只有显式配置成mock才算explicitlyMock" classname="com.dailyreading.service.ocr.OcrResolverTest" time="0.034" />
+</testsuite>

@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-13",
+  "scope": "generated plain English word-list image, local Tesseract only",
+  "elapsedSeconds": 0.36,
+  "response": {
+    "code": 0,
+    "message": "ok",
+    "data": {
+      "words": [
+        "abandon",
+        "procedure",
+        "reluctant",
+        "cautious",
+        "vivid",
+        "witness"
+      ],
+      "total": 6,
+      "engine": "tesseract（离线，不用账号）",
+      "degraded": false,
+      "cached": false,
+      "dropped": []
+    }
+  },
+  "cloudCalls": 0
+}

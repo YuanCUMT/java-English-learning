@@ -13,8 +13,7 @@ USE daily_reading;
 -- ------------------------------------------------------------
 -- 1. 用户
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS users;
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id            BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键',
     username      VARCHAR(50)  NOT NULL COMMENT '登录名，3-20 位',
@@ -28,8 +27,7 @@ CREATE TABLE users
 -- 2. 每日单词（截图识别 / 粘贴导入的作业词）
 --    word 存小写规范形，surface 存识别到的原始形态（Ledger / takes）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS words;
-CREATE TABLE words
+CREATE TABLE IF NOT EXISTS words
 (
     id         BIGINT      NOT NULL AUTO_INCREMENT,
     user_id    BIGINT      NOT NULL,
@@ -46,8 +44,7 @@ CREATE TABLE words
 -- ------------------------------------------------------------
 -- 3. 生词本（阅读时收藏）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS marks;
-CREATE TABLE marks
+CREATE TABLE IF NOT EXISTS marks
 (
     id          BIGINT       NOT NULL AUTO_INCREMENT,
     user_id     BIGINT       NOT NULL,
@@ -74,8 +71,7 @@ CREATE TABLE marks
 --    content 存整份 JSON（段落/译文/词汇卡/长难句/题目），
 --    因为它是「一次生成、整体读取」的文档，拆表反而更麻烦。
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS articles;
-CREATE TABLE articles
+CREATE TABLE IF NOT EXISTS articles
 (
     id           BIGINT      NOT NULL AUTO_INCREMENT,
     user_id      BIGINT      NOT NULL,
@@ -97,8 +93,7 @@ CREATE TABLE articles
 -- ------------------------------------------------------------
 -- 5. 文章用词（哪篇文章用了哪些词，用于「本篇用到 X/Y 个」）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS article_words;
-CREATE TABLE article_words
+CREATE TABLE IF NOT EXISTS article_words
 (
     id         BIGINT      NOT NULL AUTO_INCREMENT,
     article_id BIGINT      NOT NULL,
@@ -112,8 +107,7 @@ CREATE TABLE article_words
 -- ------------------------------------------------------------
 -- 6. 本地词典词条（ECDICT 子集，21,699 条）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS dict_entries;
-CREATE TABLE dict_entries
+CREATE TABLE IF NOT EXISTS dict_entries
 (
     word        VARCHAR(64)   NOT NULL,
     phonetic    VARCHAR(64)   DEFAULT NULL,
@@ -131,8 +125,7 @@ CREATE TABLE dict_entries
 -- ------------------------------------------------------------
 -- 7. 词形索引（27,278 条：takes -> take）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS dict_forms;
-CREATE TABLE dict_forms
+CREATE TABLE IF NOT EXISTS dict_forms
 (
     form  VARCHAR(64) NOT NULL,
     lemma VARCHAR(64) NOT NULL,
@@ -143,8 +136,7 @@ CREATE TABLE dict_forms
 -- ------------------------------------------------------------
 -- 8. 查词缓存（模型查过的词，避免重复调用）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS lookup_cache;
-CREATE TABLE lookup_cache
+CREATE TABLE IF NOT EXISTS lookup_cache
 (
     id         BIGINT      NOT NULL AUTO_INCREMENT,
     user_id    BIGINT      NOT NULL,
@@ -160,8 +152,7 @@ CREATE TABLE lookup_cache
 -- ------------------------------------------------------------
 -- 9. OCR 结果缓存（同一张图不重复调用云 OCR，省钱）
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS ocr_cache;
-CREATE TABLE ocr_cache
+CREATE TABLE IF NOT EXISTS ocr_cache
 (
     image_sha1 CHAR(40) NOT NULL COMMENT '图片内容 sha1',
     payload    LONGTEXT NOT NULL COMMENT 'JSON：识别到的词 + 产生它的引擎',
@@ -169,8 +160,7 @@ CREATE TABLE ocr_cache
     PRIMARY KEY (image_sha1)
 ) ENGINE = InnoDB COMMENT ='OCR 结果缓存';
 
-DROP TABLE IF EXISTS user_settings;
-CREATE TABLE user_settings
+CREATE TABLE IF NOT EXISTS user_settings
 (
     user_id    BIGINT      NOT NULL,
     skey       VARCHAR(40) NOT NULL,

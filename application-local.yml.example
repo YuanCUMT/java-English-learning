@@ -1,16 +1,23 @@
 # ---------------------------------------------------------------------------
-# 本地私有配置模板
+# 本地私有配置模板（不随作业提交）
 #
-# 用法：复制一份改名为 application-local.yml，填上你自己的 Key。
-# 这个文件已被 .gitignore 排除，不会被提交；但填了真实 Key 之后
-# 不要把改名后的文件发给别人 / 传网盘。
+# 用法：复制到【项目根目录】（与 pom.xml、启动.cmd 同级），改名为 application-local.yml，
+#       再填自己的 Key。它只供本机开发用，已写进 .gitignore，不会被打进 jar，也不进提交包。
 #
-# 一项都不填也能跑：文章生成和「问模型查词」会提示去网页「设置」里填。
+# 老师/评分者可以完全不建这个文件：
+#   直接双击 启动.cmd 启动，登录后到网页「设置」页填写自己的 DeepSeek Key，保存即生效。
+#
+# 能力边界（不填 Key 时）：
+#   可用：截图 OCR（不填百度 Key 时 provider=auto 会优先试本地 Tesseract，再退到 mock）、
+#         单词本、查词、阅读、历史文章；
+#   不可用：生成新文章、AI 查词（会提示"请先在设置页填写 DeepSeek Key"）。
+#
+# 不填百度 Key 时，provider=auto 的顺序是 Tesseract → mock，不会去调百度。
 # ---------------------------------------------------------------------------
 app:
   deepseek:
     # 去 https://platform.deepseek.com 注册 → 创建 API Key → 复制 sk- 开头那一串
-    # 也可以留空，改在网页右上角「设置」里填（网页填的优先级更高）
+    # 留空也行：改在网页右上角「设置」里填（网页填的优先级更高）
     api-key: ""
 
   ocr:
@@ -41,8 +48,5 @@ app:
     default-questions: 5
     exam-word-limit: 15         # 真题模式最多用多少个目标词
 
-# 如果你本机的 MySQL 不是默认口令，可以在这里覆盖（application.yml 里用的是环境变量）
-# spring:
-#   datasource:
-#     username: root
-#     password: "123456"
+# 如果你本机的 MySQL 不是默认口令，可以换一种方式覆盖：
+# 设置环境变量 DB_USERNAME / DB_PASSWORD，或在 application.yml 里改默认值。

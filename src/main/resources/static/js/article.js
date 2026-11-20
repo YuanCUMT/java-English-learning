@@ -27,12 +27,13 @@
     toastEl.className = 'toast' + (isError ? ' error' : '');
     toastEl.hidden = false;
     clearTimeout(toast._t);
-    toast._t = setTimeout(() => { toastEl.hidden = true; }, 2600);
+    toast._t = setTimeout(() => { toastEl.hidden = true; }, isError ? 7000 : 3500);
   }
 
   async function api(url, opts) {
     const res = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
     const data = await res.json().catch(() => null);
+    if (data && data.code === 404 && data.canAskModel) return data;
     if (!res.ok || !data) {
       throw new Error((data && data.message) || `请求失败（HTTP ${res.status}）`);
     }
@@ -88,6 +89,7 @@
     const qs = b.questions || [];
     const re = targetPattern(words.map((w) => w.word));
 
+    const coverage = b.coverage;
     const ymd = article.date || '';
     const html = [];
     html.push(`<header class="art-head">
@@ -99,9 +101,11 @@
         <span class="pill">${esc(article.difficulty || '')}</span>
         <span class="pill">${paras.length} 段</span>
         <span class="pill">约 ${article.wordCount || 0} 词</span>
-        <span class="pill">目标词 ${words.length} 个</span>
+        <span class="pill">${coverage ? `目标词 ${coverage.matched.length}/${coverage.targets.length} · ${Math.round(coverage.ratio*100)}%` : `词汇卡 ${words.length} 个`}</span>
+        ${b.example ? '<span class="pill">固定示例 · 非实时生成</span>' : ''}
       </div>
       ${b.gist ? `<p class="art-gist">${esc(b.gist)}</p>` : ''}
+      ${coverage && coverage.missing.length ? `<p class="hint">未命中：${coverage.missing.map(esc).join('、')}</p>` : ''}
       <div class="art-tools">
         <button class="tool-link" id="btnRead" type="button">▶ 朗读全文</button>
         <button class="tool-link" id="btnCn" type="button">显示中文</button>
@@ -113,7 +117,7 @@
       html.push(`<div class="para">
         <span class="para-no">${String(i + 1).padStart(2, '0')}</span>
         <div class="para-main">
-          <p class="en">${highlight(p.en || '', re)}</p>
+          <p class="en" lang="en">${highlight(p.en || '', re)}</p>
           <p class="cn" hidden>${esc(p.cn || '')}</p>
           <div class="para-tools">
             <button class="tool-link sm" type="button" data-psay>▶ 朗读本段</button>
@@ -221,6 +225,12 @@
             if (b.dataset.k === right) b.classList.add('right');
             else if (b === btn) b.classList.add('wrong');
           });
+          const feedback=document.createElement('p');
+          feedback.className='answer-result'+(picked===right?'':' is-wrong');
+          feedback.setAttribute('role','status');
+          feedback.textContent=picked===right?'回答正确 · '+right:'你选择了 '+picked+'，正确答案为 '+right;
+          q.querySelector('.q-exp').before(feedback);
+          q.querySelectorAll('.q-opt').forEach(b=>{b.disabled=true;});
           q.querySelector('.q-exp').hidden = false;
         };
       });
@@ -307,6 +317,7 @@
               }),
             });
             btn.textContent = '已在生词本';
+            btn.dataset.saved = 'true';
             toast('已收进生词本');
           } catch (err) {
             btn.disabled = false;
@@ -457,7 +468,8 @@
     box.hidden = true;
     body.hidden = true;
     loading.hidden = false;
-    $('#articleLoadingHint').textContent = '正在写文章，大约 20–40 秒……';
+    $('#articleLoadingHint').textContent = '正在生成并校验文章，请稍候。无需重复点击；生成失败会保留已有文章。';
+    btnGen.setAttribute('aria-busy','true');
     try {
       const modeSel = $('#genMode');
       const diffSel = $('#genDifficulty');
@@ -478,10 +490,11 @@
     } catch (err) {
       toast(err.message, true);
       box.hidden = !!state.article;
-      if (!state.article) box.hidden = false;
+      body.hidden = !state.article;
     } finally {
       loading.hidden = true;
       btnGen.disabled = false;
+      btnGen.removeAttribute('aria-busy');
     }
   }
 
@@ -522,5 +535,9 @@
   const url = articleId ? `/api/articles/${articleId}` : '/api/articles/today';
   api(url)
     .then((d) => render(d || null))
-    .catch(() => render(null));
+    .catch((err) => {
+      render(null);
+      box.innerHTML='<p class="empty-code">暂时未能加载</p><h2>文章暂时没有加载出来</h2><p>'+esc(err.message || '请检查网络连接后重试。')+'</p><button class="btn ghost" id="retryArticle" type="button">重新加载</button>';
+      box.querySelector('#retryArticle').onclick=()=>location.reload();
+    });
 })();

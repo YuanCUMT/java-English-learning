@@ -186,6 +186,7 @@ public class WordService {
                 String w = raw == null ? "" : raw.trim().toLowerCase();
                 if (w.isEmpty() || w.length() > 40) continue;
                 if (dictService.lookup(w) != null) continue; // 词典里已有，不用花这个钱
+                if (lookupCacheMapper.findPayload(userId, w) != null) continue;
                 want.add(w);
                 if (want.size() >= 40) break;
             }
@@ -202,8 +203,8 @@ public class WordService {
                 请对每一个字符串判断它是不是真正的英文单词，然后：
                 - 是单词：给最常见的中文释义
                 - 不是单词（比如 bl、kb、levv 这种被截断或糊在一起的）：cn 填空字符串，并标 notWord=true
-                只输出 JSON 数组，不要任何解释，格式：
-                [{"word":"原词","notWord":false,"phonetic":"音标，没有就空字符串","pos":"词性，如 n./v./adj.","cn":"中文释义；多个义项用分号隔开，尽量简短"}]
+                只输出 JSON 对象，words 字段为数组，不要任何解释，格式：
+                {"words":[{"word":"原词","notWord":false,"phonetic":"音标，没有就空字符串","pos":"词性，如 n./v./adj.","cn":"中文释义；多个义项用分号隔开，尽量简短"}]}
                 必须把给定的每一个字符串都返回；不要编造音标。
                 """;
         String user = "单词列表：" + String.join(", ", want);
@@ -211,6 +212,7 @@ public class WordService {
         JsonNode node = deepSeek.completeJson(system, user, 0.2, settingService.effectiveDeepSeekKey(userId));
         List<String> filled = new ArrayList<>();
         List<String> removed = new ArrayList<>();
+        if (node != null && !node.isArray()) node = node.path("words");
         if (node != null && node.isArray()) {
             for (JsonNode item : node) {
                 String word = item.path("word").asText("").trim().toLowerCase();
@@ -218,7 +220,7 @@ public class WordService {
                 if (word.isEmpty() || !want.contains(word)) continue;
                 // 模型说这不是个词（截图认错的碎片）：直接从当天的词表里删掉，免得占着位置没释义
                 if (item.path("notWord").asBoolean(false) || cn.isEmpty()) {
-                    wordMapper.deleteByWord(userId, word);
+                    // 模型判断只作为建议，保留已有词表数据。
                     removed.add(word);
                     continue;
                 }
@@ -237,7 +239,8 @@ public class WordService {
         }
         out.put("filled", filled.size());
         out.put("words", filled);
-        out.put("removed", removed);
+        out.put("removed", List.of());
+        out.put("suggestedInvalid", removed);
         out.put("requested", want.size());
         return out;
     }

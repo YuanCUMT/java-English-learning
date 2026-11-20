@@ -59,3 +59,6 @@ mysql -uroot -p --default-character-set=utf8mb4 < sql/dict-data.sql
 抽取脚本留在我上一版 Node 项目里（`tools/build-dict.js`），这个 Java 仓库只做「gz → SQL」这一步。
 真要重抽，把同一份 `ecdict.csv` 按上面的过滤规则跑一遍、产出同样的 `{ words, forms }` 结构即可，
 `DictService` 不用改。
+## 独立体验库的统计口径
+
+本次 H2 体验库实际导入 21699 条词条。MySQL 使用 utf8mb4_unicode_ci，大小写与重音等比较规则可能合并词条，因此词条数与 H2 不完全相同；不要将历史 MySQL 行数写成所有数据库固定行数。两者均使用随包 ECDICT 子集，不代表实时云词典。

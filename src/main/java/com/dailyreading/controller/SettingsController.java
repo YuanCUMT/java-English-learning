@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * 设置页：让用户自己填 DeepSeek API Key，不用改服务器上的配置文件。
- * Key 只存在本机 MySQL 的 user_settings 表里，不往外发。
+ * Key 加密保存在本地 user_settings 中；主动调用云模型时用作 HTTPS 认证。
  */
 @RestController
 @RequestMapping("/api/settings")

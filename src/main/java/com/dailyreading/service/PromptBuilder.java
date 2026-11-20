@@ -48,7 +48,7 @@ public class PromptBuilder {
         StringBuilder sb = new StringBuilder();
         sb.append("今天学生背的单词：").append(w).append("\n\n");
         sb.append("请用这些词写一篇英文文章。\n");
-        sb.append("- 难度：").append(difficultyHint(opt.difficulty())).append("\n");
+        sb.append("- 难度：").append(exam ? difficultyHint(opt.difficulty()) : "复习阅读，平均句长 12–18 词；" + opt.difficulty() + " 仅控制词汇难度").append("\n");
         sb.append("- 段落数：").append(opt.paragraphs()).append("\n");
         sb.append("- 题材：").append(opt.topic() == null || opt.topic().isBlank()
                 ? "社科 / 科普类议论文，话题要具体（例如某一项具体的技术、政策、行业变化），不要泛泛谈人生"
@@ -63,7 +63,7 @@ public class PromptBuilder {
                        不要「现象 → 科学解释 → 历史回顾 → 提出问题 → 文化升华」这种五段模板。
                     4. 结尾不要升华、不要格言、不要提「我们应该」。就以一个具体的、未解决的张力收尾。
                     5. words 数组只放你实际用到的词。
-                    """.formatted(opt.examWordLimit(), sentenceRule(opt.difficulty())));
+                    """.formatted(Math.min(opt.examWordLimit(), words.size()), sentenceRule(opt.difficulty())));
         } else {
             sb.append("""
                     【复习模式】这段是重点：

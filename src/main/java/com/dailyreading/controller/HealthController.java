@@ -14,12 +14,18 @@ import java.util.Map;
 @RequestMapping("/api")
 public class HealthController {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.boot.availability.ApplicationAvailability availability;
+    @org.springframework.beans.factory.annotation.Value("${app.demo:false}")
+    private boolean demo;
+
     @GetMapping("/health")
     public Map<String, Object> health() {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("code", 0);
         body.put("message", "ok");
-        body.put("data", Map.of("app", "daily-reading", "status", "up"));
+        body.put("data", Map.of("app", "daily-reading", "status", "up", "mode", demo ? "demo" : "mysql",
+                "ready", availability.getReadinessState() == org.springframework.boot.availability.ReadinessState.ACCEPTING_TRAFFIC));
         return body;
     }
 }

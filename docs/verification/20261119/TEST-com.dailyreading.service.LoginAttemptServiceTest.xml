@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.service.LoginAttemptServiceTest" time="0.006" tests="7" errors="0" skipped="0" failures="0">
+  <testcase name="封禁五分钟后自动解除" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.0" />
+  <testcase name="连续失败五次会被挡住" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.001" />
+  <testcase name="key大小写和空格归一" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.001" />
+  <testcase name="失败四次还能试第五次" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.0" />
+  <testcase name="登录成功会清掉计数" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.0" />
+  <testcase name="不同用户名互不影响" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.001" />
+  <testcase name="窗口过期后失败次数重新算" classname="com.dailyreading.service.LoginAttemptServiceTest" time="0.0" />
+</testsuite>

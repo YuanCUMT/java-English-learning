@@ -29,8 +29,8 @@ public class UserService {
         if (username == null || !USERNAME_RE.matcher(username).matches()) {
             throw new BizException("用户名要 3-20 位，只能用字母、数字、下划线");
         }
-        if (rawPassword == null || rawPassword.length() < 6) {
-            throw new BizException("密码至少 6 位");
+        if (rawPassword == null || rawPassword.length() < 6 || rawPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            throw new BizException("密码至少 6 位，UTF-8 编码不超过 72 字节");
         }
         if (!rawPassword.equals(confirm)) {
             throw new BizException("两次输入的密码不一致");

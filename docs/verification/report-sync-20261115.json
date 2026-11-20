@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-15",
+  "uiScreenshots": [
+    {
+      "caption": "图 4 新版登录页与免 Key 示例入口",
+      "source": "ui-login-light.png",
+      "sha256": "16918c31f2dd6210a6e2014922f72801ff32c29b15dce63948458ca1aa44bf88"
+    },
+    {
+      "caption": "图 5 新版固定示例阅读页",
+      "source": "ui-reading-light.png",
+      "sha256": "a91a33f70278758a26860f99ff9fbebc5d5d4ff93f7d5fc6912198e4de9838ee"
+    },
+    {
+      "caption": "图 6 新版本地查词与收藏完成状态 局部",
+      "source": "lookup-detail.png",
+      "sha256": "7a31d21e0d2d9e0b98b5c92586c15ff7111df9aad30bca9629592f6908fa7396"
+    },
+    {
+      "caption": "图 7 新版答题反馈与原文定位",
+      "source": "report-answers-new.png",
+      "sha256": "10a9a0f6fd8e9ce201221d9bee239685fd7f87321bca61aa8386c344e26007a1"
+    }
+  ],
+  "tests": {
+    "discovered": 127,
+    "passed": 108,
+    "skippedMysql": 19,
+    "failed": 0,
+    "errors": 0
+  },
+  "historicTests": "2026-11-13: 121 passed, including 17 isolated MySQL cases",
+  "newDocument": "Java课程报告.docx",
+  "pages": 17,
+  "autoTOCUpdated": true,
+  "pageNumbersUpdated": true,
+  "visualReview": "All 17 page PNGs reviewed after Word COM PDF export; overflow and orphan paragraph corrected",
+  "renderNote": "Bundled render_docx.py attempted; LibreOffice absent. Used installed Microsoft Word for pagination and PDF export, then pypdfium2 for page PNGs.",
+  "oldUiImagesRemovedFromDocxPackage": true,
+  "uiScreenshotsCount": 4,
+  "reportSha256": "f055b30e18b837573238198db1d6e2129e8d1a041890744ccfee6931150568d8",
+  "cloudCalls": 0
+}

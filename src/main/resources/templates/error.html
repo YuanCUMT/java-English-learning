@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
+  <meta name="csrf-token" th:content="${csrfToken}">
+  <script th:src="@{/js/security.js}"></script>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>出错了 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/refinements.css(v=reading-5)}">
   <script th:src="@{/js/theme.js}"></script>
+  <script th:src="@{/js/ui.js(v=20261115)}" defer></script>
 </head>
-<body>
+<body class="auth-page">
 <div class="auth">
-  <div class="eyebrow">Oops</div>
+  <div class="eyebrow">Daily Reading</div>
   <h1>出了点问题</h1>
-  <div class="alert" th:text="${error} ?: '未知错误'">未知错误</div>
+  <div class="alert" th:text="${error} ?: '暂时无法完成操作，请稍后再试。'">未知错误</div>
   <a class="btn ghost" th:href="@{/}">回首页</a>
 </div>
 </body>

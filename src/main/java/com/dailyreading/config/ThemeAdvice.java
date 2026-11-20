@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 @RequiredArgsConstructor
 public class ThemeAdvice {
+    @org.springframework.beans.factory.annotation.Value("${app.demo:false}") private boolean demoMode;
+    @org.springframework.web.bind.annotation.ModelAttribute("storageLabel") public String storageLabel() { return demoMode?"内嵌 H2 体验库":"MySQL 本地库"; }
 
     private final SettingService settingService;
 

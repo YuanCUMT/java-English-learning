@@ -39,17 +39,10 @@ public class DictService {
         if (key.isEmpty()) return null;
 
         String surface = key;
-        String head = key;
-
-        String lemma = dictMapper.findLemma(key);
-        if (lemma != null && !lemma.equals(key)) {
-            head = lemma;
-        }
-
-        DictEntry entry = dictMapper.findByWord(head);
-        if (entry == null && !head.equals(key)) {
-            entry = dictMapper.findByWord(key);
-            head = entry == null ? key : key;
+        DictEntry entry = dictMapper.findByWord(key);
+        if (entry == null) {
+            String lemma = dictMapper.findLemma(key);
+            if (lemma != null && !lemma.equals(key)) entry = dictMapper.findByWord(lemma);
         }
         if (entry == null) return null;
 
@@ -100,8 +93,8 @@ public class DictService {
         }
 
         for (String k : keys) {
-            DictEntry entry = entries.get(lemma.getOrDefault(k, k));
-            if (entry == null) entry = entries.get(k);
+            DictEntry entry = entries.get(k);
+            if (entry == null) entry = entries.get(lemma.getOrDefault(k, k));
             if (entry == null) continue;
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("word", entry.getWord());

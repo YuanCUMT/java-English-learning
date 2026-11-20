@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.DeliveryIntegrationTest" time="6.147" tests="17" errors="0" skipped="0" failures="0">
+  <testcase name="realDictionaryHandlesIndependentInflections" classname="com.dailyreading.DeliveryIntegrationTest" time="0.656">
+    </testcase>
+  <testcase name="unauthenticatedApiIs401" classname="com.dailyreading.DeliveryIntegrationTest" time="0.089" />
+  <testcase name="realDatabaseRollsBackFailedReplacement" classname="com.dailyreading.DeliveryIntegrationTest" time="0.217" />
+  <testcase name="invalidDateIs400" classname="com.dailyreading.DeliveryIntegrationTest" time="0.081" />
+  <testcase name="offlineEntryWorks" classname="com.dailyreading.DeliveryIntegrationTest" time="0.133" />
+  <testcase name="wrongMediaIs415" classname="com.dailyreading.DeliveryIntegrationTest" time="0.055" />
+  <testcase name="invalidDifficultyIs400" classname="com.dailyreading.DeliveryIntegrationTest" time="0.08" />
+  <testcase name="badJsonIs400" classname="com.dailyreading.DeliveryIntegrationTest" time="0.057" />
+  <testcase name="anotherUserCannotChangeMark" classname="com.dailyreading.DeliveryIntegrationTest" time="0.111" />
+  <testcase name="csrfRejectsWrongToken" classname="com.dailyreading.DeliveryIntegrationTest" time="0.054" />
+  <testcase name="registerRotatesSessionAndRendersCsrf" classname="com.dailyreading.DeliveryIntegrationTest" time="0.29" />
+  <testcase name="exampleIsValidAndIdempotent" classname="com.dailyreading.DeliveryIntegrationTest" time="0.064" />
+  <testcase name="anotherUserCannotReadArticle" classname="com.dailyreading.DeliveryIntegrationTest" time="0.114" />
+  <testcase name="csrfRejectsUnsafeRequest" classname="com.dailyreading.DeliveryIntegrationTest" time="0.053" />
+  <testcase name="validCsrfCanImport" classname="com.dailyreading.DeliveryIntegrationTest" time="0.076" />
+  <testcase name="malformedImageIs400" classname="com.dailyreading.DeliveryIntegrationTest" time="0.085" />
+  <testcase name="schemaCanRepeatWithoutLosingData" classname="com.dailyreading.DeliveryIntegrationTest" time="0.064" />
+</testsuite>

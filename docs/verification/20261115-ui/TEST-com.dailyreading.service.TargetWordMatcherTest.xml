@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.service.TargetWordMatcherTest" time="0.023" tests="13" errors="0" skipped="0" failures="0">
+  <testcase name="phraseBoundaries" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.005" />
+  <testcase name="prefixIsNotAnInflection" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="punctuationAndCase" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.0" />
+  <testcase name="baseForm" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="eightyPercentExact" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="phraseWhitespace" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="takenAlone" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="takesAlone" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="eightyPercentRounding" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+  <testcase name="takingAlone" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.0" />
+  <testcase name="irregularWent" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.0" />
+  <testcase name="examShortList" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.0" />
+  <testcase name="batchQueries" classname="com.dailyreading.service.TargetWordMatcherTest" time="0.001" />
+</testsuite>

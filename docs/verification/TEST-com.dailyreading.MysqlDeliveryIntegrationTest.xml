@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dailyreading.MysqlDeliveryIntegrationTest" time="1.776" tests="17" errors="0" skipped="0" failures="0">
+  <testcase name="realDictionaryHandlesIndependentInflections" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.07">
+    </testcase>
+  <testcase name="unauthenticatedApiIs401" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.054" />
+  <testcase name="realDatabaseRollsBackFailedReplacement" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.095" />
+  <testcase name="invalidDateIs400" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.055" />
+  <testcase name="offlineEntryWorks" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.12" />
+  <testcase name="wrongMediaIs415" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.054" />
+  <testcase name="invalidDifficultyIs400" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.055" />
+  <testcase name="badJsonIs400" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.055" />
+  <testcase name="anotherUserCannotChangeMark" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.11" />
+  <testcase name="csrfRejectsWrongToken" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.055" />
+  <testcase name="registerRotatesSessionAndRendersCsrf" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.121" />
+  <testcase name="exampleIsValidAndIdempotent" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.071" />
+  <testcase name="anotherUserCannotReadArticle" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.12" />
+  <testcase name="csrfRejectsUnsafeRequest" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.053" />
+  <testcase name="validCsrfCanImport" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.057" />
+  <testcase name="malformedImageIs400" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.056" />
+  <testcase name="schemaCanRepeatWithoutLosingData" classname="com.dailyreading.MysqlDeliveryIntegrationTest" time="0.077" />
+</testsuite>

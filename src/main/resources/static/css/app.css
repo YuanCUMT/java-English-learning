@@ -1,11 +1,4 @@
 :root {
-  --paper: #f6f4ef;
-  --paper-white: #fffdf8;
-  --ink: #17161a;
-  --muted: #6f6a63;
-  --grid: #d8d3c9;
-  --red: #e0301e;
-  --blue: #1d4ed8;
   --serif: "Source Han Serif SC", "Noto Serif SC", Georgia, "Times New Roman", serif;
   --sans: "Source Han Sans SC", "Noto Sans SC", -apple-system, "Segoe UI", sans-serif;
 }

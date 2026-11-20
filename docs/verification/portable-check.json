@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-13",
+  "cleanExtractedCopy": true,
+  "pathContainsChineseAndSpace": true,
+  "usedBundledRuntimeWithInvalidJavaHome": true,
+  "existing8080Preserved": true,
+  "autoSelectedPort": 8081,
+  "dictionaryEntries": 21699,
+  "sampleWords": 284,
+  "coverage": {
+    "targets": [
+      "modest",
+      "procedure",
+      "reluctant",
+      "cautious",
+      "abandon",
+      "witness",
+      "vivid"
+    ],
+    "matched": [
+      "modest",
+      "procedure",
+      "reluctant",
+      "cautious",
+      "abandon",
+      "witness",
+      "vivid"
+    ],
+    "missing": [],
+    "required": 6,
+    "ratio": 1.0
+  },
+  "externalKeysUsed": false
+}

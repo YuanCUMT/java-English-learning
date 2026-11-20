@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
+  <meta name="csrf-token" th:content="${csrfToken}">
+  <script th:src="@{/js/security.js}"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>设置 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
   <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
   <link rel="stylesheet" th:href="@{/css/workspace.css}">
+  <link rel="stylesheet" th:href="@{/css/refinements.css(v=reading-5)}">
   <script th:src="@{/js/theme.js}"></script>
+  <script th:src="@{/js/ui.js(v=20261115)}" defer></script>
 </head>
 <body class="page">
 <div class="app">
@@ -26,7 +30,7 @@
         <a th:href="@{/vocab}">单词本 <span class="nav-count" th:text="${learningMarks}">0</span></a>
         <a class="active" th:href="@{/settings}">设置</a>
         <span class="nav-user" th:text="${username}">用户</span>
-        <form class="nav-logout" th:action="@{/logout}" method="post"><button type="submit">退出</button></form>
+        <form class="nav-logout" th:action="@{/logout}" method="post"><input type="hidden" name="_csrf" th:value="${csrfToken}"><button type="submit">退出</button></form>
       </nav>
     </div>
   </header>
@@ -35,14 +39,14 @@
     <section class="page-head">
       <p class="eyebrow">Settings / 设置</p>
       <h1>要不要填自己的 Key？</h1>
-      <p class="lede">生成文章和点词查词都要调 DeepSeek。我开发时把 Key 写在 <code>application-local.yml</code> 里（那个文件我没提交），你拿到项目之后，要在这页填一个自己的。</p>
+      <p class="lede">固定示例和本地查词无需 Key。生成新文章、AI 查词和连通性测试需要你自己的 DeepSeek Key，可能产生服务费用。</p>
     </section>
 
 
     <section class="panel settings-panel">
       <div class="panel-code">01 / 外观</div>
       <h2>外观</h2>
-      <p class="settings-note">晚上读得多的话，深色更省眼。这个选择存在你的账号里，换台电脑打开还是它。</p>
+      <p class="settings-note">选择适合当前光线的外观，设置保存在本地账号中；迁移账号数据库后可以保留。</p>
       <div class="theme-picker" role="radiogroup" aria-label="外观">
         <button type="button" class="theme-btn" data-theme-opt="light" role="radio" aria-checked="false">
           <span class="theme-dot dot-light" aria-hidden="true"></span>浅色
@@ -62,7 +66,7 @@
       <h2>DeepSeek API Key</h2>
 
       <p class="settings-note">
-        还没有 Key？我当初是在 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">platform.deepseek.com</a>
+        需要使用真实 AI 功能时，可在 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">platform.deepseek.com</a>
         注册、「创建 API Key」，然后把 <code>sk-</code> 开头那一串复制过来。
       </p>
 
@@ -85,8 +89,8 @@
       <h2>几点说明</h2>
       <ul class="settings-list">
         <li>保存后立刻生效，不用重启、也不用重新打包 —— Key 存在 <code>user_settings</code> 表里，按账号隔离。</li>
-        <li>抓图识别走的是百度 OCR 或本地 Tesseract，<b>不吃</b> DeepSeek 的额度。</li>
-        <li>一篇 400 词的文章大约几千 token，几毛钱以内。</li>
+        <li>离线 Tesseract 无需云账号；启用百度 OCR 会发送图片，并按服务商规则计费。</li>
+        <li>生成、AI 查词与测试 Key 都会发送真实模型请求；费用以服务商账单为准。</li>
         <li>查词我先查内置词典（2 万多词，免费），查不到才调模型 —— 而且要你点了才调。</li>
       </ul>
     </section>
@@ -95,7 +99,7 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span class="footer-mark">每日阅读</span>
-      <span class="footer-note">数据都在本机 MySQL，不上传任何服务器。</span>
+      <span class="footer-note">业务记录主要本地保存；云 OCR 发送图片，模型请求发送必要词表与提示词。</span>
     </div>
   </footer>
 </div>

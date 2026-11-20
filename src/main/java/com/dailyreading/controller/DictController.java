@@ -27,6 +27,7 @@ public class DictController {
     public Map<String, Object> lookup(@RequestParam String word,
                                       @RequestParam(required = false, defaultValue = "0") String ai,
                                       HttpServletRequest request) {
+        if(word==null || word.isBlank() || word.length()>80) throw new IllegalArgumentException("查询内容须为 1–80 字符");
         Map<String, Object> body = new LinkedHashMap<>();
 
         if (!"1".equals(ai)) {

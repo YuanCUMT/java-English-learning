@@ -55,7 +55,7 @@ public final class ArticleValidator {
                 if (opts.isArray()) {
                     for (int j = 0; j < opts.size(); j++) {
                         String text = opts.get(j).asText("").trim();
-                        if (!text.toUpperCase().startsWith(String.valueOf((char) ('A' + j)))) {
+                        if (!text.matches("(?is)^" + (char)('A'+j) + "[.、)）]\\s*\\S.*")) {
                             problems.add("第 " + (i + 1) + " 题第 " + (j + 1) + " 个选项没有 A./B./C./D. 前缀：" + text);
                         }
                     }
@@ -66,12 +66,42 @@ public final class ArticleValidator {
                 }
             }
         }
+        if (paragraphs.isArray()) {
+            for (JsonNode p : paragraphs) if (p.path("cn").asText("").isBlank()) problems.add("段落译文为空");
+        }
+        StringBuilder source = new StringBuilder();
+        if (paragraphs.isArray()) paragraphs.forEach(p -> source.append(' ').append(p.path("en").asText("")));
+        String original = " " + comparable(source.toString()) + " ";
+        if (questions.isArray()) for (JsonNode q : questions) {
+            if (q.path("explain").asText("").isBlank()) problems.add("题目解析为空");
+            String locate = comparable(q.path("locate").asText(""));
+            if (locate.isBlank() || !original.contains(" "+locate+" ")) problems.add("题目定位不在正文");
+        }
+        JsonNode cards = json.path("words");
+        if (!cards.isArray() || cards.isEmpty()) problems.add("缺少词汇卡");
+        else for (JsonNode card : cards) {
+            for (String field : List.of("word", "cn", "pos", "example"))
+                if (card.path(field).asText("").isBlank()) problems.add("词汇卡缺少 " + field);
+        }
+        JsonNode sentences = json.path("sentences");
+        if (!sentences.isArray() || sentences.size()!=2) problems.add("需要两条长难句分析");
+        else for (JsonNode sentence : sentences) {
+            String quote = comparable(sentence.path("sent").asText(""));
+            if (quote.isBlank() || !original.contains(" "+quote+" ")) problems.add("长难句不在正文");
+            if (sentence.path("structure").asText("").isBlank() || sentence.path("meaning").asText("").isBlank())
+                problems.add("长难句分析不完整");
+        }
         return problems;
+    }
+
+    private static String comparable(String text) {
+        String value = text.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]+", " ").trim();
+        return value;
     }
 
     /**
      * 从正文里实际找目标词，而不是信模型自己在 words 数组里报的那份。
-     * 单词按词形前缀匹配（take / takes / taking 都算），短语按整串匹配。
+     * 纯边界匹配；业务用 TargetWordMatcher 批量查询词形表。短语按整串匹配。
      * 这样 article_words 记的就是"正文里真出现了什么"，老师问起来才有得答。
      */
     public static List<String> matchWords(JsonNode json, List<String> targets) {
@@ -93,7 +123,7 @@ public final class ArticleValidator {
             } else {
                 hit = false;
                 for (String tok : tokens) {
-                    if (tok.equals(key) || (tok.startsWith(key) && tok.length() <= key.length() + 3)) {
+                    if (tok.equals(key)) {
                         hit = true;
                         break;
                     }

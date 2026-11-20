@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-15",
+  "fix": "Expose the validated session CSRF token when POST renders login/register forms after input errors. CSRF checks remain enabled.",
+  "buildJdk": "21.0.12.1",
+  "tests": {
+    "discovered": 125,
+    "passed": 106,
+    "failed": 0,
+    "errors": 0,
+    "skippedMySql": 19
+  },
+  "mysqlNote": "No isolated MySQL instance supplied for this rerun; historical Nov13 MySQL results are not a rerun.",
+  "liveHttp": {
+    "loginRetryHttpStatuses": [
+      200,
+      200
+    ],
+    "wrongTokenHttpStatus": 403,
+    "health": {
+      "ready": true,
+      "app": "daily-reading",
+      "status": "up",
+      "mode": "demo"
+    }
+  },
+  "jarSha256": "ce114620e17c10323668819eed92669b523ca22882c402a5246ec79d65a78741",
+  "cloudCalls": 0
+}

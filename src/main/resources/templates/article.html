@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
+  <meta name="csrf-token" th:content="${csrfToken}">
+  <script th:src="@{/js/security.js}"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>阅读 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
   <link rel="stylesheet" th:href="@{/css/bauhaus.css}">
   <link rel="stylesheet" th:href="@{/css/workspace.css}">
+  <link rel="stylesheet" th:href="@{/css/refinements.css(v=reading-5)}">
   <script th:src="@{/js/theme.js}"></script>
+  <script th:src="@{/js/ui.js(v=20261115)}" defer></script>
 </head>
 <body th:attr="data-article-id=${articleId}">
 
@@ -22,7 +26,7 @@
       <a class="active" th:href="@{/archive}">历史文章</a>
       <a th:href="@{/vocab}">单词本</a>
       <span th:text="${username}">用户</span>
-      <form class="nav-logout" th:action="@{/logout}" method="post"><button type="submit">退出</button></form>
+      <form class="nav-logout" th:action="@{/logout}" method="post"><input type="hidden" name="_csrf" th:value="${csrfToken}"><button type="submit">退出</button></form>
     </nav>
   </div>
 </header>
@@ -49,7 +53,7 @@
   </section>
 </main>
 
-<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <script th:src="@{/js/article.js}"></script>
 </body>
 </html>

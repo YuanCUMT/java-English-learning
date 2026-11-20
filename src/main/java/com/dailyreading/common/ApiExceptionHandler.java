@@ -10,32 +10,45 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * 统一异常出口：业务异常一律 HTTP 200 + {code,message}，
- * 只有没登录（拦截器返回 401）才走 HTTP 状态码。
- * 这样前端只需要看 code，不用每个接口各写一套判断。
+ * 统一异常出口。ApiStatusAdvice 同步业务码与 HTTP 错误状态。
  */
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse badRequest(IllegalArgumentException e) {
         return ApiResponse.fail(400, e.getMessage() == null ? "参数不对" : e.getMessage());
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse illegalState(IllegalStateException e) {
-        log.warn("业务异常: {}", e.getMessage());
+        log.warn("业务操作失败：{}",e.getClass().getSimpleName());
         return ApiResponse.fail(500, e.getMessage() == null ? "操作失败" : e.getMessage());
     }
 
+    @ExceptionHandler({org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.web.bind.MissingServletRequestParameterException.class,
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+            java.time.format.DateTimeParseException.class})
+    public ApiResponse invalidInput(Exception e) { return ApiResponse.fail(400,"参数或 JSON 格式不正确，请检查日期与输入内容"); }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ApiResponse tooLarge(Exception e) { return ApiResponse.fail(413,"上传文件过大，单张图片不得超过 10 MB"); }
+
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ApiResponse status(org.springframework.web.server.ResponseStatusException e) { return ApiResponse.fail(e.getStatusCode().value(),e.getReason()); }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ApiResponse method(Exception e) { return ApiResponse.fail(405,"请求方法不支持"); }
+
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse unexpected(Exception e) {
         log.error("未预期的异常", e);
-        return ApiResponse.fail(500, "服务器出了点问题：" + e.getClass().getSimpleName());
+        return ApiResponse.fail(500, "服务器暂时无法完成操作，请稍后重试");
     }
 
     /**

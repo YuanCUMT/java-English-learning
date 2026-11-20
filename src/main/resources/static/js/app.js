@@ -14,7 +14,7 @@
     toastEl.className = 'toast' + (isError ? ' error' : '');
     toastEl.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toastEl.hidden = true; }, 2600);
+    toastTimer = setTimeout(() => { toastEl.hidden = true; }, isError ? 7000 : 3500);
   }
 
   async function api(url, options) {
@@ -26,8 +26,7 @@
     }
     const res = await fetch(url, opts);
     if (res.status === 401) {
-      window.location.href = '/login';
-      throw new Error('未登录');
+      throw new Error('登录状态已失效，请重新登录后继续');
     }
     let body = null;
     try { body = await res.json(); } catch (e) { /* 非 JSON */ }

@@ -49,12 +49,13 @@ public class MarkService {
             throw new IllegalArgumentException("status 只能是 learning 或 mastered");
         }
         if (markMapper.updateStatus(id, userId, status) == 0) {
-            throw new IllegalArgumentException("生词不存在");
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND,"生词不存在");
         }
         return markMapper.findById(id, userId);
     }
 
     public void remove(Long userId, Long id) {
+        if(markMapper.findById(id,userId)==null) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND,"生词不存在");
         markMapper.delete(id, userId);
     }
 

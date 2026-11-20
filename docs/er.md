@@ -1,146 +1,31 @@
-# 数据库设计（ER 图）
+# 数据库设计
 
-10 张表，全部 `utf8mb4` / InnoDB。建表语句见 [`../sql/init.sql`](../sql/init.sql)。
-
-## 关系图
-
-> GitHub 会直接渲染下面的 Mermaid；本地用 VS Code（装 Markdown Preview Mermaid 插件）或 Typora 也能看。
+生产存储 MySQL 8.0，10 张表；体验模式 H2 文件库（MySQL 兼容模式），相同的业务 Mapper，单独的 schema-demo.sql 不含 MySQL FULLTEXT 索引。两种存储均经过实际集成测试，不能据此推断全部数据库行为完全相同。
 
 ```mermaid
 erDiagram
-    users ||--o{ words          : "每天的作业词"
-    users ||--o{ marks          : "生词本"
-    users ||--o{ articles       : "生成的文章"
-    users ||--o{ lookup_cache   : "查词缓存"
-    articles ||--o{ article_words : "本篇用了哪些词"
-  users ||--o{ user_settings  : "用户自己的设置（Key）"
-    dict_forms }o--|| dict_entries : "form → lemma"
-
-    users {
-        bigint   id            PK "自增主键"
-        varchar  username      UK "登录名 3–20 位"
-        varchar  password_hash    "BCrypt 哈希"
-        datetime created_at       "注册时间"
-    }
-
-    words {
-        bigint   id         PK
-        bigint   user_id    FK "→ users.id"
-        varchar  word          "规范形（小写）"
-        varchar  surface       "原文形态，如 Ledger / takes"
-        date     batch_date    "属于哪一天的作业"
-        datetime created_at
-    }
-
-    marks {
-        bigint   id          PK
-        bigint   user_id     FK "→ users.id"
-        varchar  word           "单词或短语（小写）"
-        varchar  lemma          "词典原形，可空"
-        varchar  phonetic       "音标"
-        varchar  pos            "词性，短语为 phr."
-        varchar  cn             "中文释义"
-        varchar  exam_sense     "考研常考义项"
-        varchar  collocation    "常用搭配"
-        varchar  example        "例句"
-        varchar  note           "这句里的具体含义"
-        enum     status         "learning / mastered"
-        varchar  source         "ecdict / model"
-        datetime added_at
-    }
-
-    articles {
-        bigint   id           PK
-        bigint   user_id      FK "→ users.id"
-        date     article_date    "属于哪一天"
-        varchar  mode            "review / exam"
-        varchar  title
-        varchar  subtitle        "中文副标题"
-        varchar  gist            "一句话主旨"
-        varchar  difficulty      "C1 等"
-        int      word_count      "正文词数"
-        longtext content         "完整 JSON：段落/译文/词汇卡/长难句/题目"
-        datetime created_at
-    }
-
-    article_words {
-        bigint  id         PK
-        bigint  article_id FK "→ articles.id"
-        varchar word
-        tinyint is_target     "1=目标词"
-    }
-
-    dict_entries {
-        varchar  word        PK "词条原形"
-        varchar  phonetic
-        varchar  pos            "从译文前缀抽出的词性"
-        varchar  translation    "中文释义"
-        varchar  tag            "zk gk ky cet4 cet6 toefl ielts gre"
-        int      collins        "柯林斯星级 1–5"
-        tinyint  oxford         "是否牛津 3000"
-        int      frq            "词频，越小越常用"
-    }
-
-    dict_forms {
-        varchar form  PK "变形，如 takes"
-        varchar lemma    "→ dict_entries.word"
-    }
-
-    lookup_cache {
-        bigint   id         PK
-        bigint   user_id    FK "→ users.id"
-        varchar  word
-        varchar  source        "ecdict / model"
-        longtext payload       "JSON"
-        datetime created_at
-    }
-
-    ocr_cache {
-        char    image_sha1 PK "图片内容的 sha1"
-        longtext payload      "JSON：识别到的词 + 产生它的引擎"
-        datetime created_at
-    }
-  user_settings {
-    BIGINT user_id PK
-    VARCHAR skey PK
-    TEXT svalue
-    DATETIME updated_at
-  }
+ users ||--o{ words : imports
+ users ||--o{ articles : owns
+ articles ||--o{ article_words : contains
+ users ||--o{ marks : collects
+ users ||--o{ lookup_cache : caches
+ users ||--o{ user_settings : configures
+ dict_entries ||..o{ dict_forms : lemma
 ```
 
-## 表清单
+| 表 | 关键键与用途 |
+|---|---|
+| users | id；username 唯一；BCrypt password_hash |
+| words | user_id/date/word 唯一；按用户日期索引 |
+| marks | user_id/word 唯一；learning/mastered；用户外键 |
+| articles | user_id/article_date/mode 唯一；content 保存完整文章 JSON |
+| article_words | article_id 外键级联删除；只记录真实命中目标词 |
+| dict_entries | word 主键；公共词典，不含个人数据 |
+| dict_forms | form 主键、lemma 索引；来源数据可能存在双向映射，精确词条优先 |
+| lookup_cache | user_id/word 唯一，模型查词 JSON |
+| ocr_cache | image_sha1 主键；公共图片识别结果，模拟结果不缓存 |
+| user_settings | user_id/skey 主键；模型 Key 使用 AES-GCM |
 
-| # | 表 | 作用 | 关键约束 |
-|---|---|---|---|
-| 1 | `users` | 用户 | `uk_users_username` 唯一 |
-| 2 | `words` | 每天导入的作业词 | `uk_words_user_date_word (user_id, batch_date, word)` 同一天同一个词只留一条 |
-| 3 | `marks` | 生词本（阅读时收藏） | `uk_marks_user_word (user_id, word)` 收藏过的词再收藏是更新，不是新增 |
-| 4 | `articles` | 生成的文章 | `uk_articles_user_date_mode (user_id, article_date, mode)` 一天一个模式只能有一篇 |
-| 5 | `article_words` | 文章用了哪些词 | 外键级联删除 |
-| 6 | `dict_entries` | 本地词典词条（21,339 条） | 主键就是 `word`；`translation` 建了全文索引 |
-| 7 | `dict_forms` | 词形 → 原形（27,278 条） | 主键 `form`，查 `takes` 时先查这张表 |
-| 8 | `lookup_cache` | 模型查过的词 | `uk_lookup_user_word`，避免同一个词重复花钱 |
-| 9 | `ocr_cache` | 同一张图不重复识别 | 主键是图片内容的 sha1；**mock 的结果不写入**，避免以后配了真引擎还拿到假词 |
-| 10 | `user_settings` | 用户自己填的 Key 等设置 | `uk_setting_user_key (user_id, skey)`，一个用户一个键一行 |
+init.sql 与 dict-data.sql 可重复执行，不删除现有数据，不是旧库结构迁移脚本。H2 启动也只用 CREATE TABLE IF NOT EXISTS。文章替换事务包含删除同用户同日期同模式旧文、插入新文、插入命中词；外部 HTTP 在事务外。插入命中词失败时旧文恢复，此行为已在两种真实数据库连接上验证。
 
-## 几个设计取舍
-
-**为什么 `articles.content` 存一整份 JSON，不拆成段落表、题目表？**
-
-因为它的读写方式是「一次生成、整体展示」——没有任何场景需要单独查「第 3 段」。拆开要多 4 张表、多一堆 join，却换不来查询能力。真要统计题目正确率，再加一张独立的答题记录表更合适。
-
-**为什么 `marks` 有 `word` 和 `lemma` 两列？**
-
-`word` 是用户实际收藏的形态（可能是短语 `in terms of`），`lemma` 是词典原形。查词时用 `lemma` 命中词典，展示时用 `word` 保留原样。
-
-**为什么 `dict_forms` 单独一张表？**
-
-一个原形有多个变形（`take / takes / took / taken / taking`），塞进 `dict_entries` 的某一列会变成逗号分隔字符串，没法建索引。单独一张表，主键就是 `form`，查一个词最多两次点查：先 `dict_forms` 拿 `lemma`，再 `dict_entries` 拿释义。
-
-**为什么 `ocr_cache` 的主键是 sha1？**
-
-同一张截图经常被重复上传（手滑点两次、换浏览器再传一次）。用图片内容的 sha1 做键，命中就直接返回上次的识别结果 —— 离线引擎省几秒，将来换回百度云则是省钱。
-
-**为什么 `words` 要存 `surface`？**
-
-识别出来是 `Ledger`、`takes`，规范形要转成 `ledger`、`take` 才好查词典和查重。但界面上还是应该显示用户原本看到的形态，所以两个都留着。
+备份个人数据必须同时备份数据库与 data/secret.key（体验模式为 data/demo/secret.key）。已有密钥文件损坏时启动报错而不覆盖。提交包不含作者数据与密钥。

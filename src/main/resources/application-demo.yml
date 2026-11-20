@@ -1,0 +1,29 @@
+# 独立体验模式，不读取个人配置，不连接 MySQL。
+server:
+  address: 127.0.0.1
+spring:
+  config:
+    import: ""
+  datasource:
+    url: jdbc:h2:file:./data/demo/reading;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-demo.sql
+app:
+  demo: true
+  crypto:
+    key-file: data/demo/secret.key
+  deepseek:
+    api-key: ""
+  ocr:
+    provider: tesseract
+    baidu:
+      api-key: ""
+      secret-key: ""
+logging:
+  level:
+    com.dailyreading: info

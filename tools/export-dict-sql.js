@@ -56,16 +56,13 @@ const lines = [];
 lines.push('-- 由 tools/export-dict-sql.js 自动生成，不要手改');
 lines.push(`-- 词条 ${Object.keys(words).length}，变形 ${Object.keys(forms).length}`);
 lines.push('SET NAMES utf8mb4;');
-lines.push('SET FOREIGN_KEY_CHECKS = 0;');
 lines.push('USE daily_reading;');
-lines.push('TRUNCATE TABLE dict_entries;');
-lines.push('TRUNCATE TABLE dict_forms;');
 lines.push('');
 
 function emit(table, cols, rows, batch = 500) {
   for (let i = 0; i < rows.length; i += batch) {
     const chunk = rows.slice(i, i + batch);
-    lines.push(`INSERT INTO ${table} (${cols.join(',')}) VALUES`);
+    lines.push(`INSERT IGNORE INTO ${table} (${cols.join(',')}) VALUES`);
     lines.push(chunk.map((r) => `(${r.join(',')})`).join(',\n') + ';');
   }
 }
@@ -100,7 +97,6 @@ const formRows = Object.entries(forms)
 emit('dict_forms', ['form', 'lemma'], formRows);
 lines.push('');
 
-lines.push('SET FOREIGN_KEY_CHECKS = 1;');
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, lines.join('\n'), 'utf8');

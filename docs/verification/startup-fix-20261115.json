@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-15",
+  "changes": [
+    "CMD always pauses on success and failure",
+    "explicit Edge or Chrome new window with manual URL fallback",
+    "port detection uses .NET instead of CIM"
+  ],
+  "validation": {
+    "launcherExitCode": 0,
+    "healthReady": true,
+    "loginHttpStatus": 200,
+    "dotNetListenerQuery": true,
+    "url": "http://127.0.0.1:8080"
+  },
+  "scope": "launcher only; existing database and application JAR unchanged"
+}

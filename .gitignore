@@ -1,47 +1,19 @@
-# 构建产物
-target/
-*.class
-
-# 本地工具（体积大，不进仓库）
-tools/apache-maven-*/
-
-# 生成的 SQL（由 tools/export-dict-sql.js 从 dict/ecdict.json.gz 生成）
-sql/dict-data.sql
-
-# 运行时
-*.log
-run.log
-run.err.log
-
-# IDE
-.idea/
-*.iml
-.vscode/
-.settings/
-.project
-.classpath
-
-# 系统
-Thumbs.db
-.DS_Store
-
-# 本地配置（含数据库密码、OCR AK/SK，绝不入库）
+# 私有配置：含真实 Key，绝不入库、绝不进 jar
 src/main/resources/application-local.yml
+/application-local.yml
 
-# maven 输出重定向的临时文件
-build-*.txt
-run.log
-run.err.log
-
-# 临时截图/调试脚本
-tools/tmp-*
-
-# 运行时密钥（SecretBox 自动生成，绝不能进仓库）
+# 运行时密钥与数据
 data/
 secret.key
 
-# 渲染/转换过程中的临时目录
-.dsh-office-*/
+# 构建产物
+target/
+/app/
+/runtime/
+/tools/apache-maven-*/
 
-# 课程报告与答辩 PPT 含学号/姓名/教师等个人信息，不进仓库
-docs/report/
+# 运行日志
+*.log
+run.log
+run.err.log
+启动日志.txt

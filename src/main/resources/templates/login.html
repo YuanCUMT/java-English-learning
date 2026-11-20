@@ -1,34 +1,50 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" th:attr="data-theme=${theme}">
 <head>
+  <meta name="csrf-token" th:content="${csrfToken}">
+  <script th:src="@{/js/security.js}"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>登录 · 每日阅读</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
+  <link rel="stylesheet" th:href="@{/css/refinements.css(v=reading-5)}">
   <script th:src="@{/js/theme.js}"></script>
+  <script th:src="@{/js/ui.js(v=20261115)}" defer></script>
 </head>
-<body>
+<body class="auth-page">
+<main class="auth-layout">
+<aside class="auth-intro" aria-label="每日阅读">
+  <div class="auth-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M3 7c5-2 9-1 13 2 4-3 8-4 13-2v20c-5-2-9-1-13 2-4-3-8-4-13-2zM16 9v20M7 12l5 1M7 17l5 1M20 13l5-1M20 18l5-1"/></svg></div>
+  <div class="eyebrow">每日阅读</div>
+  <h2>让背过的单词，<br>在阅读里留下来。</h2>
+  <p>导入词表，在文章里理解词义。配合译文、长难句和理解题，完成一次有积累的精读。</p>
+</aside>
 <div class="auth">
-  <div class="eyebrow">Daily Reading</div>
-  <h1>登录</h1>
-  <p class="sub">把今天背的单词，读成一篇真题。</p>
+  <h1>欢迎回来</h1>
+  <p class="sub">登录后，继续你的阅读与词汇积累。</p>
 
-  <div class="alert" th:if="${error}" th:text="${error}"></div>
+  <div role="alert" class="alert" th:if="${error}" th:text="${error}"></div>
 
-  <form method="post" th:action="@{/login}">
+  <form method="post" th:action="@{/login}"><input type="hidden" name="_csrf" th:value="${csrfToken}">
     <div class="field">
       <label for="username">用户名</label>
       <input id="username" name="username" type="text" th:value="${username}"
-             autocomplete="username" autofocus required>
+             autocomplete="username" maxlength="20" placeholder="输入用户名" autofocus required>
     </div>
     <div class="field">
       <label for="password">密码</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="输入密码" required>
     </div>
     <button class="btn" type="submit">登录</button>
   </form>
 
+  <div th:if="${demoMode}" class="auth-demo">
+    <p>先看看阅读效果？无需配置 Key，直接体验固定示例。</p>
+    <form method="post" th:action="@{/demo/start}"><input type="hidden" name="_csrf" th:value="${csrfToken}"><button class="btn" type="submit">直接体验示例阅读</button></form>
+    <p class="demo-note">示例不是实时 AI 生成。体验入口每次创建临时账号，长期使用请注册。</p>
+  </div>
   <p class="foot">还没有账号？<a th:href="@{/register}">注册一个</a></p>
 </div>
+</main>
 </body>
 </html>

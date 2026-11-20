@@ -78,10 +78,12 @@ public class WordController {
     public ApiResponse importByText(@RequestBody Map<String, String> body,
                                     @RequestAttribute("userId") Long userId) {
         String text = body.get("text");
+        if (text == null || text.length()>20000) throw new IllegalArgumentException("请输入不超过 20000 字符的词表");
         String dateStr = body.get("date");
         LocalDate d = dateStr == null || dateStr.isBlank() ? LocalDate.now() : LocalDate.parse(dateStr);
 
         List<String> words = WordService.extract(text);
+        if (words.size()>300 || words.stream().anyMatch(w -> w.length()>64)) throw new IllegalArgumentException("一次最多导入 300 个词，每词最多 64 字符");
         if (words.isEmpty()) {
             return ApiResponse.fail(400, "没从这段文字里找到英文单词");
         }
@@ -92,13 +94,14 @@ public class WordController {
     @PostMapping("/ocr")
     public ApiResponse importByImage(@RequestParam("file") MultipartFile file,
                                      @RequestParam(required = false) String date,
-                                     @RequestParam(required = false, defaultValue = "true") boolean save,
+                                     @RequestParam(required = false, defaultValue = "false") boolean save,
                                      @RequestAttribute("userId") Long userId) throws IOException {
         if (file == null || file.isEmpty()) {
             return ApiResponse.fail(400, "没有收到图片");
         }
         LocalDate d = date == null || date.isBlank() ? LocalDate.now() : LocalDate.parse(date);
         byte[] bytes = file.getBytes();
+        com.dailyreading.service.ImageInput.validate(bytes);
         // 同一张图（内容 sha1 相同）只识别一次；命中缓存就不碰外部服务
         String sha1 = OcrCacheService.sha1(bytes);
         // 显式配成 mock 时不读缓存：缓存里可能是以前真引擎认出来的词，读出来就分不清真假了

@@ -18,7 +18,7 @@ import java.util.Base64;
  *
  * 严格说这台机器上「加密」挡不住能读文件的人（密钥也在这台机器上），
  * 但它至少让 mysqldump / 截图 / 误提交导出的数据里不出现明文 Key。
- * 密钥放 data/secret.key（第一次运行自动生成，权限 600 不够就置空权限）。
+ * 密钥放 data/secret.key（第一次运行自动生成，POSIX 600；Windows 使用当前用户 ACL）。
  */
 @Service
 public class SecretBox {
@@ -34,21 +34,40 @@ public class SecretBox {
         this.key = new SecretKeySpec(loadOrCreate(Path.of(keyFile)), "AES");
     }
 
-    private static byte[] loadOrCreate(Path path) {
+    private static byte[] readKey(Path path) throws IOException {
         try {
-            if (Files.exists(path)) {
-                byte[] raw = Base64.getDecoder().decode(Files.readString(path, StandardCharsets.UTF_8).trim());
-                if (raw.length == 32) return raw;
-            }
-            byte[] fresh = new byte[32];
-            new SecureRandom().nextBytes(fresh);
-            Path parent = path.toAbsolutePath().getParent();
-            if (parent != null) Files.createDirectories(parent);
-            Files.writeString(path, Base64.getEncoder().encodeToString(fresh), StandardCharsets.UTF_8);
-            return fresh;
-        } catch (IOException e) {
-            throw new IllegalStateException("读写密钥文件失败：" + path, e);
+            byte[] raw=Base64.getDecoder().decode(Files.readString(path,StandardCharsets.UTF_8).trim());
+            if(raw.length!=32) throw new IllegalArgumentException();
+            return raw;
+        } catch(IllegalArgumentException e) {
+            throw new IllegalStateException("密钥文件已损坏，请从配套备份恢复，原文件未修改："+path);
         }
+    }
+
+    private static byte[] loadOrCreate(Path path) {
+        path=path.toAbsolutePath();
+        try {
+            if(Files.exists(path)) return readKey(path);
+            Files.createDirectories(path.getParent());
+            byte[] fresh=new byte[32]; new SecureRandom().nextBytes(fresh);
+            Path temp=Files.createTempFile(path.getParent(),"key-",".tmp");
+            try {
+                try { Files.setPosixFilePermissions(temp,java.nio.file.attribute.PosixFilePermissions.fromString("rw-------")); }
+                catch(UnsupportedOperationException e) {
+                    var view=Files.getFileAttributeView(temp,java.nio.file.attribute.AclFileAttributeView.class);
+                    if(view!=null) {
+                        var entry=java.nio.file.attribute.AclEntry.newBuilder().setType(java.nio.file.attribute.AclEntryType.ALLOW)
+                            .setPrincipal(Files.getOwner(temp)).setPermissions(java.util.EnumSet.allOf(java.nio.file.attribute.AclEntryPermission.class)).build();
+                        view.setAcl(java.util.List.of(entry));
+                    }
+                }
+                Files.writeString(temp,Base64.getEncoder().encodeToString(fresh),StandardCharsets.UTF_8);
+                // Hard-link installation publishes complete bytes without replacing an existing key.
+                try { Files.createLink(path,temp); }
+                catch(java.nio.file.FileAlreadyExistsException race) { return readKey(path); }
+                return fresh;
+            } finally { Files.deleteIfExists(temp); }
+        } catch(IOException e) { throw new IllegalStateException("无法安全创建或读取密钥文件："+path,e); }
     }
 
     /** 已经是密文就原样返回，方便重复调用 */
